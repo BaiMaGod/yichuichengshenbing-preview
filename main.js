@@ -38,7 +38,7 @@ function initChoose(){
  const order=$('order'),prev=order.value;
  order.innerHTML='<option value="">自由锻造 · 无委托奖金</option>'+availableOrders(game.state).map(o=>'<option value="'+o.id+'">'+o.id+' '+o.title+' · '+o.detail+'</option>').join('');
  if(prev&&order.querySelector('option[value="'+prev+'"]'))order.value=prev;
- else if(game.state.totalMade===0)order.value='C01';
+ else order.value=availableOrders(game.state)[0]?.id||'';
 }
 function enterTrial(){trialStart=performance.now();trialSkipped=false;$('trial-result').classList.remove('unveiled')}
 function render(){
@@ -56,8 +56,8 @@ function render(){
  $('foot-hint').textContent=s?'当前 '+(s.apprentice?'学徒代工':'正式锻造')+' · 已锤 '+s.hits+'/6':'先接委托，再锻出你的神兵';
  if(!s){initChoose();const apprentice=game.needsApprentice();$('apprentice').hidden=!apprentice;
   const m=MATERIALS[$('material').value]||MATERIALS.iron;
-  $('cost-label').textContent='胚料 '+m.blank+' + 燃料 '+m.fuel+' · 绑定残料可抵胚料';
-  $('begin').toggleAttribute('disabled',apprentice);
+  $('cost-label').textContent=state.formalCount===0?'首次教学免费 · 胚料与燃料由工坊提供':'胚料 '+m.blank+' + 燃料 '+m.fuel+' · 绑定残料可抵胚料';
+  $('begin').toggleAttribute('disabled',state.formalCount>0&&apprentice);
   updateSword(0, 'iron');return;
  }
  updateSword(s.level,s.material);
@@ -138,7 +138,7 @@ function hit(){
  const t=classifyTiming(performance.now()-ringStart,game.state.hammerLevel);
  const id=s.id+':hit:'+s.hits;
  action(()=>{
-   const result=game.strike(selection,t,id);
+   const result=game.strikeAt(selection,performance.now()-ringStart,id);
    if(result.result==='success'){lastResult='✦ 锻造成功 Lv'+result.after;sfx(540+result.after*36,0.22);spark(22)}
    else if(result.result==='damage'){lastResult=result.protected?'🛡️ 护符挡住断剑 · Lv'+result.after:'⚡ 锻造受损 Lv'+result.after;sfx(215,0.28);spark(10)}
    else{lastResult='💥 宝剑断裂';sfx(145,0.4);spark(36)}
@@ -172,8 +172,24 @@ for(const [button,kind] of [['sell','SOLD'],['deliver','DELIVERED'],['collect','
 $('broken-next').addEventListener('click',()=>action(()=>{game.closeBroken();lastResult=''}));
 $('nav-upgrades').addEventListener('click',()=>action(()=>{game.upgrade('hammer');toast('锻锤升到 Lv2，完美时机窗扩大')}));
 $('nav-furnace').addEventListener('click',()=>action(()=>{game.upgrade('furnace');toast('熔炉升级，解锁新材料')}));
-$('nav-collection').addEventListener('click',()=>{const l=game.state.swords.slice(-6).map(s=>'Lv'+s.level+' '+MATERIALS[s.material].name+' · '+s.value+'金 · '+s.disposal).join('\n');alert('神兵剑谱 · 最近六把\n'+(l||'尚无成剑记录'))});
+$('nav-collection').addEventListener('click',()=>{
+ const held=game.state.swords.filter(s=>s.disposal==='COLLECTED');
+ const l=game.state.swords.slice(-8).map(s=>'Lv'+s.level+' '+MATERIALS[s.material].name+' · '+s.value+'金 · '+s.disposal).join('\n');
+ if(held.length){
+  const list=held.map((s,i)=>(i+1)+'. Lv'+s.level+' '+MATERIALS[s.material].name+'（售价 '+Math.floor(s.value*.7)+' 金）').join('\n');
+  const pick=prompt('剑谱：最近八把\n'+(l||'暂无记录')+'\n\n展柜中的剑（输入序号出售，取消则关闭）：\n'+list);
+  if(pick!==null&&pick.trim()!==''){
+   const index=Number(pick)-1;
+   if(!Number.isInteger(index)||index<0||index>=held.length){toast('请输入正确的展柜序号');return}
+   action(()=>{const coins=game.sellCollected(held[index].id);toast('收藏神兵售出 +'+coins+' 金')});
+  }
+ }else alert('神兵剑谱 · 最近八把\n'+(l||'尚无成剑记录'));
+});
 $('sound').addEventListener('click',()=>{game.state.sound=!game.state.sound;localStorage.setItem(KEY,JSON.stringify(game.state));render()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){heating=false;audio?.suspend()}else{audio?.resume();ringStart=performance.now()}});
+for(const id of ['material','blade','order'])$(id).addEventListener('change',()=>{
+ if(!game.state.session){const mat=MATERIALS[$('material').value]||MATERIALS.iron;
+ $('cost-label').textContent=game.state.formalCount===0?'首次教学免费 · 胚料与燃料由工坊提供':'胚料 '+mat.blank+' + 燃料 '+mat.fuel+' · 绑定残料可抵胚料';}
+});
 const s=game.state.session;if(s?.phase==='finished')enterTrial();
 render();requestAnimationFrame(ringLoop);

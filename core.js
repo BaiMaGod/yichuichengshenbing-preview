@@ -132,20 +132,26 @@ export class Game {
  start(material='iron',blade='straight',orderId='C01',apprentice=false) {
  if(this.state.session)throw new Error('请先完成当前这把剑');
  if(apprentice&&!this.needsApprentice())throw new Error('材料尚够，不能申请免费代工');
- if(!apprentice && (MATERIALS[material].unlock>this.state.furnaceLevel||!this.canAfford(material)))throw new Error('材料尚未解锁或金币不足');
+ if(apprentice){material='iron';blade='straight'}
+ if(!apprentice && (MATERIALS[material].unlock>this.state.furnaceLevel||!(this.state.formalCount===0||this.canAfford(material))))throw new Error('材料尚未解锁或金币不足');
  if(orderId&&!ORDERS.some(o=>o.id===orderId))throw new Error('无效订单');
  const mat=MATERIALS[material];let paid=0;
  if(!apprentice){
-   const offset=Math.min(this.state.scraps,mat.blank);
-   this.state.scraps-=offset;paid=mat.blank-offset+mat.fuel;this.state.coins-=paid;this.state.formalCount++;
+   const tutorial=this.state.formalCount===0;
+   const offset=tutorial?0:Math.min(this.state.scraps,mat.blank);
+   this.state.scraps-=offset;paid=tutorial?0:mat.blank-offset+mat.fuel;this.state.coins-=paid;this.state.formalCount++;
  }
+ const tutorial=!apprentice&&this.state.formalCount===1;
  const seed=nextSeed(this.state.seed);this.state.seed=seed;
  const id='forge_'+this.state.totalMade+'_'+this.state.totalBroken+'_'+this.state.formalCount+'_'+seed;
- const session={id,phase:'heat',orderId:apprentice?null:orderId,blade,material,apprentice,level:0,hits:0,safeUsed:0,perfect:0,goodHeat:false,protectedUsed:false,protection:!apprentice&&this.state.formalCount<=2,strikes:[],paid,seed,sword:null,quenchGood:false};
+ const session={id,phase:'heat',orderId:apprentice?null:orderId,blade,material,apprentice,tutorial,level:0,hits:0,safeUsed:0,perfect:0,goodHeat:false,protectedUsed:false,protection:!apprentice&&this.state.formalCount<=2,strikes:[],paid,seed,sword:null,quenchGood:false};
  this.state.session=session;this.save();return session;
  }
  heat(temperature){const s=this.must('heat');s.goodHeat=temperature>=70&&temperature<=90;s.phase='forge';this.save()}
  must(phase){const s=this.state.session;if(!s||s.phase!==phase)throw new Error('当前操作阶段不正确');return s}
+ strikeAt(style,elapsedMs,actionId) {
+   return this.strike(style,classifyTiming(elapsedMs,this.state.hammerLevel),actionId);
+ }
  strike(style,timing,actionId) {
  const ss=this.state.session;if(!ss)throw new Error('尚未开始锻造');
  const existing=ss.strikes.find(x=>x.id===actionId);if(existing)return existing;
@@ -163,7 +169,7 @@ export class Game {
  s.strikes.push(entry);
  if(result==='break'){
    s.phase='broken';this.state.totalBroken++;
-   if(!s.apprentice)this.state.scraps+=Math.floor(MATERIALS[s.material].blank*0.4);
+   if(!s.apprentice&&!s.tutorial)this.state.scraps+=Math.floor(MATERIALS[s.material].blank*0.4);
  }else if(s.hits>=6)s.phase='quench';
  this.save();return entry;
  }
@@ -198,6 +204,15 @@ export class Game {
  if(!applied)return 0;
  this.state.swords.push(JSON.parse(JSON.stringify(sword)));
  this.state.session=null;this.save();return amount;
+ }
+
+ sellCollected(swordId) {
+   const sword=this.state.swords.find(x=>x.id===swordId);
+   if(!sword||sword.disposal!=='COLLECTED'||!this.state.caseIds.includes(swordId))throw new Error('该剑不在展柜中');
+   const tx=swordId+':case-sale';let amount=0;
+   this.once(tx,()=>{amount=Math.floor(sword.value*0.7);this.state.coins+=amount;
+     sword.disposal='SOLD';this.state.caseIds=this.state.caseIds.filter(id=>id!==swordId);
+   });return amount;
  }
  caseCapacity() {return this.state.showCaseLevel>=2?6:3}
  upgrade(type) {
