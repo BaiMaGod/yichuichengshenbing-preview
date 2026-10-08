@@ -7,8 +7,13 @@ permissions:
   contents: read
 jobs:
   browser:
+    name: Browser ${{ matrix.size }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        size: ['390x844', '360x800', '1280x900']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,6 +26,8 @@ jobs:
           npm install --no-save playwright@1.58.2
           npx playwright install --with-deps chromium
       - name: Run real WebGL gameplay and capture three sizes
+        env:
+          QA_SIZE: ${{ matrix.size }}
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/forge-server.log 2>&1 &
           node qa/browser-playtest.mjs
@@ -28,7 +35,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cat-forge-3d-browser-qa
+          name: cat-forge-3d-browser-qa-${{ matrix.size }}
           path: qa-evidence/
           if-no-files-found: error
           retention-days: 7
