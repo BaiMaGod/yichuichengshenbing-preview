@@ -185,7 +185,7 @@ export class Game {
  if(apprentice&&!this.needsApprentice())throw new Error('材料尚够，不能申请免费代工');
  if(apprentice){material='iron';blade='straight'}
  if(!apprentice && (MATERIALS[material].unlock>this.state.furnaceLevel||!(this.state.formalCount===0||this.canAfford(material))))throw new Error('材料尚未解锁或金币不足');
- if(orderId&&!ORDERS.some(o=>o.id===orderId))throw new Error('无效订单');
+ if(orderId&&!availableOrders(this.state).some(o=>o.id===orderId))throw new Error('订单尚未解锁或本轮未开放');
  const mat=MATERIALS[material];let paid=0;
  if(!apprentice){
    const tutorial=this.state.formalCount===0;
@@ -274,6 +274,7 @@ export class Game {
  }
  caseCapacity() {return this.state.showCaseLevel>=2?6:3}
  upgrade(type) {
+ if(this.state.session)throw new Error('请完成当前锻造后再升级设备');
  const s=this.state;const cost=type==='hammer'?500:type==='anvil'?1100:type==='case'?600:s.furnaceLevel===1?800:1800;
  if(type==='hammer'&&s.hammerLevel>=2||type==='anvil'&&s.anvilLevel>=2||type==='case'&&s.showCaseLevel>=2||type==='furnace'&&s.furnaceLevel>=3)throw new Error('已经升到当前版本上限');
  if(s.coins<cost)throw new Error('金币不足');

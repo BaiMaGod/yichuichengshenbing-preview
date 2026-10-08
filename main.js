@@ -53,11 +53,11 @@ function render(){
  $('workshop-level').textContent='铁匠工坊 · 炉火 Lv'+state.furnaceLevel;
  $('sound').textContent=state.sound?'🔊':'🔇';
  $('nav-upgrades').textContent='升级锻锤 '+(state.hammerLevel>=2?'已满级':'500 金');
- $('nav-upgrades').toggleAttribute('disabled',state.hammerLevel>=2||state.coins<500);
+ $('nav-upgrades').toggleAttribute('disabled',!!s||state.hammerLevel>=2||state.coins<500);
  $('nav-furnace').textContent='升级熔炉 '+(state.furnaceLevel>=3?'已满级':state.furnaceLevel===1?'800 金':'1800 金');
- $('nav-furnace').toggleAttribute('disabled',state.furnaceLevel>=3||state.coins<(state.furnaceLevel===1?800:1800));
+ $('nav-furnace').toggleAttribute('disabled',!!s||state.furnaceLevel>=3||state.coins<(state.furnaceLevel===1?800:1800));
  $('nav-anvil').textContent='升级铁砧 '+(state.anvilLevel>=2?'已满级':'1100 金');
- $('nav-anvil').toggleAttribute('disabled',state.anvilLevel>=2||state.coins<1100);
+ $('nav-anvil').toggleAttribute('disabled',!!s||state.anvilLevel>=2||state.coins<1100);
  $('nav-collection').textContent='剑谱 '+state.swords.length+' · 展柜 '+state.caseIds.length+'/'+game.caseCapacity();
  $('foot-hint').textContent=s?'当前 '+(s.apprentice?'学徒代工':'正式锻造')+' · 已锤 '+s.hits+'/6':'先接委托，再锻出你的神兵';
  if(!s){initChoose();const apprentice=game.needsApprentice();$('apprentice').hidden=!apprentice;
