@@ -1,4 +1,4 @@
-:root{font-family:"Noto Sans SC",system-ui,sans-serif;color:#fff6e2;background:#101621;font-synthesis:none}
+:root{font-family:"Noto Sans SC","Noto Sans CJK SC","PingFang SC","Microsoft YaHei","Microsoft JhengHei",system-ui,sans-serif;color:#fff6e2;background:#101621;font-synthesis:none}
 *{box-sizing:border-box}html,body{min-width:320px;margin:0;overscroll-behavior-y:none}button,select{font:inherit}button{cursor:pointer;touch-action:manipulation;border:0;user-select:none}button:disabled{opacity:.34;cursor:not-allowed;filter:grayscale(.7)}[hidden]{display:none!important}
 body{background:radial-gradient(circle at 50% 5%,#5b3331 0%,#15202b 55%,#0d121b 100%);min-height:100dvh}
 .game{width:min(100%,480px);margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;box-shadow:0 0 110px #0009;position:relative;overflow:hidden;background:linear-gradient(155deg,#202635 2%,#111825 45%,#111725 98%);border-inline:1px solid #cf90502c}

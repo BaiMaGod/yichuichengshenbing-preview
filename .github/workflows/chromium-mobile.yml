@@ -41,6 +41,12 @@ jobs:
           };
           </script></body></html>
           EOF
+      - name: Install CJK fonts on the Linux runner
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          fc-cache -f
+          fc-list :lang=zh family | grep -q 'Noto Sans CJK'
       - name: Headless Chromium - actual DOM interaction and mobile captures
         run: |
           set -euo pipefail
