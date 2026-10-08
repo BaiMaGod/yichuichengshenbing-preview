@@ -21,7 +21,7 @@ for(const [width,height] of [[390,844],[360,800],[1280,900]]){
  await page.goto(url);await page.waitForSelector('#scene3d[data-ready="true"]');await page.waitForTimeout(1400);
  assert.equal(await page.locator('#blade').inputValue(),'great');await checkLayout();await snap('forge');
  await page.locator('#begin').click();assert.equal((await state()).session.phase,'heat');
- const heat=await page.locator('#heat-button').boundingBox();await page.mouse.move(heat.x+heat.width/2,heat.y+heat.height/2);await page.mouse.down();await page.waitForTimeout(1750);await page.mouse.up();
+ const heat=await page.locator('#heat-button').boundingBox();await page.mouse.move(heat.x+heat.width/2,heat.y+heat.height/2);await page.mouse.down();await page.waitForFunction(()=>parseInt(document.getElementById('heat-text').textContent,10)>=72,{},{timeout:6000});await page.mouse.up();
  assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true);await checkLayout();await snap('forging');
  for(let i=0;i<2;i++){await page.locator('#strike').click();await page.waitForTimeout(650)}
  assert.equal((await state()).session.hits,2);assert.equal((await state()).session.level,2);
