@@ -182,30 +182,34 @@ export class Game {
  }
  dispose(kind) {
  const s=this.must('finished'),sword=s.sword;if(sword.disposal!=='NEW')throw new Error('此剑已处置');
+ if(s.apprentice&&kind!=='DELIVERED')throw new Error('学徒代工不可出售或收藏');
  const tx=sword.id+':'+kind;let amount=0;
  const applied=this.once(tx,()=>{
    if(s.apprentice){
-      if(s.hits>=2){amount=60;this.state.coins+=amount}
-      sword.disposal='DELIVERED';
-      return;
+     if(s.hits>=2){amount=60;this.state.coins+=amount}
+     sword.disposal='DELIVERED';
+   }else{
+     if(kind==='DELIVERED'){
+       if(!orderSatisfied(s.orderId,sword))throw new Error('委托尚未达标');
+       const o=ORDERS.find(o=>o.id===s.orderId);
+       amount=Math.floor(sword.value*1.2)+o.bonus;this.state.coins+=amount;
+       this.state.rep+=this.state.completed.includes(o.id)?Math.floor(o.rep/3):o.rep;
+       if(!this.state.completed.includes(o.id))this.state.completed.push(o.id);
+     }else if(kind==='SOLD'){amount=Math.floor(sword.value*0.7);this.state.coins+=amount}
+     else{
+       if(this.state.caseIds.length>=this.caseCapacity())throw new Error('展柜已满');
+       this.state.caseIds.push(sword.id);
+     }
+     sword.disposal=kind;
    }
-   if(kind==='DELIVERED'){
-     if(!orderSatisfied(s.orderId,sword))throw new Error('委托尚未达标');
-     const o=ORDERS.find(o=>o.id===s.orderId);amount=Math.floor(sword.value*1.2)+o.bonus;this.state.coins+=amount;
-     this.state.rep+=this.state.completed.includes(o.id)?Math.floor(o.rep/3):o.rep;
-     if(!this.state.completed.includes(o.id))this.state.completed.push(o.id);
-   }else if(kind==='SOLD'){amount=Math.floor(sword.value*0.7);this.state.coins+=amount}
-   else {
-     if(this.state.caseIds.length>=this.caseCapacity())throw new Error('展柜已满');
-     this.state.caseIds.push(sword.id);
-   }
-   sword.disposal=kind;
+   // One atomic snapshot: payout, ledger key, history record and clearing session.
+   // Do not persist an already-paid unfinished session between these changes.
+   this.state.swords.push(JSON.parse(JSON.stringify(sword)));
+   this.state.session=null;
  });
  if(!applied)return 0;
- this.state.swords.push(JSON.parse(JSON.stringify(sword)));
- this.state.session=null;this.save();return amount;
+ return amount;
  }
-
  sellCollected(swordId) {
    const sword=this.state.swords.find(x=>x.id===swordId);
    if(!sword||sword.disposal!=='COLLECTED'||!this.state.caseIds.includes(swordId))throw new Error('该剑不在展柜中');
