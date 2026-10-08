@@ -27,8 +27,8 @@ for(const [width,height] of [[390,844],[360,800],[1280,900]]){
  assert.equal((await state()).session.hits,2);assert.equal((await state()).session.level,2);
  await page.locator('#cashout').click();await page.locator('#quench-quick').click();await page.locator('#skip-trial').click();assert.equal((await state()).session.phase,'finished');await checkLayout();await snap('finished');
  await page.locator('#offer-cat').click();await page.waitForTimeout(1200);await checkLayout();await snap('cat');
- await page.locator('#tribute').click();await page.waitForTimeout(1000);await snap('swallow');
- await page.waitForTimeout(3600);await snap('eject');
+ await page.locator('#tribute').click();await page.waitForSelector('#scene3d[data-tribute="chewing"]',{timeout:15000});await snap('swallow');
+ await page.waitForSelector('#scene3d[data-tribute="ejecting"]',{timeout:15000});await snap('eject');
  await page.waitForSelector('#cat-back:not([hidden])',{timeout:15000});await snap('reward');
  const after=await state();assert.equal(after.ironBlanks,3);assert.equal(after.catTributes,1);assert.equal(after.session,null);assert.equal(after.swords[0].disposal,'TRIBUTED');assert.equal(after.coins,300);
  await page.reload();await page.waitForSelector('#scene3d[data-ready="true"]');assert.equal((await state()).ironBlanks,3);
