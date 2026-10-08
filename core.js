@@ -15,6 +15,7 @@
 
 
 
+
 export const MATERIALS={
  iron:{name:'铁胚',blank:65,fuel:15,value:1,atk:1,unlock:1},
  bronze:{name:'青铜',blank:90,fuel:15,value:1.35,atk:1.06,unlock:2},
@@ -23,13 +24,39 @@ export const MATERIALS={
 export const BLADES={
  straight:{name:'直剑',interval:950},great:{name:'大剑',interval:1350},short:{name:'短剑',interval:700}
 };
+export const MARKS={
+ none:{name:'无铭文',detail:'不附加属性'},
+ flame:{name:'赤焰纹',detail:'命中灼烧2秒，0.5秒一跳'},
+ armor_break:{name:'破甲纹',detail:'对护甲伤害 ×1.20'},
+ swift:{name:'迅风纹',detail:'攻击间隔 ×0.92'},
+ guard:{name:'守锋纹',detail:'专属甲盾评价徽章'},
+ echo:{name:'回响纹',detail:'每第5次基础命中追加30%攻击'},
+ star:{name:'星芒纹',detail:'纯外观星辉效果'}
+};
+export function unlockedMarks(s) {
+ const marks=['none'];
+ if(s.anvilLevel<2)return marks;
+ if(s.completed.includes('C05'))marks.push('flame');
+ if(s.completed.includes('C04'))marks.push('armor_break');
+ if(s.completed.includes('C09'))marks.push('swift');
+ if(s.completed.length>=10)marks.push('guard');
+ if(s.completed.length>=15)marks.push('echo');
+ if(s.completed.length>=25)marks.push('star');
+ return marks;
+}
 export const ORDERS=[
  {id:'C01',title:'新兵的第一把剑',detail:'等级达到 Lv2',bonus:40,rep:10,condition:'lv2'},
  {id:'C02',title:'镇上的木工',detail:'直剑达到 Lv3',bonus:55,rep:12,condition:'straight3'},
  {id:'C03',title:'轻快刺客',detail:'短剑 · 魔偶伤害≥450 · 击断木桩',bonus:100,rep:18,condition:'assassin'},
  {id:'C04',title:'铁门破坏者',detail:'大剑 · 甲盾 8秒内破甲',bonus:100,rep:18,condition:'shield8'},
  {id:'C05',title:'精致礼剑',detail:'品质 Q≥1.05',bonus:80,rep:15,condition:'q105'},
- {id:'C06',title:'佣兵的利刃',detail:'等级达到 Lv5',bonus:125,rep:20,condition:'lv5'}
+ {id:'C06',title:'佣兵的利刃',detail:'等级达到 Lv5',bonus:125,rep:20,condition:'lv5'},
+ {id:'C07',title:'山道守卫',detail:'直剑 · 甲盾盾体击碎',bonus:140,rep:22,condition:'shield_destroy'},
+ {id:'C08',title:'三击断木',detail:'木桩不超过3次基础攻击击断',bonus:160,rep:24,condition:'wood_3'},
+ {id:'C09',title:'三连快剑',detail:'短剑 · 追击≥2次 · 魔偶伤害≥650',bonus:185,rep:28,condition:'short_combo'},
+ {id:'C10',title:'铁甲冠军',detail:'大剑 · 甲盾专属评级至少A',bonus:215,rep:32,condition:'shield_a'},
+ {id:'C11',title:'冷光之剑',detail:'寒铁 · Lv≥6',bonus:250,rep:38,condition:'cold6'},
+ {id:'C12',title:'城主收藏品',detail:'Lv≥8 · 品质Q≥1.08',bonus:350,rep:45,condition:'city_legend'}
 ];
 export function clamp(n,a,b) {return Math.min(b,Math.max(a,n))}
 export function roundHalfUp(n){return Math.floor(n+0.5000000001)}
@@ -110,14 +137,38 @@ export function orderSatisfied(orderId,s){
  case 'C04':return s.blade==='great' && s.trial.shield.armorBreakMs!==null && s.trial.shield.armorBreakMs<=8000;
  case 'C05':return s.quality>=1.05;
  case 'C06':return s.level>=5;
+ case 'C07':return s.blade==='straight' && s.trial.shield.killed;
+ case 'C08':return s.trial.wood.killed && s.trial.wood.hits<=3;
+ case 'C09':return s.blade==='short' && s.trial.dummy.followups>=2 && s.trial.dummy.damage>=650;
+ case 'C10':return s.blade==='great' && s.trial.shieldScore>=70;
+ case 'C11':return s.material==='cold' && s.level>=6;
+ case 'C12':return s.level>=8 && s.quality>=1.08;
  default:return false;
  }
 }
 export function availableOrders(s){
- // Always a repeatable reachable basic order; other orders are optional high-tier choices.
+ // Three cards maximum, always with a safe repeatable path (C01/C02).
  const basic=ORDERS[s.completed.includes('C01')?1:0];
- const more=ORDERS.filter(x=>x.id!==basic.id && (x.id==='C05'||x.id==='C06'||s.totalMade>0)).slice((s.totalMade%4),s.totalMade%4+2);
- return [basic,...more].slice(0,3);
+ const n=s.completed.length;
+ const eligible=ORDERS.filter(o=>o.id!==basic.id && (o.id==='C01'?false:
+  o.id==='C11'?s.furnaceLevel>=3 && n>=6:
+  o.id==='C12'?n>=8:
+  o.id==='C10'?n>=6:
+  o.id==='C09'?n>=5:
+  o.id==='C08'?n>=4:
+  o.id==='C07'?n>=3:
+  o.id==='C06'?n>=2:
+  o.id==='C05'?n>=1:
+  o.id==='C03'||o.id==='C04'?n>=1:true));
+ // Prefer unseen objectives; rotate visible cards after each finished sword.
+ const unseen=eligible.filter(o=>!s.completed.includes(o.id));
+ const pool=unseen.length>=2?unseen:eligible;
+ const picks=[];
+ for(let i=0;i<pool.length && picks.length<2;i++){
+   const order=pool[(s.totalMade+i)%pool.length];
+   if(order && !picks.some(x=>x.id===order.id))picks.push(order);
+ }
+ return [basic,...picks];
 }
 export function freshState(seed=20261008){return {version:1,coins:300,scraps:0,rep:0,formalCount:0,totalMade:0,totalBroken:0,hammerLevel:1,furnaceLevel:1,anvilLevel:1,showCaseLevel:1,completed:[],caseIds:[],swords:[],session:null,ledger:[],seed:seed>>>0||1,sound:true}}
 export class Game {
@@ -128,7 +179,7 @@ export class Game {
  canAfford(m){
  const mat=MATERIALS[m];return this.state.coins>=mat.fuel+Math.max(0,mat.blank-this.state.scraps);
  }
- needsApprentice(){return !this.canAfford('iron')}
+ needsApprentice(){return this.state.formalCount>0 && !this.canAfford('iron')}
  start(material='iron',blade='straight',orderId='C01',apprentice=false) {
  if(this.state.session)throw new Error('请先完成当前这把剑');
  if(apprentice&&!this.needsApprentice())throw new Error('材料尚够，不能申请免费代工');
@@ -175,7 +226,10 @@ export class Game {
  }
  cashout(){const s=this.must('forge');s.phase='quench';this.save()}
  quench(good,mark='none') {
- const s=this.must('quench');s.quenchGood=good;
+ const s=this.must('quench');
+ if(!unlockedMarks(this.state).includes(mark))throw new Error('该铭文尚未解锁或铁砧未升级');
+ if(s.apprentice && mark!=='none')throw new Error('学徒代工不可安装铭文');
+ s.quenchGood=good;
  const q=quality(s.goodHeat,s.perfect,good),v=value(s.level,q,s.material,mark);
  const sword={id:'sword_'+s.id,material:s.material,blade:s.blade,level:s.level,quality:q,value:v,attack:attack(s.level,q,s.material),intervalMs:intervalMs(s.blade,mark),mark,quenchGood:good,orderId:s.orderId,disposal:'NEW',trial:simulateTrial(s.level,q,s.material,s.blade,mark)};
  s.sword=sword;s.phase='finished';this.state.totalMade++;this.save();return sword;

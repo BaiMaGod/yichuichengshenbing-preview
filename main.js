@@ -1,4 +1,4 @@
-import { Game, MATERIALS, BLADES, ORDERS, availableOrders, probabilities, classifyTiming, orderSatisfied } from './core.js';
+import { Game, MATERIALS, BLADES, ORDERS, MARKS, unlockedMarks, availableOrders, probabilities, classifyTiming, orderSatisfied } from './core.js';
 const KEY='yichuichengshenbing.v1';
 let saved;
 try { saved=JSON.parse(localStorage.getItem(KEY)||'null') }catch { saved=null }
@@ -40,7 +40,11 @@ function initChoose(){
  if(prev&&order.querySelector('option[value="'+prev+'"]'))order.value=prev;
  else order.value=availableOrders(game.state)[0]?.id||'';
 }
-function enterTrial(){trialStart=performance.now();trialSkipped=false;$('trial-result').classList.remove('unveiled')}
+function enterTrial(){
+ trialStart=performance.now();trialSkipped=false;
+ $('trial-result').classList.remove('unveiled');
+ $('trial-arena').classList.remove('done');
+}
 function render(){
  const state=game.state,s=state.session,p=phase();
  setPane(p);
@@ -52,6 +56,8 @@ function render(){
  $('nav-upgrades').toggleAttribute('disabled',state.hammerLevel>=2||state.coins<500);
  $('nav-furnace').textContent='升级熔炉 '+(state.furnaceLevel>=3?'已满级':state.furnaceLevel===1?'800 金':'1800 金');
  $('nav-furnace').toggleAttribute('disabled',state.furnaceLevel>=3||state.coins<(state.furnaceLevel===1?800:1800));
+ $('nav-anvil').textContent='升级铁砧 '+(state.anvilLevel>=2?'已满级':'1100 金');
+ $('nav-anvil').toggleAttribute('disabled',state.anvilLevel>=2||state.coins<1100);
  $('nav-collection').textContent='剑谱 '+state.swords.length+' · 展柜 '+state.caseIds.length+'/'+game.caseCapacity();
  $('foot-hint').textContent=s?'当前 '+(s.apprentice?'学徒代工':'正式锻造')+' · 已锤 '+s.hits+'/6':'先接委托，再锻出你的神兵';
  if(!s){initChoose();const apprentice=game.needsApprentice();$('apprentice').hidden=!apprentice;
@@ -81,7 +87,14 @@ function render(){
    const text=(p==='forge')?'点击击打，在光圈对齐中心时获得完美判定':'';
    $('forge-tip').textContent=text;
  }
- if(p==='quench'){$('quench-level').textContent='Lv'+s.level;$('quench-alert').textContent='把剑往下拖，停在蓝色目标带可精准淬火（品质+0.02）'}
+ if(p==='quench'){
+   $('quench-level').textContent='Lv'+s.level;
+   $('quench-alert').textContent='把剑往下拖，停在蓝色目标带可精准淬火（品质+0.02）';
+   const sel=$('mark'),old=sel.value;
+   const choices=unlockedMarks(state).filter(id=>!s.apprentice||id==='none');
+   sel.innerHTML=choices.map(id=>'<option value="'+id+'">'+MARKS[id].name+' · '+MARKS[id].detail+'</option>').join('');
+   sel.value=old && choices.includes(old)?old:'none';
+ }
  if(p==='finished' && s.sword){
    const sword=s.sword;
    $('finished-level').textContent='Lv'+sword.level;
@@ -129,7 +142,17 @@ function ringLoop(now){
    const elapsed=now-trialStart;
    const progress=Math.min(1,elapsed/8500);
    $('trial-progress').style.width=Math.round(progress*100)+'%';
-   if(progress>=1){trialSkipped=true;$('trial-result').classList.add('unveiled')}
+   const index=Math.min(2,Math.floor(progress*3)),local=Math.min(1,progress*3-index);
+   const targets=['🪵','🛡️','👹'];
+   const names=['木桩 · 斩断测试','甲盾 · 破甲测试','训练魔偶 · 伤害测试'];
+   $('trial-target').textContent=targets[index];
+   $('trial-stage-label').textContent=names[index]+' · 独立10秒';
+   $('trial-arena').setAttribute('data-phase',String(index));
+   $('trial-hp').style.width=Math.round(local*100)+'%';
+   if(progress>=1){
+     trialSkipped=true;$('trial-result').classList.add('unveiled');
+     $('trial-arena').classList.add('done');
+   }
  }
  requestAnimationFrame(ringLoop);
 }
@@ -163,15 +186,16 @@ $('quench-area').addEventListener('pointerup',e=>{
  if(dy<70){toast('请把宝剑往下拖动至少 70px');return}
  const rect=$('quench-area').getBoundingClientRect(),fraction=(e.clientY-rect.top)/rect.height;
  const good=fraction>=0.68&&fraction<=0.87;
- action(()=>{game.quench(good);sfx(good?840:510,0.3);spark(26);enterTrial()});
+ action(()=>{game.quench(good,($('mark').value||'none'));sfx(good?840:510,0.3);spark(26);enterTrial()});
 });
-$('quench-quick').addEventListener('click',()=>action(()=>{game.quench(false);enterTrial()}));
-$('skip-trial').addEventListener('click',()=>{trialSkipped=true;$('trial-progress').style.width='100%';$('trial-result').classList.add('unveiled')});
+$('quench-quick').addEventListener('click',()=>action(()=>{game.quench(false,($('mark').value||'none'));enterTrial()}));
+$('skip-trial').addEventListener('click',()=>{trialSkipped=true;$('trial-progress').style.width='100%';$('trial-result').classList.add('unveiled');$('trial-arena').classList.add('done');$('trial-stage-label').textContent='三靶试剑完成';$('trial-hp').style.width='100%'});
 for(const [button,kind] of [['sell','SOLD'],['deliver','DELIVERED'],['collect','COLLECTED']])
  $(button).addEventListener('click',()=>action(()=>{const amount=game.dispose(kind);toast(amount>0?'获得金币 +'+fmt(amount):'神兵已收入剑谱');trialStart=0;sfx(700,0.25)}));
 $('broken-next').addEventListener('click',()=>action(()=>{game.closeBroken();lastResult=''}));
 $('nav-upgrades').addEventListener('click',()=>action(()=>{game.upgrade('hammer');toast('锻锤升到 Lv2，完美时机窗扩大')}));
 $('nav-furnace').addEventListener('click',()=>action(()=>{game.upgrade('furnace');toast('熔炉升级，解锁新材料')}));
+ $('nav-anvil').addEventListener('click',()=>action(()=>{game.upgrade('anvil');toast('铁砧升级，可安装已解锁铭文')}));
 $('nav-collection').addEventListener('click',()=>{
  const held=game.state.swords.filter(s=>s.disposal==='COLLECTED');
  const l=game.state.swords.slice(-8).map(s=>'Lv'+s.level+' '+MATERIALS[s.material].name+' · '+s.value+'金 · '+s.disposal).join('\n');

@@ -26,9 +26,33 @@ body{background:radial-gradient(circle at 50% 5%,#5b3331 0%,#15202b 55%,#0d121b 
 .trial-head{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#f5d79b;font-weight:700}.link-like{background:transparent;color:#aeeaff;text-decoration:underline;font-size:11px}.trial-progress-track{height:8px;background:#2e4152;border:1px solid #58677d;border-radius:9px;overflow:hidden}.trial-progress-track>div{height:100%;width:0;background:linear-gradient(90deg,#64bcd9,#ffdf87);transition:width .1s}
 .trial-result{min-height:92px;background:#0c1826;border-radius:12px;padding:10px 14px;border:1px solid #5c788051;color:#cbd7e0;font-size:13px;line-height:1.85;opacity:.4;filter:blur(2px)}.trial-result.unveiled{opacity:1;filter:none;transition:filter .3s,opacity .3s}.deal-info{font-size:11px;color:#f1d7ad;display:flex;justify-content:space-between;gap:5px}.deal-info b{color:#fff4c4}.disposal{display:grid;grid-template-columns:1.3fr .85fr .85fr;gap:6px}.disposal button{font-size:12px;padding:0 4px}
 .failed h2{font-size:24px;color:#ff9b81}.failed p{text-align:center;color:#bfc8cd;font-size:14px;line-height:1.6}.failed{justify-content:center}
-.bottom{position:relative;z-index:6;margin-top:auto;min-height:58px;padding:7px 14px calc(env(safe-area-inset-bottom) + 10px);border-top:1px solid #c6975960;background:linear-gradient(180deg,#222837,#121824)}.foot-hint{font-size:10px;color:#abaeb9;text-align:center;margin-bottom:6px}.nav-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.nav-actions button{padding:8px 2px;background:#24303d;border:1px solid #6479885c;color:#e5ca9d;font-size:10px;border-radius:8px}
+.bottom{position:relative;z-index:6;margin-top:auto;min-height:58px;padding:7px 14px calc(env(safe-area-inset-bottom) + 10px);border-top:1px solid #c6975960;background:linear-gradient(180deg,#222837,#121824)}.foot-hint{font-size:10px;color:#abaeb9;text-align:center;margin-bottom:6px}.nav-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.nav-actions button{padding:8px 1px;background:#24303d;border:1px solid #6479885c;color:#e5ca9d;font-size:10px;border-radius:8px}
 #toast{position:fixed;z-index:30;top:17%;left:50%;transform:translate(-50%,-20px);max-width:min(90vw,390px);padding:12px 20px;border-radius:12px;background:#354656f5;color:#fff0c6;border:1px solid #ffd891a6;text-align:center;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;box-shadow:0 12px 28px #0008}#toast.show{opacity:1;transform:translate(-50%,0)}
 .shards{position:absolute;inset:0;pointer-events:none;z-index:15}.spark{height:5px;width:5px;position:absolute;display:block;background:#ffcc72;border-radius:50%;box-shadow:0 0 8px #ff5a24;animation:scatter .6s ease-out forwards}@keyframes scatter{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--x),var(--y)) scale(.1);opacity:0}}@keyframes ember{to{transform:translate(-50%,-50%) scale(1.15);opacity:.65}}@keyframes aura{to{opacity:.28}}
 @media(max-height:790px){.workbench{height:clamp(210px,30dvh,300px);min-height:210px}.control{min-height:260px;padding-top:9px;padding-bottom:9px;gap:8px}.timing-area{height:69px}.styles .style{min-height:60px}.primary,.secondary{height:41px}.giant{height:55px}}
 @media(max-height:660px){.workbench{height:190px;min-height:190px}.control{max-height:53dvh}.anvil{top:52%}}
 @media(min-width:800px){body{padding:15px}.game{min-height:calc(100dvh - 30px);border-radius:24px}.workbench{height:34dvh}}
+
+.mark-selector{margin-top:1px}.mark-selector select{min-height:39px}
+@media(max-width:380px){.nav-actions button{font-size:9px}.topbar{padding-inline:11px}}
+
+/* Fixed-output, 8.5-second accelerated trial montage: UI only, never owns damage. */
+.trial-arena{height:126px;flex-shrink:0;position:relative;border:1px solid #6289a27a;border-radius:13px;
+ background:linear-gradient(180deg,#263e4c 0%,#345363 66%,#40382d 67%,#2b2928 100%);overflow:hidden}
+.trial-arena:before{content:"";position:absolute;left:50%;top:66%;width:190px;height:18px;transform:translateX(-50%);
+ border-radius:50%;background:#07152460;filter:blur(8px)}
+.trial-target{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);font-size:62px;
+ filter:drop-shadow(0 4px 1px #0006);animation:trial-target-hit .65s ease-in-out infinite}
+.trial-swoosh{position:absolute;left:26%;top:1%;height:80px;width:110px;
+ background:linear-gradient(123deg,transparent 35%,#d0f7ff14 40%,#fff5cfb8 50%,#d6ecff9c 53%,transparent 67%);
+ transform-origin:100% 60%;animation:trial-slice .66s cubic-bezier(.14,.72,.25,1) infinite;filter:drop-shadow(0 0 9px #fff5a0)}
+.trial-stage-label{position:absolute;bottom:16px;left:8px;right:8px;color:#f9e2b2;text-align:center;font-size:11px;
+ text-shadow:0 1px 4px #15232d;font-weight:700}
+.trial-target-meter{position:absolute;bottom:0;left:0;right:0;height:4px;background:#354652}
+.trial-target-meter>div{height:100%;width:0;background:linear-gradient(90deg,#72cbe8,#ffe397)}
+.trial-arena[data-phase="1"]{background:linear-gradient(#314352 0%,#435969 67%,#443e39 68%,#292826)}
+.trial-arena[data-phase="2"]{background:linear-gradient(#423955 0%,#474058 67%,#3d3631 68%,#2b2429)}
+.trial-arena.done .trial-target,.trial-arena.done .trial-swoosh{animation-play-state:paused}
+@keyframes trial-slice{0%{transform:rotate(-58deg) translateX(-45px);opacity:0}25%{opacity:1}72%{transform:rotate(70deg) translateX(14px);opacity:.9}100%{transform:rotate(75deg) translateX(15px);opacity:0}}
+@keyframes trial-target-hit{0%,40%,100%{transform:translate(-50%,-50%) rotate(0)}57%{transform:translate(-50%,-50%) rotate(-7deg)}75%{transform:translate(-50%,-50%) rotate(5deg)}}
+@media(max-height:790px){.trial-arena{height:90px}.trial-target{font-size:49px}.trial-stage-label{font-size:10px}}
