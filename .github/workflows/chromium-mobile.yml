@@ -1,4 +1,4 @@
-name: Chromium mobile UI smoke (free public runner)
+name: 3D workshop browser QA
 on:
   push:
     branches: [main]
@@ -8,71 +8,27 @@ permissions:
 jobs:
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Create short-lived browser interaction harness
-        run: |
-          cat > ci-browser.html <<'EOF'
-          <!doctype html><html lang="zh"><head><meta charset="utf-8">
-          <meta name="viewport" content="width=device-width,initial-scale=1"></head>
-          <body data-result="PENDING" style="margin:0">
-          <iframe id="game" src="./" title="forge" style="width:100%;height:100vh;border:0"></iframe>
-          <script>
-          document.querySelector('#game').onload=()=>{
-            try{
-              const frame=document.querySelector('#game');
-              const d=frame.contentDocument,w=frame.contentWindow;
-              if(d.querySelector('#order').value!=='C01')throw Error('C01 not selected');
-              if(!d.querySelector('#cost-label').textContent.includes('免费'))throw Error('tutorial cost missing');
-              const start=d.querySelector('#begin');
-              if(start.disabled)throw Error('start disabled');
-              start.click();
-              const raw=w.localStorage.getItem('yichuichengshenbing.v1');
-              const state=raw&&JSON.parse(raw);
-              if(state?.session?.phase!=='heat')throw Error('start click did not enter heat');
-              if(state?.coins!==300)throw Error('tutorial should be free');
-              document.body.dataset.result='PASS';
-              document.body.dataset.phase=state.session.phase;
-            }catch(err){
-              document.body.dataset.result='FAIL';
-              document.body.dataset.error=String(err?.message||err);
-            }
-          };
-          </script></body></html>
-          EOF
-      - name: Install CJK fonts on the Linux runner
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chinese fonts and Playwright
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
-          fc-cache -f
-          fc-list :lang=zh family | grep -q 'Noto Sans CJK'
-      - name: Headless Chromium - actual DOM interaction and mobile captures
+          sudo apt-get install -y fonts-noto-cjk
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Run real WebGL gameplay and capture three sizes
         run: |
-          set -euo pipefail
-          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/forge-server.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
-          sleep 2
-          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)"
-          test -n "$CHROME"
-          mkdir -p screenshots
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=6000 --window-size=390,844 --dump-dom http://127.0.0.1:8765/ci-browser.html > /tmp/forge-smoke.html
-          if ! grep -q 'data-result="PASS"' /tmp/forge-smoke.html; then
-            echo 'Chromium interaction failed:'
-            grep 'data-result\|data-error' /tmp/forge-smoke.html || true
-            exit 1
-          fi
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=3000 --window-size=390,844 --screenshot=screenshots/forge-390x844.png http://127.0.0.1:8765/
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=3000 --window-size=360,800 --screenshot=screenshots/forge-360x800.png http://127.0.0.1:8765/
-          test -s screenshots/forge-390x844.png
-          test -s screenshots/forge-360x800.png
-          echo 'Real Chromium DOM click and screenshots PASS'
-      - name: Upload mobile screenshots
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/forge-server.log 2>&1 &
+          node qa/browser-playtest.mjs
+      - name: Upload actual screenshots and report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: forge-mobile-chromium
-          path: screenshots/*.png
-          if-no-files-found: warn
+          name: cat-forge-3d-browser-qa
+          path: qa-evidence/
+          if-no-files-found: error
           retention-days: 7

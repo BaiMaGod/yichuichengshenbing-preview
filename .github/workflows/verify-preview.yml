@@ -1,52 +1,20 @@
-name: Verify browser preview (free public-runner smoke)
+name: Verify built preview
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  smoke:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verify static artifact and JavaScript syntax
+      - name: Check published assets
         run: |
-          test -f index.html
-          test -f style.css
-          test -f core.js
-          test -f main.js
-          grep -q './main.js' index.html
-          node --experimental-default-type=module --check core.js
-          node --experimental-default-type=module --check main.js
-      - name: End-to-end forging rules smoke without npm packages
-        run: |
-          node --experimental-default-type=module --input-type=module <<'NODE'
-          import assert from 'node:assert/strict';
-          import {Game, ORDERS, availableOrders} from './core.js';
-          const game=new Game(()=>{});
-          assert.equal(ORDERS.length,12);
-          assert.deepEqual(availableOrders(game.state).map(x=>x.id),['C01','C02']);
-          assert.throws(()=>game.start('iron','straight','C12'));
-          assert.equal(game.state.coins,300);
-          const session=game.start('iron','straight','C01');
-          assert.equal(session.tutorial,true);
-          assert.throws(()=>game.upgrade('hammer'));
-          game.heat(80);
-          game.strike('safe','perfect','1');
-          game.strike('safe','perfect','2');
-          game.cashout();
-          game.quench(true);
-          const cash=game.dispose('DELIVERED');
-          assert.ok(cash>0);
-          assert.equal(game.state.session,null);
-          assert.equal(game.state.totalMade,1);
-          assert.equal(game.state.swords.length,1);
-          assert.equal(game.state.completed[0],'C01');
-          assert.equal(availableOrders(game.state)[0].id,'C02');
-          console.log('Preview smoke OK: first sword, settlement, C02 unlock');
-          NODE
+          python3 - <<'PY'
+          import re,pathlib
+          html=pathlib.Path('index.html').read_text()
+          for path in re.findall(r'(?:src|href)="\./([^"]+)"',html):
+              assert pathlib.Path(path).is_file(), path
+          assert '/src/' not in html
+          PY
