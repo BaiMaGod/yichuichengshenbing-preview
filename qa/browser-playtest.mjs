@@ -10,7 +10,13 @@ for(const [width,height] of sizes){
  const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});
  const errors=[],failed=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push(r.url()+':'+r.failure()?.errorText));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
  const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')));
- const snap=async name=>page.screenshot({path:`${out}/${width}-${name}.png`});
+ const renders=[];
+ const snap=async name=>{
+  await page.screenshot({path:`${out}/${width}-${name}.png`});
+  const frame=await page.evaluate(()=>{const e=document.querySelector('#scene3d'),c=e.querySelector('canvas');return{calls:Number(e.dataset.renderCalls),triangles:Number(e.dataset.renderTriangles),pixels:c.width*c.height}});
+  assert.ok(frame.calls>0,'a real 3D frame must have been rendered');assert.ok(frame.triangles>10000);assert.ok(frame.pixels<=752000);
+  renders.push({name,...frame});
+ };
  const checkLayout=async()=>{
   const layout=await page.evaluate(()=>{
    const panel=document.querySelector('.control:not([hidden])').getBoundingClientRect(),nav=document.querySelector('.station-nav').getBoundingClientRect();
@@ -22,6 +28,7 @@ for(const [width,height] of sizes){
  };
  await page.goto(url);await page.waitForSelector('#scene3d[data-ready="true"]');await page.waitForTimeout(1400);
  assert.equal(await page.locator('#blade').inputValue(),'great');await checkLayout();await snap('forge');
+ if(width>=800)await page.screenshot({path:`${out}/${width}-forge-detail.png`,clip:{x:Math.round(width*.27),y:Math.round(height*.25),width:Math.round(width*.43),height:Math.round(height*.56)}});
  await page.locator('#begin').click();assert.equal((await state()).session.phase,'heat');
  const heat=await page.locator('#heat-button').boundingBox();await page.mouse.move(heat.x+heat.width/2,heat.y+heat.height/2);await page.mouse.down();await page.waitForFunction(()=>parseInt(document.getElementById('heat-text').textContent,10)>=72,{},{timeout:30000});const releaseHeat=await page.locator('#heat-text').textContent();await page.mouse.up();
  assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true,`${width}px release at ${releaseHeat}: ${(await state()).session.goodHeat}`);await checkLayout();await snap('forging');
@@ -38,7 +45,7 @@ for(const [width,height] of sizes){
  await page.locator('.relic-row').filter({hasText:'九命护符'}).locator('button').click();assert.equal((await state()).ironBlanks,1);assert.ok((await state()).relics.includes('guard'));
  await page.reload();await page.waitForSelector('#scene3d[data-ready="true"]');assert.equal((await state()).ironBlanks,1);
  await page.locator('#begin').click();const next=await state();assert.equal(next.session.paid,15);assert.equal(next.coins,285);assert.equal(next.ironBlanks,0);assert.equal(next.session.protection,true);
- assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);results.push({width,height,passed:true,errors,failed,checks:['3D WebGL startup','layout','real heat input','two real hammer inputs','quench','giant sword tribute','swallow/eject/reward','persisted reward','relic purchase','iron sword consumption']});
+ assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);results.push({width,height,passed:true,errors,failed,renders,checks:['3D WebGL startup','layout','real heat input','two real hammer inputs','quench','giant sword tribute','swallow/eject/reward','persisted reward','relic purchase','iron sword consumption']});
  console.log(`${width}x${height}: full gameplay, reward persistence and inventory reuse passed`);await page.close();
 }
 await writeFile(`${out}/report.json`,JSON.stringify({passed:true,url,renderer:'Chromium WebGL / SwiftShader',results},null,2));
