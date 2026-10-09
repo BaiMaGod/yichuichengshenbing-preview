@@ -12,6 +12,7 @@ for(const [width,height] of sizes){
  const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')));
  const renders=[];
  const snap=async name=>{
+  await writeFile(`${out}/last-frame.json`,JSON.stringify({name,errors,failed,renders,frame:await page.evaluate(()=>({...document.querySelector('#scene3d').dataset}))},null,2));
   await page.screenshot({path:`${out}/${width}-${name}.png`});
   const frame=await page.evaluate(()=>{const e=document.querySelector('#scene3d'),c=e.querySelector('canvas');return{calls:Number(e.dataset.renderCalls),triangles:Number(e.dataset.renderTriangles),pixels:c.width*c.height}});
   assert.ok(frame.calls>0,'a real 3D frame must have been rendered');assert.ok(frame.triangles>10000);assert.ok(frame.pixels<=752000);
