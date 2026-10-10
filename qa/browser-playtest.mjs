@@ -11,6 +11,7 @@ for(const [width,height] of sizes){
  const errors=[],failed=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push(r.url()+':'+r.failure()?.errorText));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
  const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')));
  const renders=[];
+ const visibility=[];
  const snap=async name=>{
   await writeFile(`${out}/last-frame.json`,JSON.stringify({name,errors,failed,renders,frame:await page.evaluate(()=>({...document.querySelector('#scene3d').dataset}))},null,2));
   await page.screenshot({path:`${out}/${width}-${name}.png`});
@@ -27,12 +28,25 @@ for(const [width,height] of sizes){
   assert.equal(layout.ready,'true');assert.equal(layout.canvas,true);assert.equal(layout.clickable,true,'all station buttons must receive clicks');assert.ok(layout.scroll<=width);assert.ok(layout.panel.x>=0&&layout.panel.right<=width);assert.ok(layout.panel.bottom<=height);
   if(width<800)assert.ok(layout.nav.bottom<=layout.panel.y,'station navigation must stay above the panel');
  };
+ const checkSword=async()=>{
+  await page.waitForFunction(()=>!!document.querySelector('#scene3d').dataset.forgeProof);
+  const proof=await page.evaluate(()=>{
+   const host=document.querySelector('#scene3d'),r=host.getBoundingClientRect(),panel=document.querySelector('.control:not([hidden])').getBoundingClientRect(),nav=document.querySelector('.station-nav').getBoundingClientRect();
+   return{...JSON.parse(host.dataset.forgeProof),host:{x:r.x,y:r.y,width:r.width,height:r.height},panel:{x:panel.x,y:panel.y},nav:{y:nav.y}};
+  });
+  assert.equal(proof.visibleSamples,proof.totalSamples,'all six broad-face rays must reach the blade without anvil occlusion');
+  assert.ok(proof.faceHeight>=20,'blade must show a readable broad face, rather than an edge');
+  assert.ok(proof.bounds.left>=10&&proof.bounds.right<=proof.host.width-10,'pommel and sword tip must fit inside the viewport');
+  if(width<800)assert.ok(proof.bounds.bottom+proof.host.y<Math.min(proof.panel.y,proof.nav.y)-8,'sword face must stay clear of phone controls');
+  else assert.ok(proof.bounds.right+proof.host.x<proof.panel.x-8||proof.bounds.bottom+proof.host.y<proof.panel.y-8,'sword must stay clear of desktop controls');
+  visibility.push(proof);
+ };
  await page.goto(url);await page.waitForSelector('#scene3d[data-ready="true"]');await page.waitForTimeout(1400);
- assert.equal(await page.locator('#blade').inputValue(),'great');await checkLayout();await snap('forge');
+ assert.equal(await page.locator('#blade').inputValue(),'great');await checkLayout();await checkSword();await snap('forge');
  if(width>=800)await page.screenshot({path:`${out}/${width}-forge-detail.png`,clip:{x:Math.round(width*.27),y:Math.round(height*.25),width:Math.round(width*.43),height:Math.round(height*.56)}});
  await page.locator('#begin').click();assert.equal((await state()).session.phase,'heat');
  const heat=await page.locator('#heat-button').boundingBox();await page.mouse.move(heat.x+heat.width/2,heat.y+heat.height/2);await page.mouse.down();await page.waitForFunction(()=>parseInt(document.getElementById('heat-text').textContent,10)>=72,{},{timeout:30000});const releaseHeat=await page.locator('#heat-text').textContent();await page.mouse.up();
- assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true,`${width}px release at ${releaseHeat}: ${(await state()).session.goodHeat}`);await checkLayout();await snap('forging');
+ assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true,`${width}px release at ${releaseHeat}: ${(await state()).session.goodHeat}`);await checkLayout();await checkSword();await snap('forging');
  for(let i=0;i<2;i++){await page.locator('#strike').click();await page.waitForTimeout(650)}
  assert.equal((await state()).session.hits,2);assert.equal((await state()).session.level,2);
  await page.locator('#cashout').click();await page.locator('#quench-quick').click();await page.locator('#skip-trial').click();assert.equal((await state()).session.phase,'finished');await checkLayout();await snap('finished');
@@ -46,7 +60,7 @@ for(const [width,height] of sizes){
  await page.locator('.relic-row').filter({hasText:'九命护符'}).locator('button').click();assert.equal((await state()).ironBlanks,1);assert.ok((await state()).relics.includes('guard'));
  await page.reload();await page.waitForSelector('#scene3d[data-ready="true"]');assert.equal((await state()).ironBlanks,1);
  await page.locator('#begin').click();const next=await state();assert.equal(next.session.paid,15);assert.equal(next.coins,285);assert.equal(next.ironBlanks,0);assert.equal(next.session.protection,true);
- assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);results.push({width,height,passed:true,errors,failed,renders,checks:['3D WebGL startup','layout','real heat input','two real hammer inputs','quench','giant sword tribute','swallow/eject/reward','persisted reward','relic purchase','iron sword consumption']});
+ assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);results.push({width,height,passed:true,errors,failed,renders,visibility,checks:['3D WebGL startup','broad blade face and full sword framing','six blade surface occlusion rays','layout','real heat input','two real hammer inputs','quench','giant sword tribute','swallow/eject/reward','persisted reward','relic purchase','iron sword consumption']});
  console.log(`${width}x${height}: full gameplay, reward persistence and inventory reuse passed`);await page.close();
 }
 await writeFile(`${out}/report.json`,JSON.stringify({passed:true,url,renderer:'Chromium WebGL / SwiftShader',results},null,2));
