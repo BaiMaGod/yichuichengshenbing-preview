@@ -50,7 +50,7 @@ for(const [width,height] of sizes){
   visibility.push(proof);
  };
  const checkCat=async phase=>{
-  await page.waitForFunction(expected=>{const raw=document.querySelector('#scene3d').dataset.catProof;return raw&&JSON.parse(raw).phase===expected},phase,{timeout:20000});
+  await page.waitForFunction(expected=>{const host=document.querySelector('#scene3d'),raw=host.dataset.catProof;if(!raw)return false;const p=JSON.parse(raw),navTop=document.querySelector('.station-nav').getBoundingClientRect().top-host.getBoundingClientRect().top;return p.phase===expected&&Math.abs(p.navTop-navTop)<2},phase,{timeout:20000});
   const proof=await page.evaluate(()=>{const host=document.querySelector('#scene3d'),r=host.getBoundingClientRect(),nav=document.querySelector('.station-nav').getBoundingClientRect();return{...JSON.parse(host.dataset.catProof),host:{x:r.x,y:r.y,width:r.width,height:r.height},navTop:nav.top-r.top}});
   catPoses.push(proof);await writeFile(`${out}/cat-poses.json`,JSON.stringify(catPoses,null,2));
   if(phase==='idle'){
