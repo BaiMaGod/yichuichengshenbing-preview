@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-DD1ePHz9.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BV1VYr6w.css">
+<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-BYP-S8cn.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-dksPLuig.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
@@ -12,7 +12,7 @@
  <button id="sound" class="sound" aria-label="切换音效">🔊</button>
 </header>
 <section class="workbench" aria-label="立体锻造工坊">
- <div id="scene3d"></div>
+ <div id="scene3d" tabindex="0" aria-label="立体锻造工坊"></div>
  <div id="scene-error" hidden>3D 工坊加载失败，请刷新后重试。</div>
  <div class="scene-heading"><span id="scene-name">神兵锻造台</span><small id="sword-level-tag">剑胚 · Lv0</small></div>
  <div class="cat-demand"><span>邪恶猫咪的索求</span><b id="cat-demand-label">巨剑 Lv2+</b><small id="cat-count">已纳贡 0 次</small></div>
@@ -62,7 +62,7 @@
  </div>
  <div class="risk-detail"><b id="style-label">稳锻 · 必定升级</b><span id="probability">成功 100% · 受损 0% · 断剑 0%</span></div>
  <div id="result" class="strike-result"></div>
- <div class="double actions"><button id="cashout" class="secondary">收锤定型</button><button id="strike" class="primary">⚒ 击打！</button></div>
+ <div class="actions"><button id="cashout" class="secondary">收锤定型</button></div>
  <small id="forge-tip" class="hint">时机越好，破损风险越低</small>
 </section>
 <section class="control" id="quench" hidden>

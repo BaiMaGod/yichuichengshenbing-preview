@@ -1,0 +1,15 @@
+Forge impact recordings
+
+forge-anvil.mp3: edited from Blacksmith's Hammer by VishwaJai.
+Source: https://opengameart.org/content/blacksmiths-hammer
+Original: https://opengameart.org/sites/default/files/blacksmithhammer.wav
+License: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
+Edits: high-pass at 75 Hz, tail fade, MP3 encoding.
+
+forge-clink.mp3: edited from clink2.wav, Metal Impact Sounds by Brian MacIntosh (BMacZero).
+Source: https://opengameart.org/content/metal-impact-sounds
+Original: https://opengameart.org/sites/default/files/clink2.wav
+License: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
+Edits: high-pass at 120 Hz, tail fade, MP3 encoding.
+
+These are independently licensed sounds. No audio was extracted from ForgeTax.

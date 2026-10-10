@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
-import { mkdir,writeFile } from 'node:fs/promises';
+import { mkdir,writeFile,readFile } from 'node:fs/promises';
 const out=process.env.QA_OUT||'qa-evidence';await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const url=process.env.QA_URL||'http://127.0.0.1:4173';const results=[];
@@ -8,7 +8,8 @@ const sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[3
 let activePage;
 try{
 for(const [width,height] of sizes){
- const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});activePage=page;
+ const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1,hasTouch:width<800});activePage=page;
+ if(process.env.QA_FONT)await installFont(page);
  const errors=[],failed=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push(r.url()+':'+r.failure()?.errorText));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
  const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')));
  const renders=[];
@@ -67,7 +68,17 @@ for(const [width,height] of sizes){
  await page.locator('#begin').click();assert.equal((await state()).session.phase,'heat');
  const heat=await page.locator('#heat-button').boundingBox();await page.mouse.move(heat.x+heat.width/2,heat.y+heat.height/2);await page.mouse.down();await page.waitForFunction(()=>parseInt(document.getElementById('heat-text').textContent,10)>=72,{},{timeout:30000});const releaseHeat=await page.locator('#heat-text').textContent();await page.mouse.up();
  assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true,`${width}px release at ${releaseHeat}: ${(await state()).session.goodHeat}`);await checkLayout();await checkSword();await snap('forging');
- for(let i=0;i<2;i++){await page.locator('#strike').click();await page.waitForTimeout(650)}
+ assert.equal(await page.locator('#strike').count(),0,'forging must not require an on-screen strike button');
+ const tapPoint=await page.locator('#scene3d').evaluate(host=>{const r=host.getBoundingClientRect(),p=JSON.parse(host.dataset.forgeProof);return{x:r.x+(p.bounds.left+p.bounds.right)/2,y:r.y+(p.bounds.top+p.bounds.bottom)/2}});
+ for(let i=0;i<2;i++){
+  if(width<800)await page.touchscreen.tap(tapPoint.x,tapPoint.y);else await page.mouse.click(tapPoint.x,tapPoint.y);
+  await page.waitForFunction(n=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')).session.hits===n,i+1);
+  await page.waitForTimeout(600);
+ }
+ assert.equal(await page.locator('#scene3d').getAttribute('data-audio-state'),'ready','actual recordings must load and decode');
+ assert.equal(await page.locator('#scene3d').getAttribute('data-audio-type'),'recording');
+ assert.equal(await page.locator('#scene3d').getAttribute('data-audio-played'),'2');
+ assert.equal(await page.locator('#scene3d').getAttribute('data-hammer-impacts'),'2','one contact per screen input');
  assert.equal((await state()).session.hits,2);assert.equal((await state()).session.level,2);
  await page.locator('#cashout').click();await page.locator('#quench-quick').click();await page.locator('#skip-trial').click();assert.equal((await state()).session.phase,'finished');await checkLayout();await checkSword();await snap('finished');
  await page.locator('#offer-cat').click();await page.waitForTimeout(1200);await checkLayout();await checkCat('idle');await snap('cat');
@@ -87,3 +98,13 @@ for(const [width,height] of sizes){
 }
 await writeFile(`${out}/report.json`,JSON.stringify({passed:true,url,renderer:'Chromium WebGL / SwiftShader',results},null,2));
 }catch(error){if(activePage&&!activePage.isClosed())await activePage.screenshot({path:`${out}/failure.png`});await writeFile(`${out}/report.json`,JSON.stringify({passed:false,error:String(error),results},null,2));throw error}finally{await browser.close()}
+
+async function installFont(page){
+ const font=(await readFile(process.env.QA_FONT)).toString('base64');
+ await page.addInitScript(data=>{
+  const face=new FontFace('Noto Sans SC',Uint8Array.from(atob(data),c=>c.charCodeAt(0)));document.fonts.add(face);void face.load();
+  const prop=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'font');
+  Object.defineProperty(CanvasRenderingContext2D.prototype,'font',{...prop,set(value){prop.set.call(this,value.replace('sans-serif','"Noto Sans SC", sans-serif'))}});
+ },font);
+}
+
