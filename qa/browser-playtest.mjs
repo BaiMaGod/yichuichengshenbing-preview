@@ -60,7 +60,7 @@ for(const [width,height] of sizes){
   if(phase==='ejecting')assert.ok(Math.abs(proof.turn)>2,'cat must turn around before dropping the reward');
   catPoses.push(proof);await writeFile(`${out}/cat-poses.json`,JSON.stringify(catPoses,null,2));
  };
- await page.goto(url);await page.waitForSelector('#scene3d[data-ready="true"]');await page.waitForTimeout(1400);
+ await page.goto(url);await page.waitForSelector('#scene3d[data-ready="true"]');await page.waitForSelector('#scene3d[data-cat-asset="ready"]',{timeout:30000});assert.equal(await page.locator('#scene3d').getAttribute('data-cat-atlas-size'),'1774x887');await page.waitForTimeout(1400);
  assert.equal(await page.locator('#blade').inputValue(),'great');await checkLayout();await checkSword();await snap('forge');
  if(width>=800)await page.screenshot({path:`${out}/${width}-forge-detail.png`,clip:{x:Math.round(width*.19),y:Math.round(height*.22),width:Math.round(width*.49),height:Math.round(height*.55)}});
  await page.locator('#begin').click();assert.equal((await state()).session.phase,'heat');
