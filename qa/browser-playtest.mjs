@@ -41,6 +41,7 @@ for(const [width,height] of sizes){
   await writeFile(`${out}/sword-proof-${visibility.length}.json`,JSON.stringify(proof,null,2));
   assert.equal(proof.visibleSamples,proof.totalSamples,'all six broad-face rays must reach the blade without anvil occlusion');
   assert.ok(proof.faceHeight>=20,'blade must show a readable broad face, rather than an edge');
+  if(width<800&&proof.boardVisible)assert.ok(proof.boardTop>=90,'world-space board must stay below the fixed phone header');
   assert.ok(proof.bounds.left>=10&&proof.bounds.right<=proof.host.width-10,'pommel and sword tip must fit inside the viewport');
   if(width<800)assert.ok(proof.bounds.bottom+proof.host.y<Math.min(proof.panel.y,proof.nav.y)-8,'sword face must stay clear of phone controls');
   else assert.ok(proof.bounds.right+proof.host.x<proof.panel.x-8||proof.bounds.bottom+proof.host.y<proof.panel.y-8,'sword must stay clear of desktop controls');
