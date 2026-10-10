@@ -28,8 +28,11 @@ jobs:
       - name: Run real WebGL gameplay and capture three sizes
         env:
           QA_SIZE: ${{ matrix.size }}
+          QA_URL: http://127.0.0.1:4173/yichuichengshenbing-preview/
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/forge-server.log 2>&1 &
+          mkdir -p /tmp/forge-pages-qa
+          ln -s "$GITHUB_WORKSPACE" /tmp/forge-pages-qa/yichuichengshenbing-preview
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/forge-pages-qa >/tmp/forge-server.log 2>&1 &
           node qa/browser-playtest.mjs
       - name: Upload actual screenshots and report
         if: always()

@@ -14,7 +14,15 @@ jobs:
           python3 - <<'PY'
           import re,pathlib
           html=pathlib.Path('index.html').read_text()
-          for path in re.findall(r'(?:src|href)="\./([^"]+)"',html):
+          refs=re.findall(r'(?:src|href)="([^"]+)"',html)
+          assets=[p for p in refs if p.endswith(('.js','.css'))]
+          assert len(assets)>=2, 'Missing script or stylesheet'
+          assert any(p.endswith('.js') for p in assets)
+          assert any(p.endswith('.css') for p in assets)
+          for path in assets:
+              assert path.startswith('./'), 'Pages assets must be relative: '+path
               assert pathlib.Path(path).is_file(), path
+          assert not any(p.startswith('/') for p in refs), 'Absolute asset path breaks project Pages'
           assert '/src/' not in html
+          assert pathlib.Path('art/cat-turnaround-v2.webp').is_file()
           PY
