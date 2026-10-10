@@ -51,7 +51,7 @@ for(const [width,height] of sizes){
  if(width>=800)await page.screenshot({path:`${out}/${width}-forge-detail.png`,clip:{x:Math.round(width*.19),y:Math.round(height*.22),width:Math.round(width*.49),height:Math.round(height*.55)}});
  await page.locator('#begin').click();assert.equal((await state()).session.phase,'heat');
  const heat=await page.locator('#heat-button').boundingBox();await page.mouse.move(heat.x+heat.width/2,heat.y+heat.height/2);await page.mouse.down();await page.waitForFunction(()=>parseInt(document.getElementById('heat-text').textContent,10)>=72,{},{timeout:30000});const releaseHeat=await page.locator('#heat-text').textContent();await page.mouse.up();
- assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true,`${width}px release at ${releaseHeat}: ${(await state()).session.goodHeat}`);await checkLayout();await snap('forging');await checkSword();
+ assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true,`${width}px release at ${releaseHeat}: ${(await state()).session.goodHeat}`);await checkLayout();await checkSword();await snap('forging');
  for(let i=0;i<2;i++){await page.locator('#strike').click();await page.waitForTimeout(650)}
  assert.equal((await state()).session.hits,2);assert.equal((await state()).session.level,2);
  await page.locator('#cashout').click();await page.locator('#quench-quick').click();await page.locator('#skip-trial').click();assert.equal((await state()).session.phase,'finished');await checkLayout();await checkSword();await snap('finished');
