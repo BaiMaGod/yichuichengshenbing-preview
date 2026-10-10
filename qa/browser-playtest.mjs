@@ -5,9 +5,10 @@ const out=process.env.QA_OUT||'qa-evidence';await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const url=process.env.QA_URL||'http://127.0.0.1:4173';const results=[];
 const sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]];
+let activePage;
 try{
 for(const [width,height] of sizes){
- const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});
+ const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});activePage=page;
  const errors=[],failed=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push(r.url()+':'+r.failure()?.errorText));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
  const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')));
  const renders=[];
@@ -51,6 +52,7 @@ for(const [width,height] of sizes){
  const checkCat=async phase=>{
   await page.waitForFunction(expected=>{const raw=document.querySelector('#scene3d').dataset.catProof;return raw&&JSON.parse(raw).phase===expected},phase,{timeout:20000});
   const proof=await page.evaluate(()=>{const host=document.querySelector('#scene3d'),r=host.getBoundingClientRect(),nav=document.querySelector('.station-nav').getBoundingClientRect();return{...JSON.parse(host.dataset.catProof),host:{x:r.x,y:r.y,width:r.width,height:r.height},navTop:nav.top-r.top}});
+  catPoses.push(proof);await writeFile(`${out}/cat-poses.json`,JSON.stringify(catPoses,null,2));
   if(phase==='idle'){
    assert.ok(proof.bounds.left>=8&&proof.bounds.right<=width-8,'whole cat, ears and whiskers must fit');
    assert.ok(proof.bounds.top>=90,'ears must stay below the fixed title');
@@ -58,7 +60,6 @@ for(const [width,height] of sizes){
   }
   if(phase==='offering')assert.ok(proof.jawAngle>.6,'lower jaw must visibly open downward');
   if(phase==='ejecting')assert.ok(Math.abs(proof.turn)>2,'cat must turn around before dropping the reward');
-  catPoses.push(proof);await writeFile(`${out}/cat-poses.json`,JSON.stringify(catPoses,null,2));
  };
  await page.goto(url);await page.waitForSelector('#scene3d[data-ready="true"]');await page.waitForSelector('#scene3d[data-cat-asset="ready"]',{timeout:30000});assert.equal(await page.locator('#scene3d').getAttribute('data-cat-atlas-size'),'1774x887');await page.waitForTimeout(1400);
  assert.equal(await page.locator('#blade').inputValue(),'great');await checkLayout();await checkSword();await snap('forge');
@@ -74,7 +75,7 @@ for(const [width,height] of sizes){
  await page.locator('#tribute').click();await checkCat('offering');await snap('offering');
  await page.waitForSelector('#scene3d[data-tribute="chewing"]',{timeout:20000});await checkCat('chewing');await snap('swallow');
  await page.waitForSelector('#scene3d[data-tribute="ejecting"]',{timeout:20000});await checkCat('ejecting');await snap('eject');
- await page.waitForSelector('#cat-back:not([hidden])',{timeout:15000});await snap('reward');
+ await page.waitForSelector('#cat-back:not([hidden])',{timeout:15000});await checkCat('idle');await snap('reward');
  const after=await state();assert.equal(after.ironBlanks,3);assert.equal(after.catTributes,1);assert.equal(after.session,null);assert.equal(after.swords[0].disposal,'TRIBUTED');assert.equal(after.coins,300);
  await page.reload();await page.waitForSelector('#scene3d[data-ready="true"]');assert.equal((await state()).ironBlanks,3);
  await page.locator('#station-relics').click();await page.waitForTimeout(1300);await checkLayout();await snap('relics');
@@ -85,4 +86,4 @@ for(const [width,height] of sizes){
  console.log(`${width}x${height}: full gameplay, reward persistence and inventory reuse passed`);await page.close();
 }
 await writeFile(`${out}/report.json`,JSON.stringify({passed:true,url,renderer:'Chromium WebGL / SwiftShader',results},null,2));
-}catch(error){await writeFile(`${out}/report.json`,JSON.stringify({passed:false,error:String(error),results},null,2));throw error}finally{await browser.close()}
+}catch(error){if(activePage&&!activePage.isClosed())await activePage.screenshot({path:`${out}/failure.png`});await writeFile(`${out}/report.json`,JSON.stringify({passed:false,error:String(error),results},null,2));throw error}finally{await browser.close()}
