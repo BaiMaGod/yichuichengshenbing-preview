@@ -29,11 +29,16 @@ for(const [width,height] of sizes){
   if(width<800)assert.ok(layout.nav.bottom<=layout.panel.y,'station navigation must stay above the panel');
  };
  const checkSword=async()=>{
-  await page.waitForFunction(()=>!!document.querySelector('#scene3d').dataset.forgeProof);
+  await page.waitForFunction(()=>{
+   const host=document.querySelector('#scene3d'),raw=host.dataset.forgeProof;if(!raw)return false;
+   const proof=JSON.parse(raw),phase=JSON.parse(localStorage.getItem('yichuichengshenbing.v1')).session?.phase||'idle',navTop=document.querySelector('.station-nav').getBoundingClientRect().top-host.getBoundingClientRect().top;
+   return proof.phase===phase&&Math.abs(proof.navTop-navTop)<2;
+  });
   const proof=await page.evaluate(()=>{
    const host=document.querySelector('#scene3d'),r=host.getBoundingClientRect(),panel=document.querySelector('.control:not([hidden])').getBoundingClientRect(),nav=document.querySelector('.station-nav').getBoundingClientRect();
    return{...JSON.parse(host.dataset.forgeProof),host:{x:r.x,y:r.y,width:r.width,height:r.height},panel:{x:panel.x,y:panel.y},nav:{y:nav.y}};
   });
+  await writeFile(`${out}/sword-proof-${visibility.length}.json`,JSON.stringify(proof,null,2));
   assert.equal(proof.visibleSamples,proof.totalSamples,'all six broad-face rays must reach the blade without anvil occlusion');
   assert.ok(proof.faceHeight>=20,'blade must show a readable broad face, rather than an edge');
   assert.ok(proof.bounds.left>=10&&proof.bounds.right<=proof.host.width-10,'pommel and sword tip must fit inside the viewport');
@@ -46,10 +51,10 @@ for(const [width,height] of sizes){
  if(width>=800)await page.screenshot({path:`${out}/${width}-forge-detail.png`,clip:{x:Math.round(width*.19),y:Math.round(height*.22),width:Math.round(width*.49),height:Math.round(height*.55)}});
  await page.locator('#begin').click();assert.equal((await state()).session.phase,'heat');
  const heat=await page.locator('#heat-button').boundingBox();await page.mouse.move(heat.x+heat.width/2,heat.y+heat.height/2);await page.mouse.down();await page.waitForFunction(()=>parseInt(document.getElementById('heat-text').textContent,10)>=72,{},{timeout:30000});const releaseHeat=await page.locator('#heat-text').textContent();await page.mouse.up();
- assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true,`${width}px release at ${releaseHeat}: ${(await state()).session.goodHeat}`);await checkLayout();await checkSword();await snap('forging');
+ assert.equal((await state()).session.phase,'forge');assert.equal((await state()).session.goodHeat,true,`${width}px release at ${releaseHeat}: ${(await state()).session.goodHeat}`);await checkLayout();await snap('forging');await checkSword();
  for(let i=0;i<2;i++){await page.locator('#strike').click();await page.waitForTimeout(650)}
  assert.equal((await state()).session.hits,2);assert.equal((await state()).session.level,2);
- await page.locator('#cashout').click();await page.locator('#quench-quick').click();await page.locator('#skip-trial').click();assert.equal((await state()).session.phase,'finished');await checkLayout();await snap('finished');
+ await page.locator('#cashout').click();await page.locator('#quench-quick').click();await page.locator('#skip-trial').click();assert.equal((await state()).session.phase,'finished');await checkLayout();await checkSword();await snap('finished');
  await page.locator('#offer-cat').click();await page.waitForTimeout(1200);await checkLayout();await snap('cat');
  await page.locator('#tribute').click();await page.waitForSelector('#scene3d[data-tribute="chewing"]',{timeout:15000});await snap('swallow');
  await page.waitForSelector('#scene3d[data-tribute="ejecting"]',{timeout:15000});await snap('eject');
