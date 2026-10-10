@@ -12,6 +12,7 @@ for(const [width,height] of sizes){
  const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')));
  const renders=[];
  const visibility=[];
+ const catPoses=[];
  const snap=async name=>{
   await writeFile(`${out}/last-frame.json`,JSON.stringify({name,errors,failed,renders,frame:await page.evaluate(()=>({...document.querySelector('#scene3d').dataset}))},null,2));
   await page.screenshot({path:`${out}/${width}-${name}.png`});
@@ -47,6 +48,18 @@ for(const [width,height] of sizes){
   else assert.ok(proof.bounds.right+proof.host.x<proof.panel.x-8||proof.bounds.bottom+proof.host.y<proof.panel.y-8,'sword must stay clear of desktop controls');
   visibility.push(proof);
  };
+ const checkCat=async phase=>{
+  await page.waitForFunction(expected=>{const raw=document.querySelector('#scene3d').dataset.catProof;return raw&&JSON.parse(raw).phase===expected},phase,{timeout:20000});
+  const proof=await page.evaluate(()=>{const host=document.querySelector('#scene3d'),r=host.getBoundingClientRect(),nav=document.querySelector('.station-nav').getBoundingClientRect();return{...JSON.parse(host.dataset.catProof),host:{x:r.x,y:r.y,width:r.width,height:r.height},navTop:nav.top-r.top}});
+  if(phase==='idle'){
+   assert.ok(proof.bounds.left>=8&&proof.bounds.right<=width-8,'whole cat, ears and whiskers must fit');
+   assert.ok(proof.bounds.top>=90,'ears must stay below the fixed title');
+   assert.ok(proof.bounds.bottom<proof.navTop-12,'paws must stay above station controls');
+  }
+  if(phase==='offering')assert.ok(proof.jawAngle>.6,'lower jaw must visibly open downward');
+  if(phase==='ejecting')assert.ok(Math.abs(proof.turn)>2,'cat must turn around before dropping the reward');
+  catPoses.push(proof);await writeFile(`${out}/cat-poses.json`,JSON.stringify(catPoses,null,2));
+ };
  await page.goto(url);await page.waitForSelector('#scene3d[data-ready="true"]');await page.waitForTimeout(1400);
  assert.equal(await page.locator('#blade').inputValue(),'great');await checkLayout();await checkSword();await snap('forge');
  if(width>=800)await page.screenshot({path:`${out}/${width}-forge-detail.png`,clip:{x:Math.round(width*.19),y:Math.round(height*.22),width:Math.round(width*.49),height:Math.round(height*.55)}});
@@ -56,9 +69,11 @@ for(const [width,height] of sizes){
  for(let i=0;i<2;i++){await page.locator('#strike').click();await page.waitForTimeout(650)}
  assert.equal((await state()).session.hits,2);assert.equal((await state()).session.level,2);
  await page.locator('#cashout').click();await page.locator('#quench-quick').click();await page.locator('#skip-trial').click();assert.equal((await state()).session.phase,'finished');await checkLayout();await checkSword();await snap('finished');
- await page.locator('#offer-cat').click();await page.waitForTimeout(1200);await checkLayout();await snap('cat');
- await page.locator('#tribute').click();await page.waitForSelector('#scene3d[data-tribute="chewing"]',{timeout:15000});await snap('swallow');
- await page.waitForSelector('#scene3d[data-tribute="ejecting"]',{timeout:15000});await snap('eject');
+ await page.locator('#offer-cat').click();await page.waitForTimeout(1200);await checkLayout();await checkCat('idle');await snap('cat');
+ if(width>=800){const b=catPoses[0].bounds;await page.screenshot({path:`${out}/${width}-cat-detail.png`,clip:{x:Math.max(0,Math.floor(b.left-10)),y:Math.max(0,Math.floor(b.top-10)),width:Math.ceil(b.right-b.left+20),height:Math.ceil(b.bottom-b.top+20)}});}
+ await page.locator('#tribute').click();await checkCat('offering');await snap('offering');
+ await page.waitForSelector('#scene3d[data-tribute="chewing"]',{timeout:20000});await checkCat('chewing');await snap('swallow');
+ await page.waitForSelector('#scene3d[data-tribute="ejecting"]',{timeout:20000});await checkCat('ejecting');await snap('eject');
  await page.waitForSelector('#cat-back:not([hidden])',{timeout:15000});await snap('reward');
  const after=await state();assert.equal(after.ironBlanks,3);assert.equal(after.catTributes,1);assert.equal(after.session,null);assert.equal(after.swords[0].disposal,'TRIBUTED');assert.equal(after.coins,300);
  await page.reload();await page.waitForSelector('#scene3d[data-ready="true"]');assert.equal((await state()).ironBlanks,3);
@@ -66,7 +81,7 @@ for(const [width,height] of sizes){
  await page.locator('.relic-row').filter({hasText:'九命护符'}).locator('button').click();assert.equal((await state()).ironBlanks,1);assert.ok((await state()).relics.includes('guard'));
  await page.reload();await page.waitForSelector('#scene3d[data-ready="true"]');assert.equal((await state()).ironBlanks,1);
  await page.locator('#begin').click();const next=await state();assert.equal(next.session.paid,15);assert.equal(next.coins,285);assert.equal(next.ironBlanks,0);assert.equal(next.session.protection,true);
- assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);results.push({width,height,passed:true,errors,failed,renders,visibility,checks:['3D WebGL startup','broad blade face and full sword framing','six blade surface occlusion rays','layout','real heat input','two real hammer inputs','quench','giant sword tribute','swallow/eject/reward','persisted reward','relic purchase','iron sword consumption']});
+ assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);results.push({width,height,passed:true,errors,failed,renders,visibility,catPoses,checks:['3D WebGL startup','broad blade face and full sword framing','six blade surface occlusion rays','whole cat and ear framing','completed GPU mouth opening and turn poses','layout','real heat input','two real hammer inputs','quench','giant sword tribute','swallow/eject/reward','persisted reward','relic purchase','iron sword consumption']});
  console.log(`${width}x${height}: full gameplay, reward persistence and inventory reuse passed`);await page.close();
 }
 await writeFile(`${out}/report.json`,JSON.stringify({passed:true,url,renderer:'Chromium WebGL / SwiftShader',results},null,2));
