@@ -31,7 +31,7 @@ for(const [width,height] of sizes){
  const checkSword=async()=>{
   await page.waitForFunction(()=>{
    const host=document.querySelector('#scene3d'),raw=host.dataset.forgeProof;if(!raw)return false;
-   const proof=JSON.parse(raw),phase=JSON.parse(localStorage.getItem('yichuichengshenbing.v1')).session?.phase||'idle',navTop=document.querySelector('.station-nav').getBoundingClientRect().top-host.getBoundingClientRect().top;
+   const proof=JSON.parse(raw),phase=JSON.parse(localStorage.getItem('yichuichengshenbing.v1'))?.session?.phase||'idle',navTop=document.querySelector('.station-nav').getBoundingClientRect().top-host.getBoundingClientRect().top;
    return proof.phase===phase&&Math.abs(proof.navTop-navTop)<2;
   });
   const proof=await page.evaluate(()=>{
