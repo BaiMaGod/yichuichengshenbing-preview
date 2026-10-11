@@ -5,7 +5,7 @@ const out=process.env.QA_OUT||'qa-input-evidence';await mkdir(out,{recursive:tru
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const reports=[];
 try{
- for(const [width,height] of [[1280,900],[390,844],[360,800]]){
+ for(const [width,height] of (process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[1280,900],[390,844],[360,800]])){
   const page=await browser.newPage({viewport:{width,height},hasTouch:width<800});
   if(process.env.QA_FONT){
    const font=(await readFile(process.env.QA_FONT)).toString('base64');
@@ -27,20 +27,22 @@ try{
   });
   const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')));
   const hits=async()=>Number((await state()).session.hits);
-  const inputPoint=()=>page.locator('#scene3d').evaluate(host=>{const r=host.getBoundingClientRect(),p=JSON.parse(host.dataset.forgeProof);return{x:r.x+(p.bounds.left+p.bounds.right)/2,y:r.y+(p.bounds.top+p.bounds.bottom)/2}});
+  const inputPoint=(name='anvil')=>page.locator('#scene3d').evaluate((host,name)=>{const r=host.getBoundingClientRect(),p=JSON.parse(host.dataset.targets)[name];return{x:r.x+p.x,y:r.y+p.y}},name);
   const tap=async p=>width<800?page.touchscreen.tap(p.x,p.y):page.mouse.click(p.x,p.y);
   await page.goto(process.env.QA_URL||'http://127.0.0.1:4173');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
-  await page.locator('#begin').click();const heat=await page.locator('#heat-button').boundingBox();
-  await page.mouse.move(heat.x+heat.width/2,heat.y+heat.height/2);await page.mouse.down();
-  await page.waitForFunction(()=>parseInt(document.querySelector('#heat-text').textContent)>=75);await page.mouse.up();
+  await page.waitForTimeout(1300);await tap(await inputPoint('furnace'));
+  await page.waitForSelector('#scene3d[data-sword-place="furnace"]');
+  await page.waitForFunction(()=>Number(document.querySelector('#scene3d').dataset.heat)>=74);await tap(await inputPoint());
+  await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='forge');
   assert.equal((await state()).session.phase,'forge');
   await page.waitForFunction(()=>{const p=document.querySelector('#scene3d').dataset.forgeProof;return p&&JSON.parse(p).phase==='forge'});
   await page.waitForSelector('#scene3d[data-audio-state="ready"]');
   const baseline=await state(),point=await inputPoint();
+  await tap({x:width-16,y:height-215});assert.equal(await hits(),0,'empty floor must not strike');
   await page.locator('#precise').click();await page.locator('#safe').click();assert.equal(await hits(),0,'style buttons must not strike');
   await page.locator('.logo-area').click();assert.equal(await hits(),0,'header must not strike');
-  await page.locator('#station-cat').click();await tap({x:width/2,y:180});assert.equal(await hits(),0,'cat station must not strike');
-  await page.locator('#station-forge').click();
+  await page.locator('#menu-toggle').click();await page.locator('#station-cat').click();await tap({x:width/2,y:180});assert.equal(await hits(),0,'cat station must not strike');
+  await page.locator('#menu-toggle').click();await page.locator('#station-forge').click();await page.waitForTimeout(1500);
   await page.mouse.click(point.x,point.y,{clickCount:3,delay:15});
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')).session.hits===1);
   assert.equal(await hits(),1,'rapid repeated inputs must produce only one strike');
@@ -65,10 +67,11 @@ try{
   }
   assert.equal((await state()).session.phase,'quench','sixth strike must transition to quenching');
   await tap({x:width/2,y:180});assert.equal(await hits(),6,'screen input after quench must not add a seventh strike');
+  const water=await inputPoint('water');await page.mouse.move(water.x,water.y);await page.mouse.down();await page.waitForTimeout(750);await page.mouse.up();await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='finished');assert.equal(await hits(),6,'quenching must not add another hit');assert.equal((await state()).session.quenchGood,true,'hold within the target window must produce precise quenching');
   // Force one unprotected fracture to verify its delayed contact and sound path.
   const broken=structuredClone(baseline);broken.session.protection=false;broken.session.seed=15872;
   await page.evaluate(s=>localStorage.setItem('yichuichengshenbing.v1',JSON.stringify(s)),broken);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
-  await page.locator('#bold').click();await tap({x:width/2,y:180});
+  await page.waitForFunction(()=>{const p=document.querySelector('#scene3d').dataset.forgeProof;return p&&JSON.parse(p).phase==='forge'});await page.locator('#bold').click();await tap(await inputPoint());
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('yichuichengshenbing.v1')).session.hits===1);
   const fractureOutcome=(await state()).session.strikes[0].result;
   assert.equal(fractureOutcome,'break','unprotected high roll must fracture the blade');

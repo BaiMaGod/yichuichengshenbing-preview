@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-BYP-S8cn.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-dksPLuig.css">
+<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-DHcdh-8z.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DRnj11oE.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
@@ -11,11 +11,15 @@
  <div class="wallet"><span>🪙 <b id="coin">300</b></span><span>铁剑 <b id="iron-blanks">0</b></span><span class="scrap-wallet">残料 <b id="scrap">0</b></span><span>✥ 声望 <b id="rep">0</b></span></div>
  <button id="sound" class="sound" aria-label="切换音效">🔊</button>
 </header>
+<div class="scene-tools"><button id="recipe-toggle" aria-expanded="false">配方</button><button id="menu-toggle" aria-expanded="false">工坊 ☰</button></div>
+<div id="scene-cue" class="scene-cue" role="status"><b id="cue-title">把剑送入炉火</b><span id="cue-detail">点炉子开始 · 配方可随时调整</span></div>
 <section class="workbench" aria-label="立体锻造工坊">
  <div id="scene3d" tabindex="0" aria-label="立体锻造工坊"></div>
  <div id="scene-error" hidden>3D 工坊加载失败，请刷新后重试。</div>
  <div class="scene-heading"><span id="scene-name">神兵锻造台</span><small id="sword-level-tag">剑胚 · Lv0</small></div>
  <div class="cat-demand"><span>邪恶猫咪的索求</span><b id="cat-demand-label">巨剑 Lv2+</b><small id="cat-count">已纳贡 0 次</small></div>
+ <div class="scene-targets" aria-hidden="true"><span id="target-furnace">熔炉 <small>入炉</small></span><span id="target-anvil">铸剑台 <small>放剑</small></span><span id="target-water">水桶 <small>淬火</small></span><span id="target-cat">猫咪</span><span id="target-relics">遗物柜</span></div>
+ <div id="quench-feedback" hidden>按住淬火 <b id="quench-hold">0%</b><div><i id="quench-hold-fill"></i></div></div>
 </section>
 <nav class="station-nav" aria-label="工坊区域"><button id="station-forge" class="active">锻造台</button><button id="station-cat">邪恶猫咪</button><button id="station-relics">遗物柜</button></nav>
 <section id="cat-panel" class="control station-panel" hidden>
@@ -33,20 +37,18 @@
  <small class="hint">先完成当前宝剑，再交换遗物。每件遗物只能拥有一次。</small>
 </section>
 <section class="control" id="choose">
- <div class="section-title"><span>选一把剑，开始锻造</span><small>猫咪只吃巨剑</small></div>
+ <div class="section-title"><span>锻造配方</span><button id="recipe-close" class="link-like">收起 ×</button></div>
  <label>委托订单 <select id="order"></select></label>
  <div class="double"><label>剑型 <select id="blade"></select></label><label>材料 <select id="material"></select></label></div>
  <p id="cost-label" class="muted">铁胚 65 + 燃料 15</p>
- <button id="begin" class="primary">点燃熔炉 · 开始锻造</button>
+ <p class="hint">选好后收起配方，直接点场景里的熔炉入炉。</p>
  <button id="apprentice" class="secondary" hidden>🛡️ 金币不足 · 接学徒免费代工</button>
  <div class="mini-info">已成功打造 <b id="made">0</b> 把 · 前两次正式锻造有显式护符保护</div>
 </section>
 <section class="control" id="heat" hidden>
- <div class="section-title"><span>02 / 熔炉加热</span><small id="heating-order">当前订单</small></div>
- <h2>🔥 火候掌控</h2><p class="muted">按住风箱持续加热，70%—90% 松手获得好火候加成。</p>
+ <div class="section-title"><span>炉中加热</span><small id="heating-order">当前订单</small></div>
  <div class="heat-bar"><div class="ideal-range"></div><div id="heat-fill"></div><b id="heat-text">0%</b></div>
- <button id="heat-button" class="primary giant">按住风箱 · 松手停火</button>
- <small class="hint">火候不佳也不会损坏宝剑，仍可正常锻造</small>
+ <small class="hint">70%—90% 点铸剑台，取剑并获得好火候</small>
 </section>
 <section class="control" id="forge" hidden>
  <div class="forge-head"><b id="forge-level">Lv0</b><span id="forge-quality">Q 0.90</span><span>已锤 <b id="hit-count">0/6</b></span></div>
@@ -57,7 +59,7 @@
   <button id="precise" class="style"><b>精锻</b><span>成功 +2</span><small>基础断剑 5%</small></button>
   <button id="bold" class="style"><b>豪锻</b><span>成功 +4</span><small>基础断剑 20%</small></button>
  </div>
- <div class="timing-area"><div class="ring-back"></div><div id="timing-ring"></div><div class="ring-center">⚒</div>
+ <div class="timing-area" aria-hidden="true"><div class="ring-back"></div><div id="timing-ring"></div><div class="ring-center">⚒</div>
   <div id="timing-indicator" class="timing">普通</div><div class="progress-line"><div id="ring-progress"></div></div>
  </div>
  <div class="risk-detail"><b id="style-label">稳锻 · 必定升级</b><span id="probability">成功 100% · 受损 0% · 断剑 0%</span></div>
@@ -66,11 +68,9 @@
  <small id="forge-tip" class="hint">时机越好，破损风险越低</small>
 </section>
 <section class="control" id="quench" hidden>
- <div class="section-title"><span>03 / 淬火定型</span><small>当前宝剑 <b id="quench-level">Lv0</b></small></div>
- <div class="quench-pool" id="quench-area"><div class="steam">☁　☁　☁</div><div class="quench-sword">↓</div><div class="water-zone"><div class="golden-water">精准区域 +0.02 品质</div>≈ ≈ ≈ ≈ ≈ ≈</div></div>
+ <div class="section-title"><span>铭文选择</span><small>当前宝剑 <b id="quench-level">Lv0</b></small></div>
  <label class="mark-selector">装配铭文 <select id="mark"></select></label>
  <p id="quench-alert" class="muted">向下拖动宝剑，落入目标带可完美淬火</p>
- <button id="quench-quick" class="secondary">普通淬火 · 不加成</button>
 </section>
 <section class="control" id="finished" hidden>
  <div class="section-title"><span>04 / 神兵出炉</span><small>宝剑已成 · 立即试剑</small></div>
