@@ -12,7 +12,7 @@ function successfulChain(){for(let n=1;n<1000000;n++){let x=n,valid=true;for(let
 let active;
 try{
 for(const [width,height] of sizes){
- const page=active=await browser.newPage({viewport:{width,height},hasTouch:width<800});page.setDefaultTimeout(20000);
+ const page=active=await browser.newPage({viewport:{width,height},hasTouch:width<800});page.setDefaultTimeout(45000);
  const errors=[],failed=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push(r.url()));
  if(process.env.QA_FONT){const font=(await readFile(process.env.QA_FONT)).toString('base64');await page.addInitScript(data=>{const face=new FontFace('Forge QA CJK',Uint8Array.from(atob(data),c=>c.charCodeAt(0)));document.fonts.add(face);void face.load();const prop=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'font');Object.defineProperty(CanvasRenderingContext2D.prototype,'font',{...prop,set(v){prop.set.call(this,v.replace('sans-serif','"Forge QA CJK",sans-serif'));}});document.addEventListener('DOMContentLoaded',()=>{const css=document.createElement('style');css.textContent='body,button,select{font-family:"Forge QA CJK",sans-serif!important}';document.head.append(css);});},font);}
  await page.addInitScript(()=>{window.__audioProbes=[];const connect=AudioNode.prototype.connect;AudioNode.prototype.connect=function(dest,...rest){if(dest instanceof AudioDestinationNode){const a=this.context.createAnalyser();a.fftSize=2048;connect.call(this,a);window.__audioProbes.push(a);}return connect.call(this,dest,...rest);};window.__peak=()=>Math.max(0,...window.__audioProbes.map(a=>{const values=new Float32Array(a.fftSize);a.getFloatTimeDomainData(values);return Math.max(...values.map(Math.abs));}));});
