@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-BTAqlNlr.js"></script>
+<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-BTAqlNlr.js?v=remove-recipe-20261012"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-7MBbTeWl.css">
-</head>
+<style>.disposal:has(#deliver[hidden]){grid-template-columns:repeat(2,minmax(0,1fr))}</style></head>
 <body>
 <main class="game" data-phase="choose">
 <header class="topbar">
@@ -11,8 +11,8 @@
  <div class="wallet"><span>🪙 <b id="coin">300</b></span><span>铁剑 <b id="iron-blanks">0</b></span><span class="scrap-wallet">残料 <b id="scrap">0</b></span><span>✥ 声望 <b id="rep">0</b></span></div>
  <button id="sound" class="sound" aria-label="切换音效">🔊</button>
 </header>
-<div class="scene-tools"><button id="recipe-toggle" aria-expanded="false">配方</button><button id="menu-toggle" aria-expanded="false">工坊 ☰</button></div>
-<div id="scene-cue" class="scene-cue" role="status"><b id="cue-title">把剑送入炉火</b><span id="cue-detail">点炉子开始 · 配方可随时调整</span></div>
+<div class="scene-tools"><button id="menu-toggle" aria-expanded="false">工坊 ☰</button></div>
+<div id="scene-cue" class="scene-cue" role="status"><b id="cue-title">把剑送入炉火</b><span id="cue-detail">点击熔炉，直接开始锻造</span></div>
 <section class="workbench" aria-label="立体锻造工坊">
  <div id="scene3d" tabindex="0" aria-label="立体锻造工坊"></div>
  <div id="scene-error" hidden>3D 工坊加载失败，请刷新后重试。</div>
@@ -36,17 +36,8 @@
  <div id="relic-list" class="relic-list"></div>
  <small class="hint">先完成当前宝剑，再交换遗物。每件遗物只能拥有一次。</small>
 </section>
-<section class="control" id="choose">
- <div class="section-title"><span>锻造配方</span><button id="recipe-close" class="link-like">收起 ×</button></div>
- <label>委托订单 <select id="order"></select></label>
- <div class="double"><label>剑型 <select id="blade"></select></label><label>材料 <select id="material"></select></label></div>
- <p id="cost-label" class="muted">铁胚 305 + 燃料 15</p>
- <p class="hint">选好后收起配方，直接点场景里的熔炉入炉。</p>
- <button id="apprentice" class="secondary" hidden>🛡️ 金币不足 · 接学徒免费代工</button>
- <div class="mini-info">已成功打造 <b id="made">0</b> 把 · 前两次正式锻造有显式护符保护</div>
-</section>
 <section class="control" id="heat" hidden>
- <div class="section-title"><span>炉中加热</span><small id="heating-order">当前订单</small></div>
+ <div class="section-title"><span>炉中加热</span><small id="heating-order">炉中加热</small></div>
  <div class="heat-bar"><div class="ideal-range"></div><div id="heat-fill"></div><b id="heat-text">0%</b></div>
  <small class="hint">70%—90% 点铸剑台，取剑并获得好火候</small>
 </section>
@@ -79,7 +70,7 @@
  </div>
  <div class="trial-progress-track"><div id="trial-progress"></div></div>
  <div class="trial-result" id="trial-result"></div>
- <div class="deal-info"><span>商行出售：<b id="finished-sell">0</b> 金</span><span>委托交付：<b id="finished-order">未达标</b></span></div>
+ <div class="deal-info"><span>商行出售：<b id="finished-sell">0</b> 金</span><span hidden>委托交付：<b id="finished-order">未达标</b></span></div>
  <button id="offer-cat" class="primary">把巨剑献给邪恶猫咪</button><div class="disposal"><button id="deliver" class="primary">交付委托</button><button id="sell" class="secondary">出售</button><button id="collect" class="secondary">收藏</button></div>
 </section>
 <section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-next" class="primary">再锻一把</button></section>
