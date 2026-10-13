@@ -8,7 +8,7 @@
 <main class="game" data-phase="choose">
 <header class="topbar">
  <div class="logo-area"><small>THE CAT’S FORGE</small><strong>一锤成神兵</strong><span id="workshop-level">邪恶猫咪的铸剑工坊</span></div>
- <div class="wallet"><span>🪙 <b id="coin">300</b></span><span>铁剑 <b id="iron-blanks">0</b></span><span class="scrap-wallet">残料 <b id="scrap">0</b></span><span>✥ 声望 <b id="rep">0</b></span></div>
+ <div class="wallet"><span>🪙 <b id="coin">300</b></span><span>铁剑 <b id="iron-blanks">0</b></span><span class="scrap-wallet">残料 <b id="scrap">0</b></span></div>
  <button id="sound" class="sound" aria-label="切换音效">🔊</button>
 </header>
 <div id="scene-cue" class="scene-cue" role="status"><b id="cue-title">把剑送入炉火</b><span id="cue-detail">点击熔炉，直接开始锻造</span></div>
@@ -66,22 +66,12 @@
   <label id="mark-row" hidden>收剑铭文 <select id="mark"></select></label>
  </details>
 </section>
-<section class="control" id="finished" hidden>
- <div class="section-title"><span>04 / 神兵出炉</span><small>宝剑已成 · 立即试剑</small></div>
- <div class="reveal-summary"><div><strong id="finished-level">Lv2</strong><small>锻造等级</small></div><div><strong id="finished-quality">Q1.00</strong><small>锻造品质</small></div><div><strong id="finished-attack">28</strong><small>攻击力</small></div><div><strong id="finished-value">150</strong><small>参考价值</small></div></div>
- <div class="trial-head">⚔️ 试剑台 · 三靶独立模拟 <button id="skip-trial" class="link-like">跳过演出 »</button></div>
- <div class="trial-arena" id="trial-arena" role="img" aria-label="试剑动画">
-   <div class="trial-target" id="trial-target">🪵</div>
-   <div class="trial-swoosh"></div>
-   <div class="trial-stage-label" id="trial-stage-label">木桩 · 斩断测试</div>
-   <div class="trial-target-meter"><div id="trial-hp"></div></div>
- </div>
- <div class="trial-progress-track"><div id="trial-progress"></div></div>
- <div class="trial-result" id="trial-result"></div>
- <div class="deal-info"><span>商行出售：<b id="finished-sell">0</b> 金</span><span>委托交付：<b id="finished-order">未达标</b></span></div>
- <button id="offer-cat" class="primary">把巨剑献给邪恶猫咪</button><div class="disposal"><button id="deliver" class="primary">交付委托</button><button id="sell" class="secondary">出售</button><button id="collect" class="secondary">收藏</button></div>
-</section>
-<section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-next" class="primary">再锻一把</button></section>
+<section class="control" id="finish<section class="control" id="finished" hidden>
+ <div class="section-title"><span>神兵出炉</span><small>宝剑已成</small></div>
+ <div class="reveal-summary"><div><strong id="finished-level">Lv2</strong><small>锻造等级</small></div><div><strong id="finished-quality">Q1.00</strong><small>锻造品质</small></div><div><strong id="finished-value">150</strong><small>宝剑价值 · 金</small></div></div>
+ <p class="finished-sale-note">出售可得 <b id="finished-sell">0</b> 金</p>
+ <div class="finished-actions"><button id="sell" class="primary">出售并继续锻造</button><button id="collect" class="secondary">收藏</button><button id="offer-cat" class="secondary">献给邪恶猫咪</button><button id="deliver" class="primary" hidden>完成代工</button></div>
+</section>="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-next" class="primary">再锻一把</button></section>
 <footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div><div class="nav-actions"><button id="nav-upgrades">升级锻锤</button><button id="nav-furnace">升级熔炉</button><button id="nav-anvil">升级铁砧</button><button id="nav-collection">神兵剑谱</button></div></footer>
 </main><div role="status" aria-live="polite" id="toast"></div>
 </body></html>
