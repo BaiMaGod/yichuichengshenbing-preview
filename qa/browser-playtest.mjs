@@ -69,7 +69,7 @@ for(const [width,height] of sizes){
  const godProof=JSON.parse(await page.locator('#scene3d').getAttribute('data-forge-proof'));
  const starA=await bladePixels(page,{...godProof,samples:[...godProof.samples,...godProof.hiltSamples]});await page.waitForTimeout(1000);const starB=await bladePixels(page,{...godProof,samples:[...godProof.samples,...godProof.hiltSamples]});assert.ok(starA.some((rgb,i)=>rgb.reduce((n,c,j)=>n+Math.abs(c-starB[i][j]),0)>12),'cosmic surface flows on rendered sword');
  await page.reload();await ready();assert.equal((await state()).session.superGod,true);const beforeGod=await state();await hit();assert.ok((await state()).session.currentValue>=beforeGod.session.currentValue*1.5);
- await page.locator('#station-relics').click();assert.equal(await page.locator('#relic-panel').isVisible(),true);assert.equal(await page.locator('#nav-upgrades').isVisible(),true);await snap('cabinet');await page.locator('#station-forge').click();
+ await page.locator('#station-relics').click();assert.equal(await page.locator('#relic-panel').isVisible(),true);await page.locator('#relic-panel .cabinet-advanced summary').click();assert.equal(await page.locator('#nav-upgrades').isVisible(),true);await snap('cabinet');await page.locator('#station-forge').click();
  console.log(`${width}: frenzy and super-god verified`);const outcomes=[];for(const [result,roll] of [['great',.70],['unchanged',.85],['damage',.99],['break',.97]]){
   const f=structuredClone(baseline);f.session.goodHeat=false;f.session.protection=false;f.session.level=result==='break'?5:0;f.session.seed=seedForRange(roll,roll+.005);await fixture(f);await hit();const after=await state();assert.equal(after.session.strikes.at(-1).result,result);outcomes.push(result);if(result==='great')assert.equal(after.session.currentValue,800);if(result==='unchanged'||result==='damage')assert.equal(after.session.currentValue,320);if(result==='break'){assert.equal(after.session.phase,'broken');assert.equal(after.session.currentValue,0);}await snap(result);
  }
@@ -80,5 +80,6 @@ for(const [width,height] of sizes){
 }
 await writeFile(`${out}/continuous-forging-report.json`,JSON.stringify({passed:true,reports},null,2));
 }catch(e){if(active){await active.screenshot({path:`${out}/failure.png`});await writeFile(`${out}/failure.json`,JSON.stringify({error:String(e),frame:await active.locator('#scene3d').evaluate(e=>({...e.dataset})),state:await active.evaluate(k=>JSON.parse(localStorage.getItem(k)),key)},null,2));}throw e;}finally{await browser.close();}
+
 
 
