@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-zb2_PTnq.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DP0Pp4Ja.css">
+<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-CZoebWtA.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-C2Es_hIk.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
 <header class="topbar">
- <div class="logo-area"><small>THE CAT’S FORGE</small><strong>一锤成神兵</strong><span id="workshop-level">邪恶猫咪的铸剑工坊</span></div>
+ <div class="logo-area"><small>THE CAT’S FORGE</small><strong>一锤成神兵</strong><span id="workshop-level">邪恶猫咪的铸剑工坊</span><span id="day-label">工坊日 1</span></div>
  <div class="wallet"><span>🪙 <b id="coin">300</b></span><span>铁剑 <b id="iron-blanks">0</b></span><span class="scrap-wallet">残料 <b id="scrap">0</b></span></div>
  <button id="sound" class="sound" aria-label="切换音效">🔊</button>
 </header>
@@ -17,10 +17,10 @@
  <div id="scene-error" hidden>3D 工坊加载失败，请刷新后重试。</div>
  <div class="scene-heading"><span id="scene-name">神兵锻造台</span><small id="sword-level-tag">剑胚 · Lv0</small></div>
  <div class="cat-demand"><span>邪恶猫咪的索求</span><b id="cat-demand-label">巨剑 Lv2+</b><small id="cat-count">已纳贡 0 次</small></div>
- <div class="scene-targets" aria-hidden="true"><span id="target-furnace">熔炉 <small>入炉</small></span><span id="target-anvil">铸剑台 <small>放剑</small></span><span id="target-cat">猫咪</span><span id="target-relics">遗物柜</span></div>
+ <button id="merchant-call" class="merchant-call" hidden>✦ 神秘商人来访</button><div class="scene-targets" aria-hidden="true"><span id="target-furnace">熔炉 <small>入炉</small></span><span id="target-anvil">铸剑台 <small>放剑</small></span><span id="target-cat">猫咪</span><span id="target-relics">遗物机</span></div>
 
 </section>
-<nav class="station-nav" aria-label="工坊区域"><button id="station-forge" class="active">锻造台</button><button id="station-cat">邪恶猫咪</button><button id="station-relics">遗物柜</button></nav>
+<nav class="station-nav" aria-label="工坊区域"><button id="station-forge" class="active">锻造台</button><button id="station-cat">邪恶猫咪</button><button id="station-relics">遗物机</button></nav>
 <section id="cat-panel" class="control station-panel" hidden>
  <details class="station-drawer" open>
   <summary class="station-drawer-title"><strong>邪恶猫咪 · 纳贡</strong><small>巨剑换铁剑</small></summary>
@@ -36,13 +36,19 @@
 </section>
 <section id="relic-panel" class="control station-panel" hidden>
  <details class="station-drawer" open>
-  <summary class="station-drawer-title"><strong>遗物柜</strong><small>用铁剑换永久效果</small></summary>
+  <summary class="station-drawer-title"><strong>遗物机 · 遗物架</strong><small id="relic-rack-count">0/8 · 每日三选</small></summary>
   <div class="station-panel-content">
+   <label class="sword-appearance-switch"><input id="show-legacy-swords" type="checkbox">显示旧剑外观<small>默认关闭 · Lv0 斩龙 / Lv1 星陨 / Lv2 开天</small></label>
    <details class="cabinet-advanced"><summary>工坊升级与剑谱</summary><div id="workshop-upgrades" class="cabinet-upgrades"></div></details>
    <div id="relic-list" class="relic-list"></div>
-   <small class="hint">完成当前宝剑后可交换遗物，每件只能拥有一次。</small>
+   <button id="relic-refresh" class="secondary market-refresh">刷新遗物</button>
+   <div class="market-subtitle">已装备遗物 · 卸下不退铁剑</div><div id="relic-equipped" class="relic-list"></div>
+   <small class="hint">第 1 日免费选 1 件，之后用铁剑交易。遗物架最多装备 8 件。</small>
   </div>
  </details>
+</section>
+<section id="merchant-panel" class="control station-panel" hidden>
+ <details class="station-drawer" open><summary class="station-drawer-title"><strong>神秘商人</strong><small>每三天来访 · 金币交易</small></summary><div class="station-panel-content"><p id="merchant-note" class="muted"></p><div id="merchant-list" class="relic-list"></div><small id="merchant-inventory" class="hint"></small><button id="merchant-back" class="secondary">返回锻造台</button></div></details>
 </section>
 <section class="control" id="heat" hidden>
  <div class="section-title"><span>炉中加热</span><small id="heating-order">当前订单</small></div>
@@ -64,6 +70,7 @@
   <div id="probability" class="risk-detail"></div>
   <div class="forge-extras"><span id="heat-tag">普通火候</span><span id="protection">护符保护</span></div>
   <label id="mark-row" hidden>收剑铭文 <select id="mark"></select></label>
+  <div class="supply-title">商人道具 · 点击启用</div><div id="supply-actions" class="supply-actions"></div>
  </details>
 </section>
 <section class="control" id="finished" hidden>
@@ -72,7 +79,7 @@
  <p class="finished-sale-note">出售可得 <b id="finished-sell">0</b> 金</p>
  <div class="finished-actions"><button id="sell" class="primary">出售并继续锻造</button><button id="collect" class="secondary">收藏</button><button id="offer-cat" class="secondary">献给邪恶猫咪</button><button id="deliver" class="primary" hidden>完成代工</button></div>
 </section>
-<section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-next" class="primary">再锻一把</button></section>
+<section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-rewind" class="secondary" hidden>⏳ 使用回溯发条 · 恢复宝剑</button><button id="broken-next" class="primary">再锻一把</button></section>
 <footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div><div class="nav-actions"><button id="nav-upgrades">升级锻锤</button><button id="nav-furnace">升级熔炉</button><button id="nav-anvil">升级铁砧</button><button id="nav-collection">神兵剑谱</button></div></footer>
 </main><div role="status" aria-live="polite" id="toast"></div>
 </body></html>
