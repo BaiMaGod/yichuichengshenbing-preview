@@ -88,7 +88,7 @@ for(const [width,height] of sizes){
  }
  assert.ok((await page.locator('#nav-furnace').textContent()).includes('Lv9 · 已满级'));
  assert.equal(await page.locator('#nav-furnace').isDisabled(),true);
- await page.locator('#station-forge').click();await page.waitForTimeout(900);
+ await page.reload();await ready();assert.equal((await state()).furnaceLevel,9);
  await tap('furnace');await page.waitForSelector('#scene3d[data-sword-place="furnace"]');
  assert.ok((await page.locator('#heating-order').textContent()).includes('1 秒满温'));
  await page.waitForFunction(()=>Number(document.querySelector('#scene3d').dataset.heat)>=100,null,{timeout:5500});
