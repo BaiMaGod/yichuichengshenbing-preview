@@ -3,7 +3,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-DFpBFENI.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-CBoPxgUe.css">
-</head>
+<link rel="stylesheet" href="./assets/forge-station-drawer-v1.css"></head>
 <body>
 <main class="game" data-phase="choose">
 <header class="topbar">
@@ -22,18 +22,27 @@
 </section>
 <nav class="station-nav" aria-label="工坊区域"><button id="station-forge" class="active">锻造台</button><button id="station-cat">邪恶猫咪</button><button id="station-relics">遗物柜</button></nav>
 <section id="cat-panel" class="control station-panel" hidden>
- <div class="section-title"><span>邪恶猫咪 · 纳贡</span><small>巨剑换铁剑</small></div>
- <p id="cat-speech" class="cat-speech">「交出你的巨剑！本大爷饿了，喵。」</p>
- <p class="muted" id="cat-offer-info">锻造大剑并收剑后，就能把巨剑送进猫咪嘴里。</p>
- <button id="tribute" class="primary">上交巨剑</button>
- <div id="tribute-reward" class="reward-text"></div>
- <button id="cat-back" class="secondary" hidden>收下铁剑 · 继续锻造</button>
- <small class="hint">猫咪吞掉巨剑，转身拉出 3–5 把铁剑。铁剑可再次锻造或交换遗物。</small>
+ <details class="station-drawer" open>
+  <summary class="station-drawer-title"><strong>邪恶猫咪 · 纳贡</strong><small>巨剑换铁剑</small></summary>
+  <div class="station-panel-content">
+   <p id="cat-speech" class="cat-speech">「交出你的巨剑！本大爷饿了，喵。」</p>
+   <p class="muted" id="cat-offer-info">锻造大剑并收剑后，就能把巨剑送进猫咪嘴里。</p>
+   <button id="tribute" class="primary">上交巨剑</button>
+   <div id="tribute-reward" class="reward-text"></div>
+   <button id="cat-back" class="secondary" hidden>收下铁剑 · 继续锻造</button>
+   <small class="hint">猫咪吞掉巨剑，转身拉出 3–5 把铁剑。铁剑可再次锻造或交换遗物。</small>
+  </div>
+ </details>
 </section>
 <section id="relic-panel" class="control station-panel" hidden>
- <div class="section-title"><span>遗物柜</span><small>用铁剑换永久效果</small></div><div id="workshop-upgrades" class="cabinet-upgrades"></div>
- <div id="relic-list" class="relic-list"></div>
- <small class="hint">先完成当前宝剑，再交换遗物。每件遗物只能拥有一次。</small>
+ <details class="station-drawer" open>
+  <summary class="station-drawer-title"><strong>遗物柜</strong><small>用铁剑换永久效果</small></summary>
+  <div class="station-panel-content">
+   <details class="cabinet-advanced"><summary>工坊升级与剑谱</summary><div id="workshop-upgrades" class="cabinet-upgrades"></div></details>
+   <div id="relic-list" class="relic-list"></div>
+   <small class="hint">完成当前宝剑后可交换遗物，每件只能拥有一次。</small>
+  </div>
+ </details>
 </section>
 <section class="control" id="heat" hidden>
  <div class="section-title"><span>炉中加热</span><small id="heating-order">当前订单</small></div>
