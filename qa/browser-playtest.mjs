@@ -20,7 +20,12 @@ async function assertEnchantedFrame(page,expected){
  else assert.equal(frame.superGod,true);
 }
 async function bladePixels(page,proof,path){
- if(proof.expectedFinish)await assertEnchantedFrame(page,proof.expectedFinish);
+ if(proof.expectedFinish){
+  await assertEnchantedFrame(page,proof.expectedFinish);
+  const previous=await page.locator('#scene3d').evaluate(e=>Number(e.dataset.gpuCompletedFrames||0));
+  await page.waitForFunction(n=>Number(document.querySelector('#scene3d').dataset.gpuCompletedFrames)>n,previous);
+  await assertEnchantedFrame(page,proof.expectedFinish);
+ }
  const b=proof.bounds,clip={x:Math.floor(b.left),y:Math.floor(b.top),width:Math.ceil(b.right)-Math.floor(b.left),height:Math.ceil(b.bottom)-Math.floor(b.top)};
  const bytes=(await page.screenshot(path?{path,timeout:SCREENSHOT_TIMEOUT}:{clip,timeout:SCREENSHOT_TIMEOUT})).toString('base64');if(path){clip.x=0;clip.y=0;}
  const colors=await page.evaluate(async({bytes,points,clip})=>{
@@ -31,11 +36,11 @@ async function bladePixels(page,proof,path){
  return colors;
 }
 function hueBins(colors){return new Set(colors.flatMap(([r,g,b])=>{const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;if(d<30||max<70)return[];let h=max===r?(g-b)/d+(g<b?6:0):max===g?(b-r)/d+2:(r-g)/d+4;return[Math.floor(h)%6];}));}
-let active;
+let active,activeConsoleMessages=[];
 try{
 for(const [width,height] of sizes){
  const page=active=await browser.newPage({viewport:{width,height},hasTouch:width<800});page.setDefaultTimeout(45000);
- const errors=[],failed=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push(r.url()));
+ const errors=[],failed=[],consoleMessages=[];activeConsoleMessages=consoleMessages;page.on('console',m=>{if(m.type()==='warning'||m.type()==='error')consoleMessages.push(m.text());});page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push(r.url()));
  if(process.env.QA_FONT){const font=(await readFile(process.env.QA_FONT)).toString('base64');await page.addInitScript(data=>{const face=new FontFace('Forge QA CJK',Uint8Array.from(atob(data),c=>c.charCodeAt(0)));document.fonts.add(face);void face.load();const prop=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'font');Object.defineProperty(CanvasRenderingContext2D.prototype,'font',{...prop,set(v){prop.set.call(this,v.replace('sans-serif','"Forge QA CJK",sans-serif'));}});document.addEventListener('DOMContentLoaded',()=>{const css=document.createElement('style');css.textContent='body,button,select{font-family:"Forge QA CJK",sans-serif!important}';document.head.append(css);});},font);}
  await page.addInitScript(()=>{window.__audioProbes=[];const connect=AudioNode.prototype.connect;AudioNode.prototype.connect=function(dest,...rest){if(dest instanceof AudioDestinationNode){const a=this.context.createAnalyser();a.fftSize=2048;connect.call(this,a);window.__audioProbes.push(a);}return connect.call(this,dest,...rest);};window.__peak=()=>Math.max(0,...window.__audioProbes.map(a=>{const values=new Float32Array(a.fftSize);a.getFloatTimeDomainData(values);return Math.max(...values.map(Math.abs));}));});
  const state=()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)),key);
@@ -114,7 +119,7 @@ for(const [width,height] of sizes){
 await writeFile(`${out}/continuous-forging-report.json`,JSON.stringify({passed:true,reports},null,2));
 }catch(e){
  console.error('Original browser QA failure:',e);
- const diagnostic={error:String(e),stack:e?.stack};
+ const diagnostic={error:String(e),stack:e?.stack,consoleMessages:activeConsoleMessages.slice(-30)};
  if(active){
   const details=await Promise.race([
    active.evaluate(k=>({frame:{...document.querySelector('#scene3d').dataset},state:JSON.parse(localStorage.getItem(k))}),key).catch(error=>({captureError:String(error)})),
