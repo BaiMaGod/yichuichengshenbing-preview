@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-0tP3G1gl.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DHiW6cGg.css">
-<meta name="source-commit" content="b03409469fbba18e6228455f20c7c6bc6ae25707"></head>
+<meta charset="UTF-8"><meta name="source-commit" content="08a0db37b0e7feec596587ef0a9c42dc26f5b295"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-DKjE56mC.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-a4kpg6Ei.css">
+</head>
 <body>
 <main class="game" data-phase="choose">
 <header class="topbar">
@@ -12,44 +12,46 @@
  <button id="sound" class="sound" aria-label="切换音效">🔊</button>
 </header>
 <div id="scene-cue" class="scene-cue" role="status"><b id="cue-title">把剑送入炉火</b><span id="cue-detail">点击熔炉，直接开始锻造</span></div>
+<button id="board-toggle" class="board-toggle" aria-label="隐藏信息面板" aria-expanded="true">▲</button>
 <section class="workbench" aria-label="立体锻造工坊">
  <div id="scene3d" tabindex="0" aria-label="立体锻造工坊"></div>
  <div id="scene-error" hidden>3D 工坊加载失败，请刷新后重试。</div>
- <div class="scene-heading"><span id="scene-name">神兵锻造台</span><small id="sword-level-tag">剑胚 · Lv0</small></div>
- <div class="cat-demand"><span>食铁兽的索求</span><b id="cat-demand-label">巨剑 Lv2+</b><small id="cat-count">已纳贡 0 次</small></div>
- <button id="merchant-call" class="merchant-call" hidden>✦ 神秘商人来访</button><div class="scene-targets" aria-hidden="true"><span id="target-furnace">熔炉 <small>入炉</small></span><span id="target-anvil">铸剑台 <small>放剑</small></span><span id="target-cat">食铁兽</span><span id="target-relics">遗物机</span></div>
+ <div class="scene-heading"><span id="scene-name">神兵锻造台</span><small id="sword-level-tag">剑胚 · 强化 +0</small></div>
+ <div class="cat-demand"><span>食铁兽的索求</span><b id="cat-demand-label">宝剑价值 ≥ 720 金</b><small id="cat-count">已纳贡 0 次</small></div>
+<div class="scene-targets" aria-hidden="true"><span id="target-furnace">熔炉 <small>入炉</small></span><span id="target-anvil">铸剑台 <small>放剑</small></span><span id="target-cat">食铁兽</span><span id="target-relics">遗物机</span></div>
 
 </section>
-<nav class="station-nav" aria-label="工坊区域"><button id="station-forge" class="active">锻造台</button><button id="station-cat">食铁兽</button><button id="station-relics">遗物机</button></nav>
+ <button id="merchant-call" class="merchant-call" hidden aria-label="幽灵商人，查看商品"><svg viewBox="0 0 64 72" aria-hidden="true"><defs><radialGradient id="ghost-light"><stop stop-color="#f0fff8"/><stop offset="1" stop-color="#9be3d6"/></radialGradient></defs><path fill="url(#ghost-light)" d="M10 35C10 2 54 2 54 35v25l-8-5-7 8-7-8-8 8-7-8-7 5z"/><ellipse cx="24" cy="32" rx="4" ry="6" fill="#28545a"/><ellipse cx="42" cy="32" rx="4" ry="6" fill="#28545a"/><path d="M28 45q5 5 10 0" fill="none" stroke="#28545a" stroke-width="3" stroke-linecap="round"/></svg></button>
+<nav class="station-nav" aria-label="工坊区域"><button id="station-forge" class="active">锻造台</button><button id="station-cat">食铁兽</button><button id="station-relics">遗物机</button><button id="station-collection">收藏架</button></nav>
 <section id="cat-panel" class="control station-panel" hidden>
  <details class="station-drawer" open>
-  <summary class="station-drawer-title"><strong>食铁兽 · 纳贡</strong><small>巨剑换铁剑</small></summary>
+  <summary class="station-drawer-title"><strong>食铁兽 · 纳贡</strong><small>按价值换铁剑</small></summary>
   <div class="station-panel-content">
    <p id="cat-speech" class="cat-speech">「交出你的巨剑！本大爷饿了，开饭！」</p>
-   <p class="muted" id="cat-offer-info">锻造大剑并收剑后，就能把巨剑送进食铁兽嘴里。</p>
-   <button id="tribute" class="primary">上交巨剑</button>
+   <p class="muted" id="cat-offer-info">锻造宝剑，价值达到纳贡要求后收剑，再上交。</p>
+   <button id="tribute" class="primary">上交宝剑</button>
    <div id="tribute-reward" class="reward-text"></div>
    <button id="cat-back" class="secondary" hidden>收下铁剑 · 继续锻造</button>
-   <small class="hint">食铁兽吞掉巨剑，转身拉出 3–5 把铁剑。铁剑可再次锻造或交换遗物。</small>
+   <small class="hint">食铁兽吞掉宝剑，转身拉出 3–5 把铁剑。铁剑可再次锻造或交换遗物。</small>
   </div>
  </details>
 </section>
 <section id="relic-panel" class="control station-panel" hidden>
  <details class="station-drawer" open>
-  <summary class="station-drawer-title"><strong>遗物机 · 遗物架</strong><small id="relic-rack-count">0/8 · 每日三选</small></summary>
+  <summary class="station-drawer-title"><strong>遗物机 · 三格货架</strong><small id="relic-rack-count">0/8 · 纳贡补货</small></summary>
   <div class="station-panel-content">
-   <label class="sword-appearance-switch"><input id="show-legacy-swords" type="checkbox">显示旧剑外观<small>默认关闭 · 七把独立剑型，+3 起新增符文、龙齿、弧刃与雷霆</small></label>
-   <details class="cabinet-advanced"><summary>工坊升级与剑谱</summary><div id="workshop-upgrades" class="cabinet-upgrades"></div></details>
    <div id="relic-list" class="relic-list"></div>
-   <button id="relic-refresh" class="secondary market-refresh">刷新遗物</button>
-   <div class="market-subtitle">已装备遗物 · 卸下不退铁剑</div><div id="relic-equipped" class="relic-list"></div>
-   <small class="hint">第 1 日免费选 1 件，之后用铁剑交易。遗物架最多装备 8 件。</small>
+   <details class="cabinet-advanced"><summary>墙上遗物与工坊设置</summary>   <div class="market-subtitle">墙上遗物 · 卸下不退铁剑</div><div id="relic-equipped" class="relic-list"></div>
+   <small class="hint">第 1 日免费选 1 件，之后用铁剑交易。已购遗物挂在铸剑台墙上，最多 8 件。空格仅在成功纳贡后补货。</small>   <label class="sword-appearance-switch"><input id="show-legacy-swords" type="checkbox">显示旧剑外观<small>默认关闭 · 七把独立剑型，+3 起新增符文、龙齿、弧刃与雷霆</small></label>
+   <div class="cabinet-upgrade-section"><b>工坊升级与剑谱</b><div id="workshop-upgrades" class="cabinet-upgrades"></div></div>
+</details>
   </div>
  </details>
 </section>
 <section id="merchant-panel" class="control station-panel" hidden>
- <details class="station-drawer" open><summary class="station-drawer-title"><strong>神秘商人</strong><small>每三天来访 · 金币交易</small></summary><div class="station-panel-content"><p id="merchant-note" class="muted"></p><div id="merchant-list" class="relic-list"></div><small id="merchant-inventory" class="hint"></small><button id="merchant-back" class="secondary">返回锻造台</button></div></details>
+ <details class="station-drawer" open><summary class="station-drawer-title"><strong>幽灵商人</strong><small>每三天来访 · 金币交易</small></summary><div class="station-panel-content"><p id="merchant-note" class="muted"></p><div id="merchant-list" class="relic-list"></div><small id="merchant-inventory" class="hint"></small><button id="merchant-back" class="secondary">返回锻造台</button></div></details>
 </section>
+<section id="collection-panel" class="control station-panel" hidden><details class="station-drawer"><summary class="station-drawer-title"><strong>收藏剑架</strong><small id="collection-count">0/3</small></summary><div class="station-panel-content"><div id="collection-list"></div></div></details></section>
 <section class="control" id="heat" hidden>
  <div class="section-title"><span>炉中加热</span><small id="heating-order">当前订单</small></div>
  <div class="heat-bar"><div class="ideal-range"></div><div id="heat-fill"></div><b id="heat-text">0%</b></div>
@@ -75,7 +77,7 @@
 </section>
 <section class="control" id="finished" hidden>
  <div class="section-title"><span>神兵出炉</span><small>宝剑已成</small></div>
- <div class="reveal-summary"><div><strong id="finished-level">Lv2</strong><small>锻造等级</small></div><div><strong id="finished-quality">Q1.00</strong><small>锻造品质</small></div><div><strong id="finished-value">150</strong><small>宝剑价值 · 金</small></div></div>
+ <div class="reveal-summary"><div><strong id="finished-level">+2</strong><small>强化进度</small></div><div><strong id="finished-quality">Q1.00</strong><small>锻造品质</small></div><div><strong id="finished-value">150</strong><small>宝剑价值 · 金</small></div></div>
  <p class="finished-sale-note">出售可得 <b id="finished-sell">0</b> 金</p>
  <div class="finished-actions"><button id="sell" class="primary">出售并继续锻造</button><button id="collect" class="secondary">收藏</button><button id="offer-cat" class="secondary">献给食铁兽</button><button id="deliver" class="primary" hidden>完成代工</button></div>
 </section>
@@ -83,6 +85,7 @@
 <footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div><div class="nav-actions"><button id="nav-upgrades">升级锻锤</button><button id="nav-furnace">升级熔炉</button><button id="nav-anvil">升级铁砧</button><button id="nav-collection">神兵剑谱</button></div></footer>
 </main><div role="status" aria-live="polite" id="toast"></div>
 </body></html>
+
 
 
 
