@@ -7,6 +7,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.CH
 const reports=[],sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]];
 // Only visual fixtures receive this longer deadline; real four-second expiry is tested first.
 const VISUAL_FRENZY_MS=10*60*1000;
+const SCREENSHOT_TIMEOUT=120000;
 const key='yichuichengshenbing.v1',url=process.env.QA_URL||'http://127.0.0.1:4173';
 function next(n){n^=n<<13;n^=n>>>17;n^=n<<5;return n>>>0;}
 function seedForRange(low,high){for(let n=1;n<1000000;n++){const r=next(n)/2**32;if(r>=low&&r<high)return n;}throw Error('no fixture seed');}
@@ -21,7 +22,7 @@ async function assertEnchantedFrame(page,expected){
 async function bladePixels(page,proof,path){
  if(proof.expectedFinish)await assertEnchantedFrame(page,proof.expectedFinish);
  const b=proof.bounds,clip={x:Math.floor(b.left),y:Math.floor(b.top),width:Math.ceil(b.right)-Math.floor(b.left),height:Math.ceil(b.bottom)-Math.floor(b.top)};
- const bytes=(await page.screenshot(path?{path}:{clip})).toString('base64');if(path){clip.x=0;clip.y=0;}
+ const bytes=(await page.screenshot(path?{path,timeout:SCREENSHOT_TIMEOUT}:{clip,timeout:SCREENSHOT_TIMEOUT})).toString('base64');if(path){clip.x=0;clip.y=0;}
  const colors=await page.evaluate(async({bytes,points,clip})=>{
   const image=await createImageBitmap(new Blob([Uint8Array.from(atob(bytes),c=>c.charCodeAt(0))],{type:'image/png'})),canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);image.close();
   return points.map(p=>{const rgb=ctx.getImageData(Math.round(p.x-clip.x)-1,Math.round(p.y-clip.y)-1,3,3).data,sums=[0,0,0];for(let i=0;i<rgb.length;i+=4)for(let c=0;c<3;c++)sums[c]+=rgb[i+c];return sums.map(n=>n/9);});
@@ -44,7 +45,7 @@ for(const [width,height] of sizes){
  const fixture=async s=>{await page.evaluate(({k,s})=>localStorage.setItem(k,JSON.stringify(s)),{k:key,s});await page.reload();await ready();};
  const idle=()=>page.waitForFunction(()=>document.querySelector('#scene3d').dataset.hammerStage==='idle');
  const hit=async()=>{const count=(await state()).session.hits;await tap('anvil');await page.waitForFunction(({k,n})=>JSON.parse(localStorage.getItem(k)).session.hits===n,{k:key,n:count+1});await idle();};
- const snap=async name=>{const s=(await state())?.session;if(s?.phase==='forge')await page.waitForFunction(n=>Number(document.querySelector('#scene3d').dataset.boardRenderedHits)===n,s.hits);await page.waitForTimeout(250);await page.screenshot({path:`${out}/${width}-${name}.png`});};
+ const snap=async name=>{const s=(await state())?.session;if(s?.phase==='forge')await page.waitForFunction(n=>Number(document.querySelector('#scene3d').dataset.boardRenderedHits)===n,s.hits);await page.waitForTimeout(250);await page.screenshot({path:`${out}/${width}-${name}.png`,timeout:SCREENSHOT_TIMEOUT});};
  await page.goto(url);await ready();assert.equal(await page.locator('#menu-toggle').count(),0);assert.deepEqual(await page.locator('.station-nav button').allTextContents(),['锻造台','食铁兽','遗物机','收藏架']);const navBounds=await page.locator('.station-nav').boundingBox();assert.ok(navBounds.y>height-90&&navBounds.y+navBounds.height<=height,'four destinations stay at bottom');assert.equal(await page.locator('#target-water').count(),0);assert.equal(await page.locator('#quench').count(),0);
  console.log(`${width}: loaded workshop`);await snap('workshop');await tap('furnace');await page.waitForSelector('#scene3d[data-sword-place="furnace"]');await page.waitForFunction(()=>Number(document.querySelector('#scene3d').dataset.heat)>=74);await tap('anvil');await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='forge');await page.waitForTimeout(800);
  console.log(`${width}: heating and placement complete`);const baseline=await state();assert.equal(baseline.session.hits,0);assert.equal(baseline.session.goodHeat,true);assert.equal(await page.locator('#forge-options').getAttribute('open'),null);
@@ -111,7 +112,19 @@ for(const [width,height] of sizes){
  reports.push({width,height,passed:true,outcomes,sevenHitsRemainForge:true,frenzyExpires:true,flowingRainbow:true,flowingHilt:true,superGodPromoted:true,flowingCosmos:true,permanentBottomNavigation:true,levelColors:true,noSwordLabel:true,swordVisible:true,recordedAudio:true,mute:true,catReward:paid.ironBlanks});console.log(`${width}x${height}: continuous forging, five results, rainbow frenzy, cashout and tribute passed`);await page.close();active=null;
 }
 await writeFile(`${out}/continuous-forging-report.json`,JSON.stringify({passed:true,reports},null,2));
-}catch(e){if(active){await active.screenshot({path:`${out}/failure.png`});await writeFile(`${out}/failure.json`,JSON.stringify({error:String(e),frame:await active.locator('#scene3d').evaluate(e=>({...e.dataset})),state:await active.evaluate(k=>JSON.parse(localStorage.getItem(k)),key)},null,2));}throw e;}finally{await browser.close();}
+}catch(e){
+ console.error('Original browser QA failure:',e);
+ const diagnostic={error:String(e),stack:e?.stack};
+ if(active){
+  const details=await Promise.race([
+   active.evaluate(k=>({frame:{...document.querySelector('#scene3d').dataset},state:JSON.parse(localStorage.getItem(k))}),key).catch(error=>({captureError:String(error)})),
+   new Promise(resolve=>{const timer=setTimeout(()=>resolve({captureError:'Page diagnostics timed out'}),10000);timer.unref();})
+  ]);
+  Object.assign(diagnostic,details);await writeFile(`${out}/failure.json`,JSON.stringify(diagnostic,null,2));
+  try{await active.screenshot({path:`${out}/failure.png`,timeout:15000});}catch(error){console.error('Failure screenshot unavailable:',String(error));}
+ }else await writeFile(`${out}/failure.json`,JSON.stringify(diagnostic,null,2));
+ throw e;
+}finally{await browser.close();}
 
 
 
