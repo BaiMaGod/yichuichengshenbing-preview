@@ -5,17 +5,29 @@ const out=process.env.QA_OUT||'qa-evidence';await mkdir(out,{recursive:true});
 const args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader'];
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args});
 const reports=[],sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]];
+// Only visual fixtures receive this longer deadline; real four-second expiry is tested first.
+const VISUAL_FRENZY_MS=10*60*1000;
 const key='yichuichengshenbing.v1',url=process.env.QA_URL||'http://127.0.0.1:4173';
 function next(n){n^=n<<13;n^=n>>>17;n^=n<<5;return n>>>0;}
 function seedForRange(low,high){for(let n=1;n<1000000;n++){const r=next(n)/2**32;if(r>=low&&r<high)return n;}throw Error('no fixture seed');}
 function successfulChain(){for(let n=1;n<1000000;n++){let x=n,valid=true;for(let i=0;i<7;i++){x=next(x);if(x/2**32>=.3){valid=false;break;}}if(valid)return n;}throw Error('no chain seed');}
+async function assertEnchantedFrame(page,expected){
+ const frame=await page.evaluate(key=>{const d=document.querySelector('#scene3d').dataset,s=JSON.parse(localStorage.getItem(key)).session;return {rendered:d.bladeRenderedFinish,hilt:d.hiltFinish,frenzy:d.frenzy,remainingMs:s.frenzyUntil-Date.now(),superGod:s.superGod};},key);
+ assert.equal(frame.rendered,expected,'Rendered finish changed during pixel sampling: '+JSON.stringify(frame));
+ assert.equal(frame.hilt,expected,'Hilt finish changed during pixel sampling: '+JSON.stringify(frame));
+ if(expected==='rainbow'){assert.equal(frame.frenzy,'active');assert.ok(frame.remainingMs>0,'Visual fixture expired before sampling finished');}
+ else assert.equal(frame.superGod,true);
+}
 async function bladePixels(page,proof,path){
+ if(proof.expectedFinish)await assertEnchantedFrame(page,proof.expectedFinish);
  const b=proof.bounds,clip={x:Math.floor(b.left),y:Math.floor(b.top),width:Math.ceil(b.right)-Math.floor(b.left),height:Math.ceil(b.bottom)-Math.floor(b.top)};
  const bytes=(await page.screenshot(path?{path}:{clip})).toString('base64');if(path){clip.x=0;clip.y=0;}
- return page.evaluate(async({bytes,points,clip})=>{
+ const colors=await page.evaluate(async({bytes,points,clip})=>{
   const image=await createImageBitmap(new Blob([Uint8Array.from(atob(bytes),c=>c.charCodeAt(0))],{type:'image/png'})),canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);image.close();
   return points.map(p=>{const rgb=ctx.getImageData(Math.round(p.x-clip.x)-1,Math.round(p.y-clip.y)-1,3,3).data,sums=[0,0,0];for(let i=0;i<rgb.length;i+=4)for(let c=0;c<3;c++)sums[c]+=rgb[i+c];return sums.map(n=>n/9);});
  },{bytes,points:proof.samples,clip});
+ if(proof.expectedFinish)await assertEnchantedFrame(page,proof.expectedFinish);
+ return colors;
 }
 function hueBins(colors){return new Set(colors.flatMap(([r,g,b])=>{const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;if(d<30||max<70)return[];let h=max===r?(g-b)/d+(g<b?6:0):max===g?(b-r)/d+2:(r-g)/d+4;return[Math.floor(h)%6];}));}
 let active;
@@ -57,16 +69,16 @@ for(const [width,height] of sizes){
  await page.waitForSelector('#scene3d[data-blade-rendered-finish="rainbow"]');
  // Check the real four-second expiry separately from slower GPU screenshot sampling.
  await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.frenzy==='charging');await page.waitForSelector('#scene3d[data-blade-rendered-finish="metal"]');assert.ok(parseFloat(await page.locator('#fracture-risk').textContent())>0);
- const rainbowFixture=structuredClone(frenzy);rainbowFixture.session.frenzyUntil=Date.now()+60000;await fixture(rainbowFixture);
- await page.waitForSelector('#scene3d[data-blade-rendered-finish="rainbow"]');const frenzyProof=JSON.parse(await page.locator('#scene3d').getAttribute('data-forge-proof')),colorsA=await bladePixels(page,frenzyProof,`${out}/${width}-frenzy.png`);await page.waitForTimeout(420);const colorsB=await bladePixels(page,frenzyProof);assert.ok(hueBins(colorsA).size>=3||hueBins(colorsB).size>=3,'rainbow has multiple colors on the actual blade');assert.ok(colorsA.some((rgb,i)=>rgb.reduce((n,c,j)=>n+Math.abs(c-colorsB[i][j]),0)>45),'rainbow flows between rendered frames');
+ const rainbowFixture=structuredClone(frenzy);rainbowFixture.session.frenzyUntil=Date.now()+VISUAL_FRENZY_MS;await fixture(rainbowFixture);
+ await page.waitForSelector('#scene3d[data-blade-rendered-finish="rainbow"]');const frenzyProof=JSON.parse(await page.locator('#scene3d').getAttribute('data-forge-proof'));frenzyProof.expectedFinish='rainbow';const colorsA=await bladePixels(page,frenzyProof,`${out}/${width}-frenzy.png`);await page.waitForTimeout(420);const colorsB=await bladePixels(page,frenzyProof);assert.ok(hueBins(colorsA).size>=3||hueBins(colorsB).size>=3,'rainbow has multiple colors on the actual blade');assert.ok(colorsA.some((rgb,i)=>rgb.reduce((n,c,j)=>n+Math.abs(c-colorsB[i][j]),0)>45),'rainbow flows between rendered frames');
  const hiltA=await bladePixels(page,{...frenzyProof,samples:frenzyProof.hiltSamples});await page.waitForTimeout(700);const hiltB=await bladePixels(page,{...frenzyProof,samples:frenzyProof.hiltSamples});assert.ok(hiltA.some((rgb,i)=>rgb.reduce((n,c,j)=>n+Math.abs(c-hiltB[i][j]),0)>30),'rainbow flows on actual hilt and guard');
  // Value outcomes use actual scene contacts with deterministic isolated RNG fixtures.
  // Trigger the one-percent promotion through a physical contact, then verify actual rendered stars.
- const cosmic=structuredClone(seven);cosmic.session.frenzyUntil=Date.now()+60000;cosmic.session.superGod=false;
+ const cosmic=structuredClone(seven);cosmic.session.frenzyUntil=Date.now()+VISUAL_FRENZY_MS;cosmic.session.superGod=false;
  for(let n=1;n<1000000;n++)if(next(next(n))/2**32<.01){cosmic.session.seed=n;break;}
  await fixture(cosmic);await hit();const god=await state();assert.equal(god.session.superGod,true);assert.equal(god.session.strikes.at(-1).enteredSuperGod,true);assert.ok(god.session.currentValue>=cosmic.session.currentValue*1.5);
  await page.waitForSelector('#scene3d[data-blade-rendered-finish="cosmos"]');await snap('super-god');
- const godProof=JSON.parse(await page.locator('#scene3d').getAttribute('data-forge-proof'));
+ const godProof=JSON.parse(await page.locator('#scene3d').getAttribute('data-forge-proof'));godProof.expectedFinish='cosmos';
  const starA=await bladePixels(page,{...godProof,samples:[...godProof.samples,...godProof.hiltSamples]});await page.waitForTimeout(1000);const starB=await bladePixels(page,{...godProof,samples:[...godProof.samples,...godProof.hiltSamples]});assert.ok(starA.some((rgb,i)=>rgb.reduce((n,c,j)=>n+Math.abs(c-starB[i][j]),0)>12),'cosmic surface flows on rendered sword');
  await page.reload();await ready();assert.equal((await state()).session.superGod,true);const beforeGod=await state();await hit();assert.ok((await state()).session.currentValue>=beforeGod.session.currentValue*1.5);
  await page.locator('#station-relics').click();assert.equal(await page.locator('#relic-panel').isVisible(),true);await page.locator('#relic-panel .cabinet-advanced summary').click();assert.equal(await page.locator('#nav-upgrades').isVisible(),true);await snap('cabinet');await page.locator('#station-forge').click();
