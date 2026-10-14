@@ -24,5 +24,9 @@ jobs:
               assert pathlib.Path(path).is_file(), path
           assert not any(p.startswith('/') for p in refs), 'Absolute asset path breaks project Pages'
           assert '/src/' not in html
-          assert pathlib.Path('art/cat-turnaround-v2.webp').is_file()
+          javascript='\n'.join(pathlib.Path(p).read_text() for p in assets if p.endswith('.js'))
+          assert 'giant-panda' in javascript and 'panda-v1' in javascript, 'Missing panda model'
+          assert 'cat-turnaround-v2.webp' not in javascript, 'Build still references removed cat atlas'
+          assert '食铁兽' in html, 'Panda station label is missing'
+          assert re.search(r'name="source-commit" content="[a-f0-9]{40}"',html), 'Missing source version'
           PY
