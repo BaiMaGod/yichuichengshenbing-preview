@@ -66,7 +66,7 @@ for(const [width,height] of sizes){
  await page.evaluate(()=>window.__restoreFence());await fixture(test);
  await page.waitForFunction(()=>{const p=document.querySelector('#scene3d').dataset.forgeProof;return p&&JSON.parse(p).phase==='forge';});const baseBladeColors=await bladePixels(page,JSON.parse(await page.locator('#scene3d').getAttribute('data-forge-proof')));
  // Mouse events and real touch both hit the world object. Empty areas and UI do not.
- await page.mouse.click(width-8,height-210);assert.equal((await state()).session.hits,0);
+ await page.mouse.click(8,height-100);assert.equal((await state()).session.hits,0);assert.equal(await page.locator('#scene3d').getAttribute('data-station'),'forge','empty floor does not switch station');
  const p=await point('anvil');await page.mouse.click(p.x,p.y,{clickCount:3,delay:10});await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).session.hits===1,key);await idle();assert.equal((await state()).session.hits,1);
  await page.waitForSelector('#scene3d[data-audio-state="ready"]');await page.locator('#sound').click();const audioBefore=await page.locator('#scene3d').getAttribute('data-audio-played');await hit();assert.equal(await page.locator('#scene3d').getAttribute('data-audio-played'),audioBefore);assert.ok(await page.evaluate(()=>window.__peak())<.0001);
  await page.locator('#sound').click();await hit();assert.ok(Number(await page.locator('#scene3d').getAttribute('data-audio-played'))>Number(audioBefore||0));
