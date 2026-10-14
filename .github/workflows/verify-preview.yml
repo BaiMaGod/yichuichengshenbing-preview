@@ -25,9 +25,13 @@ jobs:
           assert not any(p.startswith('/') for p in refs), 'Absolute asset path breaks project Pages'
           assert '/src/' not in html
           javascript='\n'.join(pathlib.Path(p).read_text() for p in assets if p.endswith('.js'))
-          assert 'giant-panda' in javascript and 'panda-reference-seated-v5' in javascript, 'Missing sculpture panda model'
+          assert 'giant-panda' in javascript and 'panda-reference-reconstruction-v6' in javascript, 'Missing sculpture panda model'
           assert 'polygon-sculpture' in javascript, 'Missing sculpture style'
-          assert 'seated-compact-curled-fingers-convex-soles' in javascript, 'Missing revised panda limbs'
+          assert 'reference-shaped-curled-hands-seated-feet' in javascript, 'Missing revised panda limbs'
+          assert './art/panda-reference-v6.glb' in javascript, 'Missing reference volume loader'
+          assert pathlib.Path('art/panda-reference-v6.glb').read_bytes()[:4] == b'glTF', 'Missing GLB'
+          assert pathlib.Path('art/panda-reference-v6.png').read_bytes()[:8] == bytes([137,80,78,71,13,10,26,10]), 'Missing reference albedo'
+          assert b'panda-reference-v6.png' in pathlib.Path('art/panda-reference-v6.glb').read_bytes(), 'Invalid external texture URI'
           assert 'cat-turnaround-v2.webp' not in javascript, 'Build still references removed cat atlas'
           assert '食铁兽' in html, 'Panda station label is missing'
           assert re.search(r'name="source-commit" content="[a-f0-9]{40}"',html), 'Missing source version'
