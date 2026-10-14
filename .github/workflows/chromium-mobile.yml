@@ -34,6 +34,7 @@ jobs:
           mkdir -p /tmp/forge-pages-qa
           ln -s "$GITHUB_WORKSPACE" /tmp/forge-pages-qa/yichuichengshenbing-preview
           python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/forge-pages-qa >/tmp/forge-server.log 2>&1 &
+          node qa/workshop-layout-review.mjs
           node qa/browser-playtest.mjs
           node qa/screen-input.mjs
       - name: Upload actual screenshots and report

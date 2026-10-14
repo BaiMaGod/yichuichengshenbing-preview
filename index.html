@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-<meta charset="UTF-8"><meta name="source-commit" content="f9c0565c488e17458c0ddaa696e7e365a1116e5a"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-N-vf8ze1.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-a4kpg6Ei.css">
+<meta name="source-commit" content="92c4cdf3d70080e3eb80405f0b09dd0b0db78fa0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-DpN5jk8u.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-C3zcu5PM.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
@@ -21,7 +21,7 @@
 <div class="scene-targets" aria-hidden="true"><span id="target-furnace">熔炉 <small>入炉</small></span><span id="target-anvil">铸剑台 <small>放剑</small></span><span id="target-cat">食铁兽</span><span id="target-relics">遗物机</span></div>
 
 </section>
- <button id="merchant-call" class="merchant-call" hidden aria-label="幽灵商人，查看商品"><svg viewBox="0 0 64 72" aria-hidden="true"><defs><radialGradient id="ghost-light"><stop stop-color="#f0fff8"/><stop offset="1" stop-color="#9be3d6"/></radialGradient></defs><path fill="url(#ghost-light)" d="M10 35C10 2 54 2 54 35v25l-8-5-7 8-7-8-8 8-7-8-7 5z"/><ellipse cx="24" cy="32" rx="4" ry="6" fill="#28545a"/><ellipse cx="42" cy="32" rx="4" ry="6" fill="#28545a"/><path d="M28 45q5 5 10 0" fill="none" stroke="#28545a" stroke-width="3" stroke-linecap="round"/></svg></button>
+ <button id="merchant-call" class="merchant-call" hidden aria-label="幽灵商人，查看商品"><img src="./art/ghost-merchant-v2.webp" alt="紫帽幽灵商人" width="90" height="100"></button>
 <nav class="station-nav" aria-label="工坊区域"><button id="station-forge" class="active">锻造台</button><button id="station-cat">食铁兽</button><button id="station-relics">遗物机</button><button id="station-collection">收藏架</button></nav>
 <section id="cat-panel" class="control station-panel" hidden>
  <details class="station-drawer" open>
@@ -83,7 +83,7 @@
 </section>
 <section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-rewind" class="secondary" hidden>⏳ 使用回溯发条 · 恢复宝剑</button><button id="broken-next" class="primary">再锻一把</button></section>
 <footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div><div class="nav-actions"><button id="nav-upgrades">升级锻锤</button><button id="nav-furnace">升级熔炉</button><button id="nav-anvil">升级铁砧</button><button id="nav-collection">神兵剑谱</button></div></footer>
-</main><div role="status" aria-live="polite" id="toast"></div>
+</main><dialog id="relic-detail" aria-labelledby="relic-detail-name"><div class="relic-detail-emblem" aria-hidden="true">◈</div><h2 id="relic-detail-name"></h2><p id="relic-detail-effect"></p><p id="relic-detail-cost" class="muted"></p><div class="relic-detail-actions"><button id="relic-exchange" class="primary">兑换</button><button id="relic-look-again" class="secondary">再看看</button></div></dialog><div role="status" aria-live="polite" id="toast"></div>
 </body></html>
 
 

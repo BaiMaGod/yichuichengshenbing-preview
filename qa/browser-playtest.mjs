@@ -58,6 +58,12 @@ for(const [width,height] of sizes){
  await page.locator('#station-cat').click();assert.equal((await state()).session.hits,0);await page.locator('#station-forge').click();await page.waitForTimeout(900);
  await page.locator('#sound').click();await page.locator('#sound').click();assert.equal((await state()).session.hits,0);
  const test=structuredClone(baseline);test.session.seed=successfulChain();await fixture(test);
+ // A stalled GPU fence must never block hit settlement or leave the information board at zero.
+ await page.evaluate(()=>{const original=WebGL2RenderingContext.prototype.clientWaitSync;window.__restoreFence=()=>{WebGL2RenderingContext.prototype.clientWaitSync=original;};WebGL2RenderingContext.prototype.clientWaitSync=function(){return this.TIMEOUT_EXPIRED;};});
+ const stuckBefore=(await state()).session.currentValue;await hit();
+ assert.equal((await state()).session.currentValue,stuckBefore*1.5);assert.equal(Number(await page.locator('#scene3d').getAttribute('data-board-value')),stuckBefore*1.5);
+ assert.ok((await page.locator('#value-now').textContent()).includes(Math.floor(stuckBefore*1.5).toLocaleString('zh-CN')));
+ await page.evaluate(()=>window.__restoreFence());await fixture(test);
  await page.waitForFunction(()=>{const p=document.querySelector('#scene3d').dataset.forgeProof;return p&&JSON.parse(p).phase==='forge';});const baseBladeColors=await bladePixels(page,JSON.parse(await page.locator('#scene3d').getAttribute('data-forge-proof')));
  // Mouse events and real touch both hit the world object. Empty areas and UI do not.
  await page.mouse.click(width-8,height-210);assert.equal((await state()).session.hits,0);
