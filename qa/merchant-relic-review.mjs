@@ -57,7 +57,17 @@ try{for(const [width,height] of sizes){
  const beforeHit=saved.session.currentValue;await clickTarget('anvil');await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key)).session.hits>=1,key);
  const struck=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).session,key);assert.ok(struck.currentValue>beforeHit);
  await page.waitForFunction(()=>document.querySelector('.game').dataset.striking==='false');
- await shot('forge-after-departure');assert.deepEqual(errors,[]);
- reports.push({width,height,centered:true,collapse,labels,departure,entry,actualHammerValue:true,persistentDeparture:true,facilityRelics:true,worldWall:true,errors});console.log(`${width}x${height}: centered merchant, body-target collapse, exit, cabinet labels, relic-only upgrades and world-wall verified`);await page.close();
+ await shot('forge-after-departure');
+ // A new visit triggered from the tribute camera must enter after returning to the forge.
+ const arrival=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
+ const gift={id:'arrival-gift',blade:'great',material:'iron',level:10,value:10000,quality:1,mark:'none',disposal:'COLLECTED'};
+ Object.assign(arrival,{session:null,tributeDays:1,workshopDay:2,catTributes:1,merchantDepartedDay:0,swords:[gift],caseIds:[gift.id]});
+ await page.evaluate(({key,arrival})=>localStorage.setItem(key,JSON.stringify(arrival)),{key,arrival});await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
+ await page.locator('#station-cat').click();await settled();await page.locator('#tribute').click();await page.waitForSelector('#cat-back:not([hidden])');
+ assert.equal(await ghost.isVisible(),false);assert.equal(await page.evaluate(()=>window.motionLog.filter(a=>a.id==='merchant-call').length),0);
+ await page.locator('#station-forge').click();await page.waitForFunction(()=>document.querySelector('#merchant-call').dataset.presence==='present');
+ assert.ok(await ghost.isVisible());assert.equal(await page.evaluate(()=>window.motionLog.filter(a=>a.id==='merchant-call').length),1);
+ assert.deepEqual(errors,[]);
+ reports.push({width,height,centered:true,collapse,labels,departure,entry,arrivalAfterTribute:true,actualHammerValue:true,persistentDeparture:true,facilityRelics:true,worldWall:true,errors});console.log(`${width}x${height}: centered merchant, body-target collapse, exit, cabinet labels, relic-only upgrades and world-wall verified`);await page.close();
 }await writeFile(`${out}/report.json`,JSON.stringify(reports,null,2));}finally{await browser.close();}
 
