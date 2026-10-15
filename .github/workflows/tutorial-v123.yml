@@ -1,0 +1,43 @@
+name: V1.23 tutorial browser QA
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  walkthrough:
+    name: Tutorial ${{ matrix.size }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        size: ['360x800','390x844','1280x900']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Test first-run walkthrough and skip
+        env:
+          QA_SIZE: ${{ matrix.size }}
+          QA_OUT: qa-tutorial-v123
+          QA_URL: http://127.0.0.1:4173/yichuichengshenbing-preview/
+        run: |
+          mkdir -p /tmp/forge-tutorial-qa
+          ln -s "$GITHUB_WORKSPACE" /tmp/forge-tutorial-qa/yichuichengshenbing-preview
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/forge-tutorial-qa >/tmp/forge-tutorial-server.log 2>&1 &
+          node qa/tutorial-playtest.mjs
+      - name: Upload screenshot and QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tutorial-v123-${{ matrix.size }}
+          path: qa-tutorial-v123/
+          if-no-files-found: warn
+          retention-days: 7
