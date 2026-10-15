@@ -93,32 +93,30 @@ for(const [width,height] of sizes){
  const godProof=JSON.parse(await page.locator('#scene3d').getAttribute('data-forge-proof'));godProof.expectedFinish='cosmos';
  const starA=await bladePixels(page,{...godProof,samples:[...godProof.samples,...godProof.hiltSamples]});await page.waitForTimeout(1000);const starB=await bladePixels(page,{...godProof,samples:[...godProof.samples,...godProof.hiltSamples]});assert.ok(starA.some((rgb,i)=>rgb.reduce((n,c,j)=>n+Math.abs(c-starB[i][j]),0)>12),'cosmic surface flows on rendered sword');
  await page.reload();await ready();assert.equal((await state()).session.superGod,true);const beforeGod=await state();await hit();assert.ok((await state()).session.currentValue>=beforeGod.session.currentValue*1.5);
- await page.locator('#station-relics').click();assert.equal(await page.locator('#relic-panel').isVisible(),true);await page.locator('#relic-panel .cabinet-advanced summary').click();assert.equal(await page.locator('#nav-upgrades').isVisible(),true);await snap('cabinet');await page.locator('#station-forge').click();
+ await page.locator('#station-relics').click();assert.equal(await page.locator('#relic-panel').isVisible(),true);assert.equal(await page.locator('#nav-upgrades,#nav-furnace,#nav-anvil').count(),0);await snap('cabinet');await page.locator('#station-forge').click();
  console.log(`${width}: frenzy and super-god verified`);const outcomes=[];for(const [result,roll] of [['great',.70],['unchanged',.85],['damage',.99],['break',.97]]){
   const f=structuredClone(baseline);f.session.goodHeat=false;f.session.protection=false;f.session.level=result==='break'?5:0;f.session.seed=seedForRange(roll,roll+.005);await fixture(f);await hit();const after=await state();assert.equal(after.session.strikes.at(-1).result,result);outcomes.push(result);if(result==='great')assert.equal(after.session.currentValue,800);if(result==='unchanged'||result==='damage')assert.equal(after.session.currentValue,320);if(result==='break'){assert.equal(after.session.phase,'broken');assert.equal(after.session.currentValue,0);}await snap(result);
  }
  console.log(`${width}: five outcomes verified`);await fixture(seven);const shown=await page.locator('#value-now').textContent();await page.locator('#cashout').click();await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='finished');const complete=await state();assert.equal(complete.session.sword.value,seven.session.currentValue);assert.ok(shown.includes(Math.floor(complete.session.sword.value).toLocaleString('zh-CN')));assert.equal(complete.session.hits,7);await tap('anvil');assert.equal((await state()).session.hits,7);await snap('collected');
  await page.locator('#offer-cat').click();await page.waitForTimeout(1200);await tap('cat');await page.waitForSelector('#cat-back:not([hidden])',{timeout:30000});const paid=await state();assert.equal(paid.session,null);assert.ok(paid.ironBlanks>=3);assert.equal(paid.catTributes,1);await snap('cat-reward');
- // Furnace QA: a Lv3 save upgrades to Lv9, then full heat is reached in one second.
- const furnaceFixture=structuredClone(paid);furnaceFixture.coins=100000;furnaceFixture.furnaceLevel=3;
- await fixture(furnaceFixture);await page.locator('#station-relics').click();
- await page.locator('#relic-panel .cabinet-advanced summary').click();
- let budget=100000;const lateCosts=[2800,4000,5500,7500,10000,13000];
+ // Furnace levels now come from purchasing and refining the furnace relic.
+ const furnaceFixture=structuredClone(paid);furnaceFixture.coins=100000;furnaceFixture.ironBlanks=100;furnaceFixture.furnaceLevel=3;furnaceFixture.relicWelcomeUsed=true;
+ furnaceFixture.relics=[...new Set([...furnaceFixture.relics,'ember'])];furnaceFixture.relicRanks={...furnaceFixture.relicRanks,ember:2};
+ let budget=100,current=furnaceFixture;
  for(let level=3;level<=8;level++){
-  const upgrade=page.locator('#nav-furnace');
-  assert.ok((await upgrade.textContent()).includes('Lv'+level+'→'+(level+1)));
-  await upgrade.click();budget-=lateCosts[level-3];
-  const upgraded=await state();assert.equal(upgraded.furnaceLevel,level+1);assert.equal(upgraded.coins,budget);
+  current.relicOffers=['ember','',''];current.relicOffersDay=current.workshopDay;
+  await fixture(current);assert.equal((await state()).furnaceLevel,level);await page.locator('#station-relics').click();
+  await page.waitForFunction(()=>{const d=document.querySelector('#scene3d').dataset;return d.renderedStation==='relics'&&d.renderedCameraReady==='true';});
+  await page.locator('#relic-list button').first().click();await page.locator('#relic-exchange').click();budget-=level;
+  current=await state();assert.equal(current.furnaceLevel,level+1);assert.equal(current.coins,100000);assert.equal(current.ironBlanks,budget);
  }
- assert.ok((await page.locator('#nav-furnace').textContent()).includes('Lv9 · 已满级'));
- assert.equal(await page.locator('#nav-furnace').isDisabled(),true);
  await page.reload();await ready();assert.equal((await state()).furnaceLevel,9);
  await tap('furnace');await page.waitForSelector('#scene3d[data-sword-place="furnace"]');
  assert.ok((await page.locator('#heating-order').textContent()).includes('1 秒满温'));
  await page.waitForFunction(()=>Number(document.querySelector('#scene3d').dataset.heat)>=100,null,{timeout:5500});
  await tap('anvil');await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='forge');
  assert.equal((await state()).session.goodHeat,true);
- await snap('furnace-lv9');console.log(`${width}: Lv9 furnace, upgrade costs, and full heat verified`);
+ await snap('furnace-lv9');console.log(`${width}: Lv9 furnace relic, iron costs, and full heat verified`);
  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);assert.equal(overflow,false);
  reports.push({width,height,passed:true,outcomes,sevenHitsRemainForge:true,frenzyExpires:true,flowingRainbow:true,flowingHilt:true,superGodPromoted:true,flowingCosmos:true,permanentBottomNavigation:true,levelColors:true,noSwordLabel:true,swordVisible:true,recordedAudio:true,mute:true,catReward:paid.ironBlanks});console.log(`${width}x${height}: continuous forging, five results, rainbow frenzy, cashout and tribute passed`);await page.close();active=null;
 }
@@ -136,6 +134,7 @@ await writeFile(`${out}/continuous-forging-report.json`,JSON.stringify({passed:t
  }else await writeFile(`${out}/failure.json`,JSON.stringify(diagnostic,null,2));
  throw e;
 }finally{await browser.close();}
+
 
 
 
