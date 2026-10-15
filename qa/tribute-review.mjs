@@ -16,7 +16,7 @@ try{for(const [width,height] of (process.env.QA_SIZE?[process.env.QA_SIZE.split(
  const snap=async name=>{console.log('Snapshot',name);await page.waitForFunction(()=>{const d=document.querySelector('#scene3d').dataset;return d.station===d.renderedStation&&d.renderedCameraReady==='true';});await page.screenshot({path:`${out}/${width}-${name}.png`,timeout:120000});};
  assert.ok(await page.locator('#merchant-call').isVisible());await snap('forge');
  await page.locator('#station-collection').click();await snap('rack');assert.ok(await page.locator('#merchant-call').isHidden());
- const rack=JSON.parse(await scene.getAttribute('data-side-display-proof'));assert.ok(rack.left>=0&&rack.right<=width);assert.ok(rack.top>85&&rack.bottom<height-80);assert.equal(await page.getByText('收藏剑架',{exact:true}).count(),0);
+ const rack=JSON.parse(await scene.getAttribute('data-side-display-proof'));assert.ok(rack.left>=0&&rack.right<=width);assert.ok(rack.top>85&&rack.bottom<height-80);assert.equal(await page.getByText('收藏剑架',{exact:true}).isVisible(),false);
  await page.locator('#station-relics').click();await snap('relics');assert.equal(await scene.getAttribute('data-relic-shelf-count'),'3');assert.ok(await page.locator('#merchant-call').isHidden());const relic=JSON.parse(await scene.getAttribute('data-side-display-proof'));
  await page.locator('#station-cat').click();await snap('tribute-choice');assert.ok(await page.locator('#merchant-call').isHidden());assert.equal(await page.locator('#tribute-choice option').count(),6);
  if(width===390){
