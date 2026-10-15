@@ -9,7 +9,7 @@ try{for(const [width,height] of sizes){
  await page.goto(process.env.QA_URL||'http://127.0.0.1:4173');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#sound').click();
  const fixture=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
- fixture.session=null;fixture.workshopDay=3;fixture.ironBlanks=20;fixture.coins=10000;fixture.sound=false;fixture.showCaseLevel=2;fixture.relics=['guard','rhythm','stellar'];fixture.relicWelcomeUsed=true;fixture.relicOffersDay=3;fixture.relicOffers=['lucky','ember','master'];fixture.caseIds=[];fixture.swords=[];
+ fixture.session=null;fixture.workshopDay=3;fixture.tributeDays=2;fixture.ironBlanks=20;fixture.coins=10000;fixture.sound=false;fixture.showCaseLevel=2;fixture.relics=['guard','rhythm','stellar'];fixture.relicWelcomeUsed=true;fixture.relicOffersDay=3;fixture.relicOffers=['lucky','ember','master'];fixture.caseIds=[];fixture.swords=[];
  for(let i=0;i<6;i++){const sword={id:'rack-'+i,blade:'great',material:'iron',level:3+i*3,name:'收藏剑 '+(i+1),value:720*2**i,quality:1,mark:'none',disposal:'COLLECTED',superGod:false};fixture.swords.push(sword);fixture.caseIds.push(sword.id);}
  await page.evaluate(({key,fixture})=>localStorage.setItem(key,JSON.stringify(fixture)),{key,fixture});await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  const snap=async name=>{await page.waitForFunction(()=>{const d=document.querySelector('#scene3d').dataset;return d.station===d.renderedStation&&d.renderedCameraReady==='true';});await page.screenshot({path:`${out}/${width}-layout-${name}.png`,timeout:120000});};
