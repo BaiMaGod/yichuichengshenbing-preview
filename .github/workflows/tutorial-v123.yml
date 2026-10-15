@@ -27,7 +27,7 @@ jobs:
         env:
           QA_SIZE: ${{ matrix.size }}
           QA_OUT: qa-tutorial-v123
-          QA_URL: http://127.0.0.1:4173/yichuichengshenbing-preview/
+          QA_URL: http://127.0.0.1:4173/yichuichengshenbing-preview/?debugQA=1
         run: |
           mkdir -p /tmp/forge-tutorial-qa
           ln -s "$GITHUB_WORKSPACE" /tmp/forge-tutorial-qa/yichuichengshenbing-preview

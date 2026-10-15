@@ -54,6 +54,7 @@ async function play(page){
  await page.locator('#relic-list button').first().click();
  await page.locator('#relic-exchange').click();
  await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).step==='done',tutorialKey);
+ await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).relicWelcomeUsed===true,key);
  const completed=await state();
  assert.equal(completed.relicWelcomeUsed,true);assert.equal(completed.relics.length,1);assert.ok(completed.ironBlanks>=3);
  await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');

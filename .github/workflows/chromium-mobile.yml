@@ -29,7 +29,7 @@ jobs:
         env:
           QA_SIZE: ${{ matrix.size }}
           QA_OUT: qa-evidence
-          QA_URL: http://127.0.0.1:4173/yichuichengshenbing-preview/
+          QA_URL: http://127.0.0.1:4173/yichuichengshenbing-preview/?debugQA=1
         run: |
           mkdir -p /tmp/forge-pages-qa
           ln -s "$GITHUB_WORKSPACE" /tmp/forge-pages-qa/yichuichengshenbing-preview

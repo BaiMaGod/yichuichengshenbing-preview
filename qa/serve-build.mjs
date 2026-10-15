@@ -12,6 +12,6 @@ export async function serveBuild(rootPath='dist'){
   }catch{res.writeHead(404);res.end();}
  });
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
- return {server,url:`http://127.0.0.1:${server.address().port}`};
+ return {server,url:`http://127.0.0.1:${server.address().port}/?debugQA=1`};
 }
 
