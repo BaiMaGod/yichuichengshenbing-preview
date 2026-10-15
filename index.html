@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta name="source-commit" content="2cade134d3f8ea5294f248a8745002f7c1c0f4ff">
+<html lang="zh-CN"><head>
+<meta name="source-commit" content="fb5ae6c08052d256eee4069b0106727b6d4df9c9">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡给食铁兽</title>  <script type="module" crossorigin src="./assets/index-LbPjgEaJ.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CYzikkiK.css">
-</head>
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡给食铁兽</title>
+  <script type="module" crossorigin src="./assets/index-v123.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-v123.css"></head>
 <body>
 <main class="game" data-phase="choose">
 <header class="topbar">
@@ -45,7 +46,7 @@
   <div class="station-panel-content">
   
    <details class="cabinet-advanced"><summary>墙上遗物与工坊设置</summary>   <div class="market-subtitle">墙上遗物 · 卸下不退铁剑</div><div id="relic-equipped" class="relic-list"></div>
-   <small class="hint">第 1 日免费选 1 件，之后用铁剑交易。已购遗物挂在铸剑台墙上，最多 8 件。空格仅在成功纳贡后补货。</small>   <label class="sword-appearance-switch"><input id="show-legacy-swords" type="checkbox">显示旧剑外观<small>默认关闭 · 七把独立剑型，+3 起新增符文、龙齿、弧刃与雷霆</small></label>
+   <small class="hint">首次免费选 1 件，不受纳贡日限制；之后用铁剑交易。已购遗物挂在铸剑台墙上，最多 8 件。空格仅在成功纳贡后补货。</small><button id="tutorial-help" type="button" class="secondary">重新体验新手引导</button>   <label class="sword-appearance-switch"><input id="show-legacy-swords" type="checkbox">显示旧剑外观<small>默认关闭 · 七把独立剑型，+3 起新增符文、龙齿、弧刃与雷霆</small></label>
    <div class="cabinet-upgrade-section"><b>收藏剑架</b><div id="workshop-upgrades" class="cabinet-upgrades"></div></div>
 </details>
   </div>
@@ -85,8 +86,18 @@
 </section>
 <section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-rewind" class="secondary" hidden>⏳ 使用回溯发条 · 恢复宝剑</button><button id="broken-next" class="primary">再锻一把</button></section>
 <footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div><div class="nav-actions"><button id="nav-collection">神兵剑谱</button></div></footer>
+<div id="tutorial-layer" class="tutorial-layer" aria-live="polite" hidden>
+ <div id="tutorial-focus" class="tutorial-focus" aria-hidden="true"></div>
+ <div id="tutorial-tip" class="tutorial-tip">
+  <small id="tutorial-progress">新手引导 1/6</small>
+  <strong id="tutorial-title">开始第一把宝剑</strong>
+  <p id="tutorial-detail">点击火炉，把免费剑胚送入炉中。</p>
+  <div class="tutorial-actions"><button id="tutorial-next" type="button" hidden>下一步 ›</button><button id="tutorial-finish" type="button" hidden>完成复习</button><button id="tutorial-skip" type="button">跳过引导 ›</button></div>
+ </div>
+</div>
 </main><dialog id="relic-detail" aria-labelledby="relic-detail-name"><div class="relic-detail-emblem" aria-hidden="true">◈</div><h2 id="relic-detail-name"></h2><p id="relic-detail-effect"></p><p id="relic-detail-cost" class="muted"></p><div class="relic-detail-actions"><button id="relic-exchange" class="primary">兑换</button><button id="relic-look-again" class="secondary">再看看</button></div></dialog><div role="status" aria-live="polite" id="toast"></div>
-<dialog id="owned-relics" aria-labelledby="owned-relic-title"><h2 id="owned-relic-title">已有遗物</h2><div id="owned-relic-list"></div><button id="owned-relic-close" class="secondary">关闭</button></dialog>
+<dialog id="owned-relics" aria-labelledby="owned-relic-title"><h2 id="owned-relic-title">已有遗物</h2><div id="owned-relic-list"></div><button id="owned-relic-close" class="secondary">关闭</button></dialog>
+
 </body></html>
 
 
