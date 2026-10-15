@@ -1,9 +1,8 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-  <meta name="source-commit" content="0e30857f13fcd0aee91752ec2bfb9dd5685de22b">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡给食铁兽</title>  <script type="module" crossorigin src="./assets/index-CloilBec.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DbzeF9xT.css">
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡给食铁兽</title>  <script type="module" crossorigin src="./assets/index-LbPjgEaJ.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CYzikkiK.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
@@ -17,6 +16,8 @@
 <section class="workbench" aria-label="立体锻造工坊">
  <div id="scene3d" tabindex="0" aria-label="立体锻造工坊"></div>
  <div id="relic-list" class="relic-world-labels" aria-label="遗物机在售遗物" hidden></div>
+ <div id="collection-list" class="collection-world-labels" aria-label="剑架宝剑信息" hidden></div>
+ <button id="wall-relic-trigger" class="wall-relic-trigger" aria-label="查看已有遗物与加成" hidden></button>
  <div id="scene-error" hidden>3D 工坊加载失败，请刷新后重试。</div>
  <div class="scene-heading"><span id="scene-name">神兵锻造台</span><small id="sword-level-tag">剑胚 · 强化 +0</small></div>
 <div class="scene-targets" aria-hidden="true"><span id="target-furnace">熔炉 <small>入炉</small></span><span id="target-anvil">铸剑台 <small>放剑</small></span><span id="target-cat">食铁兽</span><span id="target-relics">遗物机</span></div>
@@ -53,7 +54,6 @@
 <section id="merchant-panel" class="control station-panel" hidden>
  <details class="station-drawer" open><summary class="station-drawer-title"><strong>幽灵商人</strong><small>金币交易 · 点击收起</small></summary><div class="station-panel-content"><p id="merchant-note" class="muted"></p><div id="merchant-list" class="relic-list"></div><small id="merchant-inventory" class="hint"></small><button id="merchant-back" class="secondary">收起</button></div></details>
 </section>
-<section id="collection-panel" class="control station-panel" hidden><details class="station-drawer"><summary class="station-drawer-title"><strong>宝剑清单</strong><small id="collection-count">0/3</small></summary><div class="station-panel-content"><div id="collection-list"></div></div></details></section>
 <section class="control" id="heat" hidden>
  <div class="section-title"><span>炉中加热</span><small id="heating-order">当前订单</small></div>
  <div class="heat-bar"><div class="ideal-range"></div><div id="heat-fill"></div><b id="heat-text">0%</b></div>
@@ -86,6 +86,7 @@
 <section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-rewind" class="secondary" hidden>⏳ 使用回溯发条 · 恢复宝剑</button><button id="broken-next" class="primary">再锻一把</button></section>
 <footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div><div class="nav-actions"><button id="nav-collection">神兵剑谱</button></div></footer>
 </main><dialog id="relic-detail" aria-labelledby="relic-detail-name"><div class="relic-detail-emblem" aria-hidden="true">◈</div><h2 id="relic-detail-name"></h2><p id="relic-detail-effect"></p><p id="relic-detail-cost" class="muted"></p><div class="relic-detail-actions"><button id="relic-exchange" class="primary">兑换</button><button id="relic-look-again" class="secondary">再看看</button></div></dialog><div role="status" aria-live="polite" id="toast"></div>
+<dialog id="owned-relics" aria-labelledby="owned-relic-title"><h2 id="owned-relic-title">已有遗物</h2><div id="owned-relic-list"></div><button id="owned-relic-close" class="secondary">关闭</button></dialog>
 </body></html>
 
 
