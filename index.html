@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>一锤成神兵 · 锻造工坊</title>  <script type="module" crossorigin src="./assets/index-CAzq3_Q1.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-C3zcu5PM.css">
-<meta name="source-commit" content="d70c7bffae5e61e1de54735d70c7e57773379b17">
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡给食铁兽</title>  <script type="module" crossorigin src="./assets/index-UI20261015.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-UI20261015.css">
+<meta name="source-commit" content="e0ae6b273031b6209ecca18a015f349abd38fdb3">
 </head>
 <body>
 <main class="game" data-phase="choose">
 <header class="topbar">
- <div class="logo-area"><small>THE IRON-EATER’S FORGE</small><strong>一锤成神兵</strong><span id="workshop-level">食铁兽的铸剑工坊</span><span id="day-label">工坊日 1</span></div>
+ <div class="logo-area"><strong>锻剑纳贡给食铁兽</strong><span id="day-label">纳贡日 1</span><div class="cat-demand"><span>食铁兽的索求</span><b id="cat-demand-label">宝剑价值 ≥ 720 金</b><small id="cat-count">已纳贡 0 次</small></div></div>
  <div class="wallet"><span>🪙 <b id="coin">300</b></span><span>铁剑 <b id="iron-blanks">0</b></span><span class="scrap-wallet">残料 <b id="scrap">0</b></span></div>
  <button id="sound" class="sound" aria-label="切换音效">🔊</button>
 </header>
@@ -18,12 +18,11 @@
  <div id="scene3d" tabindex="0" aria-label="立体锻造工坊"></div>
  <div id="scene-error" hidden>3D 工坊加载失败，请刷新后重试。</div>
  <div class="scene-heading"><span id="scene-name">神兵锻造台</span><small id="sword-level-tag">剑胚 · 强化 +0</small></div>
- <div class="cat-demand"><span>食铁兽的索求</span><b id="cat-demand-label">宝剑价值 ≥ 720 金</b><small id="cat-count">已纳贡 0 次</small></div>
 <div class="scene-targets" aria-hidden="true"><span id="target-furnace">熔炉 <small>入炉</small></span><span id="target-anvil">铸剑台 <small>放剑</small></span><span id="target-cat">食铁兽</span><span id="target-relics">遗物机</span></div>
 
 </section>
  <button id="merchant-call" class="merchant-call" hidden aria-label="幽灵商人，查看商品"><img src="./art/ghost-merchant-v2.webp" alt="紫帽幽灵商人" width="90" height="100"></button>
-<nav class="station-nav" aria-label="工坊区域"><button id="station-forge" class="active">锻造台</button><button id="station-cat">食铁兽</button><button id="station-relics">遗物机</button><button id="station-collection">收藏架</button></nav>
+<nav class="station-nav" aria-label="工坊区域"><button id="station-collection">收藏架</button><button id="station-forge" class="active">锻造台</button><button id="station-cat">食铁兽</button><button id="station-relics">遗物机</button></nav>
 <section id="cat-panel" class="control station-panel" hidden>
  <details class="station-drawer" open>
   <summary class="station-drawer-title"><strong>食铁兽 · 纳贡</strong><small>按价值换铁剑</small></summary>
