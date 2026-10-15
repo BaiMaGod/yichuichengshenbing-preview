@@ -6,6 +6,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.CH
 const sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]],key='yichuichengshenbing.v1',reports=[];
 try{for(const [width,height] of sizes){
  const page=await browser.newPage({viewport:{width,height},hasTouch:width<800});page.setDefaultTimeout(45000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v1',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(process.env.QA_URL||'http://127.0.0.1:4173');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#sound').click();
  const fixture=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);

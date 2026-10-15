@@ -14,6 +14,7 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
   window.setAnimationSpeed=s=>{mapped=time();anchor=actual();speed=s;};
   performance.now=time;window.requestAnimationFrame=f=>raf(()=>f(time()));
  });
+ await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v1',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(url);await page.waitForSelector('#scene3d[data-cat-asset="ready"]');await page.locator('#sound').click();
  const state=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
  const sword={id:'animation-gift',blade:'great',material:'iron',level:10,value:10000,quality:1,mark:'none',disposal:'COLLECTED'};

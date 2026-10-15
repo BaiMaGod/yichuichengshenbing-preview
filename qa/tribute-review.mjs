@@ -12,7 +12,8 @@ try{for(const [width,height] of (process.env.QA_SIZE?[process.env.QA_SIZE.split(
  const state=freshState();Object.assign(state,{tributeDays:2,workshopDay:3,catTributes:2,coins:10000,ironBlanks:20,sound:false,showCaseLevel:2,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['lucky','ember','master']});
  for(let i=0;i<6;i++){const sword={id:'rack-'+i,blade:'great',material:'iron',level:3+i*3,name:'宝剑 '+(i+1),value:1500*2**i,quality:1,mark:'none',disposal:'COLLECTED'};state.swords.push(sword);state.caseIds.push(sword.id);}
  await page.addInitScript(({key,state})=>{if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(state));},{key,state});
- console.log('Opening',width,url);await page.goto(url);console.log('Loaded document');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');const scene=page.locator('#scene3d');
+ console.log('Opening',width,url);await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v1',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
+ await page.goto(url);console.log('Loaded document');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');const scene=page.locator('#scene3d');
  const snap=async name=>{console.log('Snapshot',name);await page.waitForFunction(()=>{const d=document.querySelector('#scene3d').dataset;return d.station===d.renderedStation&&d.renderedCameraReady==='true';});await page.screenshot({path:`${out}/${width}-${name}.png`,timeout:120000});};
  assert.ok(await page.locator('#merchant-call').isVisible());await snap('forge');
  await page.locator('#station-collection').click();await snap('rack');assert.ok(await page.locator('#merchant-call').isHidden());
