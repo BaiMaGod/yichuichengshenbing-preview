@@ -10,6 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "5127653f03385432129270e680b573cc8c753e1b",
-  "pandaModel": "closed-sculpted-anatomy-v8"
+  "sourceCommit": "39c163d98d667132360849b1c82c6e03c0ba38e1",
+  "pandaModel": "reference-sculpted-anatomy-v9"
 }

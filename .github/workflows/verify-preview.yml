@@ -25,9 +25,9 @@ jobs:
           assert not any(p.startswith('/') for p in refs), 'Absolute asset path breaks project Pages'
           assert '/src/' not in html
           javascript='\n'.join(pathlib.Path(p).read_text() for p in assets if p.endswith('.js'))
-          assert 'giant-panda' in javascript and 'closed-sculpted-anatomy-v8' in javascript, 'Missing sculpture panda model'
+          assert 'giant-panda' in javascript and 'reference-sculpted-anatomy-v9' in javascript, 'Missing sculpture panda model'
           assert 'polygon-sculpture' in javascript, 'Missing sculpture style'
-          assert 'articulated-curled-fingers-and-solid-feet' in javascript, 'Missing revised panda limbs'
+          assert 'continuous-limbs-curled-fingers' in javascript, 'Missing revised panda limbs'
           assert 'cat-turnaround-v2.webp' not in javascript, 'Build still references removed cat atlas'
           assert '食铁兽' in html, 'Panda station label is missing'
           assert re.search(r'name="source-commit" content="[a-f0-9]{40}"',html), 'Missing source version'
