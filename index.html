@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-<meta name="source-commit" content="5127653f03385432129270e680b573cc8c753e1b">
+<meta name="source-commit" content="f49a2b0a797d364a296f0fc6c5c999c5e8c1d91f">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡给食铁兽</title>  <script type="module" crossorigin src="./assets/index-1A4krW_w.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BNa2lw1x.css">
-</head>
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡给食铁兽</title>
+<script type="module" crossorigin src="./assets/index-dialog-v125.js"></script>
+<link rel="stylesheet" crossorigin href="./assets/index-dialog-v125.css"></head>
 <body>
 <main class="game" data-phase="choose">
 <header class="topbar">
@@ -95,7 +95,8 @@
   <div class="tutorial-actions"><button id="tutorial-next" type="button" hidden>下一步 ›</button><button id="tutorial-finish" type="button" hidden>完成复习</button><button id="tutorial-skip" type="button">跳过引导 ›</button></div>
  </div>
 </div>
-</main><dialog id="relic-detail" aria-labelledby="relic-detail-name" aria-describedby="relic-detail-cost"><h2 id="relic-detail-name">确认购买遗物？</h2><p id="relic-detail-cost" class="muted"></p><div class="relic-detail-actions"><button id="relic-look-again" class="secondary">再看看</button><button id="relic-exchange" class="primary">确认购买</button></div></dialog><div role="status" aria-live="polite" id="toast"></div>
-<dialog id="owned-relics" aria-labelledby="owned-relic-title"><h2 id="owned-relic-title">已有遗物</h2><div id="owned-relic-list"></div><button id="owned-relic-close" class="secondary">关闭</button></dialog>
-</body></html>
+</main><dialog id="relic-detail" class="game-dialog" aria-labelledby="relic-detail-name" aria-describedby="relic-detail-cost"><h2 id="relic-detail-name">确认购买遗物？</h2><p id="relic-detail-cost" class="muted"></p><div class="relic-detail-actions"><button id="relic-look-again" class="dialog-button secondary">再看看</button><button id="relic-exchange" class="dialog-button primary">确认购买</button></div></dialog><div role="status" aria-live="polite" id="toast"></div>
+<dialog id="owned-relics" class="game-dialog" aria-labelledby="owned-relic-title"><h2 id="owned-relic-title">已有遗物</h2><div id="owned-relic-list" class="game-dialog-scroll"></div><div class="game-dialog-actions single"><button id="owned-relic-close" class="dialog-button primary">关闭</button></div></dialog>
+<dialog id="game-confirm" class="game-dialog" aria-labelledby="game-confirm-title" aria-describedby="game-confirm-description"><h2 id="game-confirm-title"></h2><div class="game-dialog-rule"></div><p id="game-confirm-description" class="game-dialog-description"></p><div class="game-dialog-actions"><button id="game-confirm-cancel" class="dialog-button secondary">再看看</button><button id="game-confirm-accept" class="dialog-button primary">确认</button></div></dialog>
 
+</body></html>
