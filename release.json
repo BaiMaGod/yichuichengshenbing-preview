@@ -9,5 +9,7 @@
     "ads": false,
     "share": false,
     "leaderboard": false
-  }
+  },
+  "sourceCommit": "5127653f03385432129270e680b573cc8c753e1b",
+  "pandaModel": "closed-sculpted-anatomy-v8"
 }
