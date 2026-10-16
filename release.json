@@ -1,0 +1,13 @@
+{
+  "name": "yichuichengshenbing",
+  "version": "0.3.0",
+  "channel": "browser",
+  "orientation": "portrait",
+  "features": {
+    "cloudSave": false,
+    "vibration": false,
+    "ads": false,
+    "share": false,
+    "leaderboard": false
+  }
+}
