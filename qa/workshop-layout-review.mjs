@@ -14,10 +14,23 @@ try{for(const [width,height] of sizes){
  fixture.session=null;fixture.workshopDay=3;fixture.tributeDays=2;fixture.ironBlanks=20;fixture.coins=10000;fixture.sound=false;fixture.showCaseLevel=2;fixture.relics=['guard','rhythm','stellar'];fixture.relicWelcomeUsed=true;fixture.relicOffersDay=3;fixture.relicOffers=['lucky','ember','master'];fixture.caseIds=[];fixture.swords=[];
  for(let i=0;i<6;i++){const sword={id:'rack-'+i,blade:'great',material:'iron',level:3+i*3,name:'收藏剑 '+(i+1),value:720*2**i,quality:1,mark:'none',disposal:'COLLECTED',superGod:false};fixture.swords.push(sword);fixture.caseIds.push(sword.id);}
  await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),fixture);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
- const snap=async name=>{await page.waitForFunction(()=>{const d=document.querySelector('#scene3d').dataset;return d.station===d.renderedStation&&d.renderedCameraReady==='true';});await page.screenshot({path:`${out}/${width}-layout-${name}.png`,timeout:120000});};
+ const snap=async name=>{
+  await page.waitForFunction(()=>{
+   const d=document.querySelector('#scene3d').dataset;
+   if(d.station!==d.renderedStation||d.renderedCameraReady!=='true')return false;
+   // Camera readiness and asynchronously computed WebGL side bounds are separate events.
+   if(d.station==='collection'||d.station==='relics'){
+    try{const proof=JSON.parse(d.sideDisplayProof||'null');
+     return proof?.station===d.station&&[proof.left,proof.top,proof.right,proof.bottom].every(Number.isFinite);
+    }catch{return false;}
+   }
+   return true;
+  });
+  await page.screenshot({path:`${out}/${width}-layout-${name}.png`,timeout:120000});
+ };
  await snap('front-metal');assert.equal(await page.locator('#scene3d').getAttribute('data-board-style'),'brushed-metal');assert.equal(await page.locator('#scene3d').getAttribute('data-anvil-support'),'cast-iron');
  assert.ok(await page.locator('#merchant-call img').evaluate(e=>e.complete&&e.naturalWidth>100));await page.locator('#merchant-call').click();assert.ok(await page.locator('#merchant-panel').isVisible());await snap('ghost-merchant');await page.locator('#merchant-back').click();
- await page.locator('#station-collection').click();await snap('left-rack');const collection=JSON.parse(await page.locator('#scene3d').getAttribute('data-side-display-proof'));assert.equal(collection.yaw,90);assert.equal(JSON.parse(await page.locator('#scene3d').getAttribute('data-collection-ids')).length,6);assert.ok(collection.left>=0&&collection.right<=width,'left rack fits screen');assert.ok(collection.top>=75&&collection.bottom<height-80,'left rack clears header and bottom navigation');
+ await page.locator('#station-collection').click();await snap('left-rack');const collection=JSON.parse(await page.locator('#scene3d').getAttribute('data-side-display-proof'));assert.equal(collection.station,'collection');assert.equal(collection.yaw,90);assert.equal(JSON.parse(await page.locator('#scene3d').getAttribute('data-collection-ids')).length,6);assert.ok(collection.left>=0&&collection.right<=width,'left rack fits screen');assert.ok(collection.top>=75&&collection.bottom<height-80,'left rack clears header and bottom navigation');
  await page.locator('#station-relics').click();await snap('right-machine');assert.equal(await page.locator('#scene3d').getAttribute('data-relic-yaw'),'-90');
  // Click the actual world slot. Inspecting and cancelling must preserve both inventory and stock.
  const point=await page.locator('#scene3d').evaluate(e=>{const p=JSON.parse(e.dataset.relicPoints)[0],r=e.getBoundingClientRect();return{x:r.x+p.x,y:r.y+p.y};});
