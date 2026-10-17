@@ -8,7 +8,7 @@ const args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshade
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args});
 const size=(process.env.QA_SIZE||'390x844').split('x').map(Number);
 const url=process.env.QA_URL||'http://127.0.0.1:4173';
-const key='yichuichengshenbing.v1',tutorialKey='yichuichengshenbing.tutorial.v1';
+const key='yichuichengshenbing.v4',tutorialKey='yichuichengshenbing.tutorial.v4';
 const results=[];
 async function play(page){
  const root=page.locator('#scene3d');

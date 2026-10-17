@@ -3,17 +3,17 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const out=process.env.QA_OUT||'qa-evidence/merchant-relics';await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||(process.platform==='win32'?'C:/Program Files/Google/Chrome/Application/chrome.exe':undefined),args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const key='yichuichengshenbing.v1',reports=[];
+const key='yichuichengshenbing.v4',reports=[];
 const sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]];
 try{for(const [width,height] of sizes){
  const page=await browser.newPage({viewport:{width,height},hasTouch:width<800});page.setDefaultTimeout(45000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
  await page.addInitScript(()=>{const animate=Element.prototype.animate;window.motionLog=[];Element.prototype.animate=function(frames,options){if(this.id==='merchant-call'||this.id==='merchant-panel')window.motionLog.push({id:this.id,frames,options});return animate.call(this,frames,options);};});
- await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v1',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
+ await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(process.env.QA_URL||'http://127.0.0.1:4173');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#sound').click();
  const fixture=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
- Object.assign(fixture,{session:null,tributeDays:2,workshopDay:3,catTributes:2,ironBlanks:40,coins:10000,sound:false,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['hammer','ember','anvil'],merchantDepartedDay:0});
+ Object.assign(fixture,{session:null,tributeDays:2,workshopDay:3,catTributes:2,ironBlanks:40,coins:10000,sound:false,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['lucky','emberLocket','steady'],merchantDepartedDay:0});
  await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),fixture);
  await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  const ghost=page.locator('#merchant-call');
@@ -39,9 +39,9 @@ try{for(const [width,height] of sizes){
  for(const row of labels){assert.ok(row.x>=0&&row.x+row.width<=width);assert.ok(row.y>=80&&row.y+row.height<height-80);assert.ok(row.scroll<=row.client+1,'relic label content fits '+JSON.stringify(row));}
  await page.locator('#relic-list button').first().click();await page.locator('#relic-look-again').click();
  await page.locator('#relic-list button').first().click();await page.locator('#relic-exchange').click();
- let saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.ok(saved.relics.includes('hammer'));assert.equal(saved.hammerLevel,2);assert.equal(saved.ironBlanks,38);assert.equal(await page.locator('#relic-list .relic-empty').count(),1);
+ let saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.ok(saved.relics.includes('lucky'));assert.equal(saved.hammerLevel,1);assert.equal(saved.ironBlanks,38);assert.equal(await page.locator('#relic-list .relic-empty').count(),1);
  await page.locator('#relic-list button').first().click();await page.locator('#relic-exchange').click();
- saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.equal(saved.furnaceLevel,2);
+ saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.ok(saved.relics.includes('emberLocket'));assert.equal(saved.furnaceLevel,1);
  await page.locator('#station-forge').click();await settled();
  const world=JSON.parse(await page.locator('#scene3d').getAttribute('data-wall-relic-world'));assert.deepEqual(world.position,JSON.parse(wall).position);assert.deepEqual(world.quaternion,[0,0,0,1]);assert.deepEqual(world.scale,[1,1,1]);assert.equal(world.depthTest,true);
  await page.locator('#board-toggle').click();await settled();assert.equal(await page.locator('#scene3d').getAttribute('data-wall-relic-world'),JSON.stringify(world));
@@ -70,6 +70,6 @@ try{for(const [width,height] of sizes){
  await page.locator('#station-forge').click();await page.waitForFunction(()=>document.querySelector('#merchant-call').dataset.presence==='present');
  assert.ok(await ghost.isVisible());assert.equal(await page.evaluate(()=>window.motionLog.filter(a=>a.id==='merchant-call').length),1);
  assert.deepEqual(errors,[]);
- reports.push({width,height,centered:true,collapse,labels,departure,entry,arrivalAfterTribute:true,actualHammerValue:true,persistentDeparture:true,facilityRelics:true,worldWall:true,errors});console.log(`${width}x${height}: centered merchant, body-target collapse, exit, cabinet labels, relic-only upgrades and world-wall verified`);await page.close();
+ reports.push({width,height,centered:true,collapse,labels,departure,entry,arrivalAfterTribute:true,actualHammerValue:true,persistentDeparture:true,relicEffectsWithoutFacilityUpgrades:true,worldWall:true,errors});console.log(`${width}x${height}: centered merchant, body-target collapse, exit, cabinet labels, current relic purchases and world-wall verified`);await page.close();
 }await writeFile(`${out}/report.json`,JSON.stringify(reports,null,2));}finally{await browser.close();}
 

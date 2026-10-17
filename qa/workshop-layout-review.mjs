@@ -3,11 +3,11 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const out=process.env.QA_OUT||'qa-evidence';await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]],key='yichuichengshenbing.v1',reports=[];
+const sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]],key='yichuichengshenbing.v4',reports=[];
 try{for(const [width,height] of sizes){
  const page=await browser.newPage({viewport:{width,height},hasTouch:width<800});page.setDefaultTimeout(45000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
- await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v1',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
+ await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(process.env.QA_URL||'http://127.0.0.1:4173');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#sound').click();
  const fixture=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
@@ -34,7 +34,7 @@ try{for(const [width,height] of sizes){
  await page.locator('#station-relics').click();await snap('right-machine');assert.equal(await page.locator('#scene3d').getAttribute('data-relic-yaw'),'-90');
  // Click the actual world slot. Inspecting and cancelling must preserve both inventory and stock.
  const point=await page.locator('#scene3d').evaluate(e=>{const p=JSON.parse(e.dataset.relicPoints)[0],r=e.getBoundingClientRect();return{x:r.x+p.x,y:r.y+p.y};});
- await page.mouse.click(point.x,point.y);assert.ok(await page.locator('#relic-detail').isVisible());assert.equal(await page.locator('#relic-detail-effect').count(),0,'Relic descriptions belong beside the machine, not inside the confirmation dialog');assert.ok((await page.locator('#relic-list .relic-row small').first().textContent()).length>4);assert.ok((await page.locator('#relic-detail-cost').textContent()).length>0);assert.deepEqual(await page.locator('.relic-detail-actions button').allTextContents(),['再看看','确认购买']);await snap('relic-detail');await page.locator('#relic-look-again').click();
+ await page.mouse.click(point.x,point.y);assert.ok(await page.locator('#relic-detail').isVisible());assert.equal(await page.locator('#relic-detail-effect').count(),0,'Relic descriptions belong beside the machine, not inside the confirmation dialog');assert.ok((await page.locator('#relic-list .relic-row small').first().textContent()).length>4);assert.ok((await page.locator('#relic-detail-cost').textContent()).length>0);assert.deepEqual(await page.locator('.relic-detail-actions button:visible').allTextContents(),['再看看','确认购买']);await snap('relic-detail');await page.locator('#relic-look-again').click();
  const before=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.deepEqual(before.relicOffers,fixture.relicOffers);assert.equal(before.ironBlanks,20);
  await page.locator('#relic-list button').first().click();await page.locator('#relic-exchange').click();const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.equal(after.relicOffers[0],'');assert.ok(after.ironBlanks<20);assert.ok(after.relics.includes('lucky'));assert.equal(await page.locator('#relic-list .relic-empty').count(),1);await snap('sold-slot');
  await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');await page.locator('#station-relics').click();assert.equal(await page.locator('#relic-list .relic-empty').count(),1);

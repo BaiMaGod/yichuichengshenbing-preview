@@ -10,6 +10,7 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "76033cef182db3f06e1ed1f1db60462b7d06e3bf",
-  "previewRelease": "V4.1"
+  "sourceCommit": "2d0674af3f2e852daec8c8e822ae53bb1e3b6fcd",
+  "previewRelease": "V4.1",
+  "characterModel": "reference-calibrated-sculpture-v13"
 }

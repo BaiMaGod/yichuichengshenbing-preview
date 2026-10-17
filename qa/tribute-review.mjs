@@ -6,14 +6,14 @@ import assert from 'node:assert/strict';
 const out=process.env.QA_OUT||'qa-tribute';await mkdir(out,{recursive:true});
 const local=process.env.QA_URL?null:await serveBuild();const url=process.env.QA_URL||local.url;
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const reports=[],key='yichuichengshenbing.v1';
+const reports=[],key='yichuichengshenbing.v4';
 try{for(const [width,height] of (process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]])){
  const page=await browser.newPage({viewport:{width,height}});page.setDefaultTimeout(90000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const state=freshState();Object.assign(state,{tributeDays:2,workshopDay:3,catTributes:2,coins:10000,ironBlanks:20,sound:false,showCaseLevel:2,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['lucky','ember','master']});
  for(let i=0;i<6;i++){const sword={id:'rack-'+i,blade:'great',material:'iron',level:3+i*3,name:'宝剑 '+(i+1),value:1500*2**i,quality:1,mark:'none',disposal:'COLLECTED'};state.swords.push(sword);state.caseIds.push(sword.id);}
  await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
  await page.addInitScript(({key,state})=>{if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(state));},{key,state});
- console.log('Opening',width,url);await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v1',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
+ console.log('Opening',width,url);await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(url);console.log('Loaded document');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');const scene=page.locator('#scene3d');
  const snap=async name=>{console.log('Snapshot',name);await page.waitForFunction(()=>{const d=document.querySelector('#scene3d').dataset;return d.station===d.renderedStation&&d.renderedCameraReady==='true';});await page.screenshot({path:`${out}/${width}-${name}.png`,timeout:120000});};
  assert.ok(await page.locator('#merchant-call').isVisible());await snap('forge');
