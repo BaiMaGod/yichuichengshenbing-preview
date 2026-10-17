@@ -39,3 +39,13 @@ jobs:
           assert '食铁兽' in html, 'Panda station label is missing'
           assert re.search(r'name="source-commit" content="[a-f0-9]{40}"',html), 'Missing source version'
           PY
+      - name: Parse-check deployed JavaScript
+        run: |
+          python3 - <<'PY'
+          import pathlib,re,subprocess
+          html=pathlib.Path('index.html').read_text()
+          scripts=re.findall(r'<script[^>]*src="([^"]+\\.js)"',html)
+          assert scripts, 'No JavaScript entry point in preview'
+          for script in scripts:
+              subprocess.run(['node','--check',script.removeprefix('./')],check=True)
+          PY
