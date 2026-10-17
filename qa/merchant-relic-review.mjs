@@ -7,13 +7,14 @@ const key='yichuichengshenbing.v1',reports=[];
 const sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]];
 try{for(const [width,height] of sizes){
  const page=await browser.newPage({viewport:{width,height},hasTouch:width<800});page.setDefaultTimeout(45000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
  await page.addInitScript(()=>{const animate=Element.prototype.animate;window.motionLog=[];Element.prototype.animate=function(frames,options){if(this.id==='merchant-call'||this.id==='merchant-panel')window.motionLog.push({id:this.id,frames,options});return animate.call(this,frames,options);};});
  await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v1',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(process.env.QA_URL||'http://127.0.0.1:4173');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#sound').click();
  const fixture=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
  Object.assign(fixture,{session:null,tributeDays:2,workshopDay:3,catTributes:2,ironBlanks:40,coins:10000,sound:false,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['hammer','ember','anvil'],merchantDepartedDay:0});
- await page.evaluate(({key,fixture})=>localStorage.setItem(key,JSON.stringify(fixture)),{key,fixture});
+ await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),fixture);
  await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  const ghost=page.locator('#merchant-call');
  await page.waitForFunction(()=>document.querySelector('#merchant-call').dataset.presence==='present');
@@ -50,7 +51,7 @@ try{for(const [width,height] of sizes){
  const departure=await ghost.evaluate(e=>{const a=e.getAnimations()[0];a.pause();a.currentTime=a.effect.getTiming().duration/2;return{opacity:Number(getComputedStyle(e).opacity),transform:getComputedStyle(e).transform};});assert.ok(departure.opacity>0&&departure.opacity<1);
  await ghost.evaluate(e=>e.getAnimations()[0].play());await page.waitForFunction(()=>document.querySelector('#merchant-call').hidden);
  saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.ok(saved.session);assert.equal(saved.merchantDepartedDay,3);
- saved.session.seed=1;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key,saved});
+ saved.session.seed=1;await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),saved);
  await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');assert.equal(await ghost.isVisible(),false);
  await settled();
  const clickTarget=async name=>{const p=await page.locator('#scene3d').evaluate((e,name)=>{const p=JSON.parse(e.dataset.targets)[name],r=e.getBoundingClientRect();return{x:r.x+p.x,y:r.y+p.y};},name);await page.mouse.click(p.x,p.y);};
@@ -63,7 +64,7 @@ try{for(const [width,height] of sizes){
  const arrival=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
  const gift={id:'arrival-gift',blade:'great',material:'iron',level:10,value:10000,quality:1,mark:'none',disposal:'COLLECTED'};
  Object.assign(arrival,{session:null,tributeDays:1,workshopDay:2,catTributes:1,merchantDepartedDay:0,swords:[gift],caseIds:[gift.id]});
- await page.evaluate(({key,arrival})=>localStorage.setItem(key,JSON.stringify(arrival)),{key,arrival});await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
+ await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),arrival);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#station-cat').click();await settled();await page.locator('#tribute').click();await page.waitForSelector('#cat-back:not([hidden])');
  assert.equal(await ghost.isVisible(),false);assert.equal(await page.evaluate(()=>window.motionLog.filter(a=>a.id==='merchant-call').length),0);
  await page.locator('#station-forge').click();await page.waitForFunction(()=>document.querySelector('#merchant-call').dataset.presence==='present');

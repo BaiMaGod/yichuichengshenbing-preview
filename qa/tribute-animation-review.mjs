@@ -8,6 +8,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.CH
 const key='yichuichengshenbing.v1',reports=[];
 try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]]){
  const page=await browser.newPage({viewport:{width,height}});page.setDefaultTimeout(60000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
  await page.addInitScript(()=>{
   const actual=performance.now.bind(performance),raf=requestAnimationFrame.bind(window);let anchor=actual(),mapped=anchor,speed=1;
   const time=()=>mapped+(actual()-anchor)*speed;
@@ -19,7 +20,7 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
  const state=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
  const sword={id:'animation-gift',blade:'great',material:'iron',level:10,value:10000,quality:1,mark:'none',disposal:'COLLECTED'};
  Object.assign(state,{session:null,tributeDays:1,workshopDay:2,catTributes:1,sound:false,swords:[sword],caseIds:[sword.id]});
- await page.addInitScript(({key,state})=>{localStorage.setItem(key,JSON.stringify(state));localStorage.removeItem(key+'.meta');},{key,state});await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
+ await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),state);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#station-cat').click();await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.renderedCameraReady==='true'&&document.querySelector('#scene3d').dataset.renderedStation==='cat');
  await page.screenshot({path:`${out}/${width}-idle.png`});
  await page.evaluate(()=>{window.stages=[];const host=document.querySelector('#scene3d');new MutationObserver(()=>{const p=JSON.parse(host.dataset.catProof||'{}');if(p.elapsed)window.stages.push(p);}).observe(host,{attributes:true,attributeFilter:['data-cat-proof']});window.setAnimationSpeed(.10);});
@@ -39,7 +40,7 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
  const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.equal(after.ironBlanks,5);assert.equal(after.catTributes,2);assert.deepEqual(after.caseIds,[]);assert.deepEqual(errors,[]);
  await page.locator('#cat-back').click();await page.locator('#station-cat').click();await page.waitForFunction(()=>Math.abs(JSON.parse(document.querySelector('#scene3d').dataset.catProof||'{}').turn)<.01);
  // A second run at normal speed checks the actual three-second completion.
- await page.addInitScript(({key,state})=>{localStorage.setItem(key,JSON.stringify(state));localStorage.removeItem(key+'.meta');},{key,state});await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
+ await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),state);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#station-cat').click();await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.renderedCameraReady==='true'&&document.querySelector('#scene3d').dataset.renderedStation==='cat');
  await page.evaluate(()=>{window.phaseTimes=[];const h=document.querySelector('#scene3d');new MutationObserver(ms=>{for(const m of ms)if(m.attributeName==='data-tribute')window.phaseTimes.push({phase:h.dataset.tribute,ms:performance.now()});}).observe(h,{attributes:true,attributeFilter:['data-tribute']});});
  await page.locator('#tribute').click();await page.waitForSelector('#cat-back:not([hidden])');const times=await page.evaluate(()=>window.phaseTimes);
