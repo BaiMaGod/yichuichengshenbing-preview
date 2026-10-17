@@ -105,3 +105,4 @@ jobs:
             git commit -m "deploy: V4.1 compiled preview from private source"
             git push origin HEAD:main
           fi
+# Trigger preview-only build for relic panel boundary fix (source 350f577e4299b4584da8d16588f2a500d3e57338).
