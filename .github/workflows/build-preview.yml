@@ -1,0 +1,107 @@
+name: Build and publish preview (source remains private)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-preview.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: forge-preview-release
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check private source access
+        env:
+          SOURCE_TOKEN: ${{ secrets.FORGE_SOURCE_TOKEN }}
+        run: |
+          if [ -z "$SOURCE_TOKEN" ]; then
+            echo "::error::Preview repository secret FORGE_SOURCE_TOKEN is required to read the private formal source repository. No source or credentials are published in preview."
+            exit 1
+          fi
+
+      - name: Checkout preview (compiled artifacts only)
+        uses: actions/checkout@v4
+        with:
+          path: preview
+          persist-credentials: true
+
+      - name: Checkout private source into ephemeral runner
+        uses: actions/checkout@v4
+        with:
+          repository: BaiMaGod/yichuichengshenbing
+          ref: main
+          token: ${{ secrets.FORGE_SOURCE_TOKEN }}
+          path: private-source
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: private-source/package-lock.json
+
+      - name: Install dependencies in ephemeral source checkout
+        working-directory: private-source
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify V4.1 rules before publishing
+        working-directory: private-source
+        run: npm test
+
+      - name: Build browser version for preview only
+        working-directory: private-source
+        run: npm run build
+
+      - name: Validate compiled release has no source
+        run: |
+          test -f private-source/dist/index.html
+          test -d private-source/dist/assets
+          test -f private-source/dist/release.json
+          if find private-source/dist -type f \( -name '*.ts' -o -name '*.map' \) | grep -q .; then
+            echo "::error::Build output contains TypeScript or sourcemaps"
+            exit 1
+          fi
+
+      - name: Copy only compiled files and stamp source version
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          # The source checkout lives only in the runner, never in the public preview git tree.
+          rsync -a private-source/dist/ preview/
+          python3 - <<'PY'
+          import pathlib,subprocess,json,re
+          root=pathlib.Path('preview')
+          sha=subprocess.check_output(['git','-C','private-source','rev-parse','HEAD'],text=True).strip()
+          html=(root/'index.html').read_text()
+          html=re.sub(r'<meta name="source-commit" content="[a-f0-9]{40}">','',html)
+          html=html.replace('<head>','<head>\n<meta name="source-commit" content="'+sha+'">',1)
+          (root/'index.html').write_text(html)
+          release=root/'release.json'
+          info=json.loads(release.read_text())
+          info['sourceCommit']=sha
+          info['previewRelease']='V4.1'
+          release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
+          for forbidden in ['src','tests','node_modules','docs']:
+            assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
+          print('Prepared preview from private source commit',sha)
+          PY
+
+      - name: Commit compiled preview only
+        working-directory: preview
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html release.json assets art audio 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Preview already matches the source build"
+          else
+            git commit -m "deploy: V4.1 compiled preview from private source"
+            git push origin HEAD:main
+          fi
