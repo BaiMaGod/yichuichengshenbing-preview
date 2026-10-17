@@ -36,7 +36,7 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
  const stages=await page.evaluate(()=>window.stages),firstShot=snapshots[0];
  // Screenshots can be much slower than the WebGL animation on shared CI GPUs:
  // verify the actual earlier submitted 3D frame, not a screenshot sampled a second later.
- const early=stages.filter(p=>p.elapsed>=.20&&p.elapsed<1&&p.phase==='swallowing');
+ const early=stages.filter(p=>p.elapsed>=.20&&p.elapsed<1&&p.phase==='offering');
  const first=early.find(p=>p.swordVisible&&p.swordUp[1]<-.99&&p.swordFace[2]>.99&&p.headPitch<-.60&&p.jawAngle>.15);
  assert.ok(first,'No correct early swallow frame was rendered: '+JSON.stringify({firstShotAt:firstShot.elapsed,earlyFrames:early.map(p=>({elapsed:p.elapsed,visible:p.swordVisible,up:p.swordUp,face:p.swordFace,pitch:p.headPitch,jaw:p.jawAngle}))}));
  console.log(width,'verified early GPU swallow pose at',first.elapsed,'first screenshot at',firstShot.elapsed);
