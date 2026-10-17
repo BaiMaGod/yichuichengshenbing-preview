@@ -44,7 +44,7 @@ jobs:
           python3 - <<'PY'
           import pathlib,re,subprocess
           html=pathlib.Path('index.html').read_text()
-          scripts=re.findall(r'<script[^>]*src="([^"]+\\.js)"',html)
+          scripts=[x for x in re.findall(r'src="([^"]+)"',html) if x.endswith('.js')]
           assert scripts, 'No JavaScript entry point in preview'
           for script in scripts:
               subprocess.run(['node','--check',script.removeprefix('./')],check=True)
