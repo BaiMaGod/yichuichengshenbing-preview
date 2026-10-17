@@ -3,7 +3,7 @@
 <meta name="source-commit" content="0b276607ac2c2c1f25e783497e05b153e4faaa59">
 <meta name="ui-patch-commit" content="15ea0241e04e30736954fbeb4ee38f083c6b55fa">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-ui-20261017.js"></script>
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-single-forge-20261017.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-ui-20261017-v2.css">
 </head>
 <body>
@@ -66,16 +66,10 @@
  <div class="forge-stakes"><div><small>当前价值</small><strong id="value-now">320 金</strong></div><div><small>下一锤断裂</small><strong id="fracture-risk">0%</strong></div></div>
  <div id="frenzy-meter"><span id="frenzy-label">入神蓄力 0/10</span><div id="frenzy-cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
  <div id="result" class="strike-result" aria-live="polite"></div>
- <details id="forge-options"><summary>锻法与铭文</summary>
-  <div class="styles">
-   <button id="safe" class="style"><b>稳锻</b><small>断裂最多 −4%，转为不变</small></button>
-   <button id="precise" class="style active"><b>常规</b><small>基础五种结果</small></button>
-   <button id="bold" class="style"><b>豪锻</b><small>4% 成功转为大成功</small></button>
-  </div>
+ <details id="forge-options"><summary>锻造信息与道具</summary>
   <div class="timing-area" aria-hidden="true"><div class="ring-back"></div><div id="timing-ring"></div><div class="ring-center">⚒</div><div id="timing-indicator" class="timing">普通</div><div class="progress-line"><div id="ring-progress"></div></div></div>
   <div id="probability" class="risk-detail"></div>
   <div class="forge-extras"><span id="heat-tag">普通火候</span><span id="protection">护符保护</span></div>
-  <label id="mark-row" hidden>收剑铭文 <select id="mark"></select></label>
   <div class="supply-title">商人道具 · 点击启用</div><div id="supply-actions" class="supply-actions"></div>
  </details>
 </section>
