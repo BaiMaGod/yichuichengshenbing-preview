@@ -11,5 +11,7 @@
     "leaderboard": false
   },
   "sourceCommit": "0b276607ac2c2c1f25e783497e05b153e4faaa59",
-  "pandaModel": "reference-calibrated-sculpture-v12"
+  "pandaModel": "reference-calibrated-sculpture-v12",
+  "uiPatchSourceCommit": "15ea0241e04e30736954fbeb4ee38f083c6b55fa",
+  "uiPatchScope": "Title and panel toggle only; base bundle unchanged"
 }
