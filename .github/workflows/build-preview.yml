@@ -105,4 +105,4 @@ jobs:
             git commit -m "deploy: V4.1 compiled preview from private source"
             git push origin HEAD:main
           fi
-# Preview-only V2.2 build trigger for routed swords (source a21ad2b7dc5f84b8fdb15af70096961220957a09).
+# Preview-only V2.2 build trigger after test fixes (source e3bc8505b954231ba0087c49936e0ab51600d81e).
