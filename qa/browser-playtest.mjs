@@ -114,18 +114,10 @@ for(const [width,height] of sizes){
  }
  console.log(`${width}: five outcomes verified`);await fixture(seven);const shown=await page.locator('#value-now').textContent();await page.locator('#cashout').click();await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='finished');const complete=await state();assert.equal(complete.session.sword.value,seven.session.currentValue);assert.ok(shown.includes(Math.floor(complete.session.sword.value).toLocaleString('zh-CN')));assert.equal(complete.session.hits,7);await tap('anvil');assert.equal((await state()).session.hits,7);await snap('collected');
  await page.locator('#offer-cat').click();await page.waitForTimeout(1200);await tap('cat');await page.waitForSelector('#cat-back:not([hidden])',{timeout:30000});const paid=await state();assert.equal(paid.session,null);assert.ok(paid.ironBlanks>=3);assert.equal(paid.catTributes,1);await snap('cat-reward');
- // Furnace levels now come from purchasing and refining the furnace relic.
- const furnaceFixture=structuredClone(paid);furnaceFixture.coins=100000;furnaceFixture.ironBlanks=100;furnaceFixture.furnaceLevel=3;furnaceFixture.relicWelcomeUsed=true;
- furnaceFixture.relics=[...new Set([...furnaceFixture.relics,'ember'])];furnaceFixture.relicRanks={...furnaceFixture.relicRanks,ember:2};
- let budget=100,current=furnaceFixture;
- for(let level=3;level<=8;level++){
-  current.relicOffers=['ember','',''];current.relicOffersDay=current.workshopDay;
-  await fixture(current);assert.equal((await state()).furnaceLevel,level);await page.locator('#station-relics').click();
-  await page.waitForFunction(()=>{const d=document.querySelector('#scene3d').dataset;return d.renderedStation==='relics'&&d.renderedCameraReady==='true';});
-  await page.locator('#relic-list button').first().click();await page.locator('#relic-exchange').click();budget-=level;
-  current=await state();assert.equal(current.furnaceLevel,level+1);assert.equal(current.coins,100000);assert.equal(current.ironBlanks,budget);
- }
- await page.reload();await ready();assert.equal((await state()).furnaceLevel,9);
+ // The current merchant upgrade rules are covered by the core tests.
+ // Verify the maximum-level one-second heat behavior through the real UI.
+ const furnaceFixture=structuredClone(paid);furnaceFixture.coins=100000;furnaceFixture.ironBlanks=100;furnaceFixture.furnaceLevel=9;furnaceFixture.relicWelcomeUsed=true;
+ await fixture(furnaceFixture);assert.equal((await state()).furnaceLevel,9);
  await tap('furnace');await page.waitForSelector('#scene3d[data-sword-place="furnace"]');
  assert.ok((await page.locator('#heating-order').textContent()).includes('1 秒满温'));
  await page.waitForFunction(()=>Number(document.querySelector('#scene3d').dataset.heat)>=100,null,{timeout:5500});
@@ -149,13 +141,3 @@ await writeFile(`${out}/continuous-forging-report.json`,JSON.stringify({passed:t
  }else await writeFile(`${out}/failure.json`,JSON.stringify(diagnostic,null,2));
  throw e;
 }finally{await browser.close();}
-
-
-
-
-
-  // Facility purchases are covered by the current merchant rules. This isolated
-  // maximum-level fixture verifies the one-second heating behavior through the UI.
-  const furnaceFixture=structuredClone(paid);furnaceFixture.coins=100000;furnaceFixture.ironBlanks=100;furnaceFixture.furnaceLevel=9;furnaceFixture.relicWelcomeUsed=true;
-  await fixture(furnaceFixture);assert.equal((await state()).furnaceLevel,9);
-
