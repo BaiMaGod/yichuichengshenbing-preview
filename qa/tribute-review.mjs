@@ -1,16 +1,16 @@
 import {chromium} from 'playwright';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {serveBuild} from './serve-build.mjs';
-function freshState(seed=20261008){return {version:1,coins:300,scraps:0,formalCount:0,totalMade:0,totalBroken:0,hammerLevel:1,furnaceLevel:1,anvilLevel:1,showCaseLevel:1,caseIds:[],swords:[],session:null,ledger:[],seed:seed>>>0||1,sound:true,showLegacySwords:false,ironBlanks:0,catTributes:0,relics:[],workshopDay:1,tributeDays:0,relicOffersDay:0,relicOffers:[],relicRerolls:0,relicWelcomeUsed:false,merchantStockDay:0,merchantStock:[],merchantPurchased:[],supplies:{ward:0,chalk:0,star:0,clock:0},specialBlanks:0}}
+function freshState(seed=20261008){return {version:1,coins:300,scraps:0,formalCount:0,totalMade:0,totalBroken:0,hammerLevel:1,furnaceLevel:1,anvilLevel:1,showCaseLevel:1,caseIds:[],swords:[],session:null,ledger:[],seed:seed>>>0||1,sound:true,pendingSpecialRoute:null,swordCodex:[],ironBlanks:0,catTributes:0,relics:[],workshopDay:1,tributeDays:0,relicOffersDay:0,relicOffers:[],relicRerolls:0,relicWelcomeUsed:false,merchantStockDay:0,merchantStock:[],merchantPurchased:[],supplies:{ward:0,chalk:0,star:0,clock:0},specialBlanks:0}}
 import assert from 'node:assert/strict';
 const out=process.env.QA_OUT||'qa-tribute';await mkdir(out,{recursive:true});
 const local=process.env.QA_URL?null:await serveBuild();const url=process.env.QA_URL||local.url;
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const reports=[],key='yichuichengshenbing.v4';
+const reports=[],key='yichuichengshenbing.v5';
 try{for(const [width,height] of (process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]])){
  const page=await browser.newPage({viewport:{width,height}});page.setDefaultTimeout(90000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const state=freshState();Object.assign(state,{tributeDays:2,workshopDay:3,catTributes:2,coins:10000,ironBlanks:20,sound:false,showCaseLevel:2,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['lucky','ember','master']});
- for(let i=0;i<6;i++){const sword={id:'rack-'+i,blade:'great',material:'iron',level:3+i*3,name:'宝剑 '+(i+1),value:1500*2**i,quality:1,mark:'none',disposal:'COLLECTED'};state.swords.push(sword);state.caseIds.push(sword.id);}
+ for(let i=0;i<6;i++){const sword={id:'rack-'+i,blade:'great',material:'iron',level:3+i*3,maxReachedLevel:3+i*3,route:{kind:'normal',vein:'dragonbone',final:'dragon_slayer'},name:'宝剑 '+(i+1),value:1500*2**i,quality:1,mark:'none',disposal:'COLLECTED'};state.swords.push(sword);state.caseIds.push(sword.id);}
  await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
  await page.addInitScript(({key,state})=>{if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(state));},{key,state});
  console.log('Opening',width,url);await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));

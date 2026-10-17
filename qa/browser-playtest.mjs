@@ -8,7 +8,7 @@ const reports=[],sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(N
 // Only visual fixtures receive this longer deadline; real four-second expiry is tested first.
 const VISUAL_FRENZY_MS=10*60*1000;
 const SCREENSHOT_TIMEOUT=120000;
-const key='yichuichengshenbing.v4',url=process.env.QA_URL||'http://127.0.0.1:4173';
+const key='yichuichengshenbing.v5',url=process.env.QA_URL||'http://127.0.0.1:4173';
 function next(n){n^=n<<13;n^=n>>>17;n^=n<<5;return n>>>0;}
 function seedForRange(low,high){for(let n=1;n<1000000;n++){const r=next(n)/2**32;if(r>=low&&r<high)return n;}throw Error('no fixture seed');}
 function successfulChain(){for(let n=1;n<1000000;n++){let x=n,valid=true;for(let i=0;i<7;i++){x=next(x);if(x/2**32>=.3){valid=false;break;}}if(valid)return n;}throw Error('no chain seed');}

@@ -5,7 +5,7 @@ import {serveBuild} from './serve-build.mjs';
 const out=process.env.QA_OUT||'qa-evidence/tribute-animation';await mkdir(out,{recursive:true});
 const local=process.env.QA_URL?null:await serveBuild(),url=process.env.QA_URL||local.url;
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
-const key='yichuichengshenbing.v4',reports=[];
+const key='yichuichengshenbing.v5',reports=[];
 try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]]){
  const page=await browser.newPage({viewport:{width,height}});page.setDefaultTimeout(60000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
@@ -18,7 +18,7 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
  await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(url);await page.waitForSelector('#scene3d[data-cat-asset="ready"]');await page.locator('#sound').click();
  const state=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
- const sword={id:'animation-gift',blade:'great',material:'iron',level:10,value:10000,quality:1,mark:'none',disposal:'COLLECTED'};
+ const sword={id:'animation-gift',blade:'great',material:'iron',level:10,maxReachedLevel:10,route:{kind:'normal',vein:'dragonbone',final:'dragon_slayer'},value:10000,quality:1,mark:'none',disposal:'COLLECTED'};
  Object.assign(state,{session:null,tributeDays:1,workshopDay:2,catTributes:1,sound:false,swords:[sword],caseIds:[sword.id]});
  await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),state);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#station-cat').click();await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.renderedCameraReady==='true'&&document.querySelector('#scene3d').dataset.renderedStation==='cat');

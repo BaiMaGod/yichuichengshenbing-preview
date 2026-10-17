@@ -3,7 +3,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const out=process.env.QA_OUT||'qa-evidence/merchant-relics';await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||(process.platform==='win32'?'C:/Program Files/Google/Chrome/Application/chrome.exe':undefined),args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const key='yichuichengshenbing.v4',reports=[];
+const key='yichuichengshenbing.v5',reports=[];
 const sizes=process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]];
 try{for(const [width,height] of sizes){
  const page=await browser.newPage({viewport:{width,height},hasTouch:width<800});page.setDefaultTimeout(45000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -62,7 +62,7 @@ try{for(const [width,height] of sizes){
  await shot('forge-after-departure');
  // A new visit triggered from the tribute camera must enter after returning to the forge.
  const arrival=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
- const gift={id:'arrival-gift',blade:'great',material:'iron',level:10,value:10000,quality:1,mark:'none',disposal:'COLLECTED'};
+ const gift={id:'arrival-gift',blade:'great',material:'iron',level:10,maxReachedLevel:10,route:{kind:'normal',vein:'dragonbone',final:'dragon_slayer'},value:10000,quality:1,mark:'none',disposal:'COLLECTED'};
  Object.assign(arrival,{session:null,tributeDays:1,workshopDay:2,catTributes:1,merchantDepartedDay:0,swords:[gift],caseIds:[gift.id]});
  await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),arrival);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#station-cat').click();await settled();await page.locator('#tribute').click();await page.waitForSelector('#cat-back:not([hidden])');
