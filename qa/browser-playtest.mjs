@@ -90,7 +90,7 @@ for(const [width,height] of sizes){
  assert.ok(proof.benchBounds.left>=0&&proof.benchBounds.right<=width,'complete bench fits screen');assert.ok(proof.ledger.bottom<=proof.benchBounds.top-10,'sign stays above the bench');assert.ok(proof.ledger.bottom<proof.bounds.top,'sign stays above the blade');assert.ok(proof.benchBounds.bottom<proof.navTop,'bench clears action row');assert.ok(proof.ledger.left>=0&&proof.ledger.right<=width,'sign fits screen');assert.ok(proof.ledger.top<height*.3,'sign remains in upper screen');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight>innerHeight),false,'page fits viewport height');
  const upgradedBladeColors=await bladePixels(page,proof);assert.ok(baseBladeColors.some((rgb,i)=>rgb.reduce((n,c,j)=>n+Math.abs(c-upgradedBladeColors[i][j]),0)>60),'upgraded blade visibly changes color');
- await page.locator('#forge-options summary').click();const options=await page.locator('#forge-options').boundingBox();assert.ok(options.y+options.height<proof.bounds.top&&options.y+options.height<proof.benchBounds.top,'expanded choices stay above blade and bench');await page.locator('#forge-options summary').click();assert.equal((await state()).session.hits,7);
+ await page.locator('#forge-options summary').click({position:{x:12,y:12}});const options=await page.locator('#forge-options').boundingBox();assert.ok(options.y+options.height<proof.bounds.top&&options.y+options.height<proof.benchBounds.top,'expanded choices stay above blade and bench');await page.locator('#forge-options summary').click({position:{x:12,y:12}});assert.equal((await state()).session.hits,7);
  await page.reload();await ready();assert.equal((await state()).session.hits,7);assert.equal((await state()).session.currentValue,seven.session.currentValue);
  const charged=structuredClone(seven);charged.session.hits=9;charged.session.frenzyCharge=9;charged.session.seed=seedForRange(.95,.99);await fixture(charged);assert.ok(parseFloat(await page.locator('#fracture-risk').textContent())>0);charged.session.seed=seedForRange(.85,.86);await fixture(charged);await hit();const frenzy=await state();assert.equal(frenzy.session.hits,10);assert.equal(frenzy.session.frenzyCharge,0);assert.ok(frenzy.session.frenzyUntil>Date.now());assert.notEqual(frenzy.session.strikes.at(-1).result,'break');
  await page.waitForSelector('#scene3d[data-blade-rendered-finish="rainbow"]');
@@ -131,7 +131,7 @@ for(const [width,height] of sizes){
  await page.waitForFunction(()=>Number(document.querySelector('#scene3d').dataset.heat)>=100,null,{timeout:5500});
  await tap('anvil');await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='forge');
  assert.equal((await state()).session.goodHeat,true);
- await snap('furnace-lv9');console.log(`${width}: Lv9 furnace relic, iron costs, and full heat verified`);
+ await snap('furnace-lv9');console.log(`${width}: Lv9 furnace timing and full heat verified`);
  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);assert.equal(overflow,false);
  reports.push({width,height,passed:true,outcomes,sevenHitsRemainForge:true,frenzyExpires:true,flowingRainbow:true,flowingHilt:true,superGodPromoted:true,flowingCosmos:true,permanentBottomNavigation:true,levelColors:true,noSwordLabel:true,swordVisible:true,recordedAudio:true,mute:true,catReward:paid.ironBlanks});console.log(`${width}x${height}: continuous forging, five results, rainbow frenzy, cashout and tribute passed`);await page.close();active=null;
 }
@@ -154,4 +154,8 @@ await writeFile(`${out}/continuous-forging-report.json`,JSON.stringify({passed:t
 
 
 
+  // Facility purchases are covered by the current merchant rules. This isolated
+  // maximum-level fixture verifies the one-second heating behavior through the UI.
+  const furnaceFixture=structuredClone(paid);furnaceFixture.coins=100000;furnaceFixture.ironBlanks=100;furnaceFixture.furnaceLevel=9;furnaceFixture.relicWelcomeUsed=true;
+  await fixture(furnaceFixture);assert.equal((await state()).furnaceLevel,9);
 
