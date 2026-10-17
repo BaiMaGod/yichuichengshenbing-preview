@@ -29,6 +29,13 @@ jobs:
           assert 'polygon-sculpture' in javascript, 'Missing sculpture style'
           assert 'continuous-limbs-curled-fingers' in javascript, 'Missing revised panda limbs'
           assert 'cat-turnaround-v2.webp' not in javascript, 'Build still references removed cat atlas'
+          # Prevent shipping an obsolete choice panel while core source has removed it.
+          assert '<summary>锻造信息与道具</summary>' in html, 'Current forging panel title is missing'
+          assert '锻法与铭文' not in html, 'Obsolete forging styles panel is still rendered'
+          for old_id in ['safe','precise','bold','mark','mark-row']:
+              assert not re.search(r'id=["\\']'+old_id+r'["\\']',html), 'Obsolete forging control: '+old_id
+          for obsolete in ['function Yc(', 'function lr()', 'z("mark")', 'cashout(e="none")', 'style:e,timing:t']:
+              assert obsolete not in javascript, 'Obsolete forging/rune logic in preview bundle: '+obsolete
           assert '食铁兽' in html, 'Panda station label is missing'
           assert re.search(r'name="source-commit" content="[a-f0-9]{40}"',html), 'Missing source version'
           PY
