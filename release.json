@@ -10,9 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "0b276607ac2c2c1f25e783497e05b153e4faaa59",
-  "pandaModel": "reference-calibrated-sculpture-v12",
-  "uiPatchSourceCommit": "4ceae8ef0c1709c99965a778be55ed669f9b09a9",
-  "uiPatchScope": "Preview compiled bundle: removed forging styles, inscription selectors, inscription multipliers, style-based outcomes, and old save fields",
-  "uiPatchRevision": "2026-10-17-complete-style-rune-removal"
+  "sourceCommit": "6fd5f2478b198574a48efb9b61807c752d96979d",
+  "previewRelease": "V4.1"
 }
