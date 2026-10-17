@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-<meta name="source-commit" content="8cf017d0a274c56263dbbace5fe4028c463b61e3">
+<meta name="source-commit" content="76033cef182db3f06e1ed1f1db60462b7d06e3bf">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-relic-gift-8cf017d.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Bk_ID6_S.css">
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-ry_y1qsw.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BVEBE1bG.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
@@ -40,14 +40,22 @@
   </div>
  </details>
 </section>
+<section id="collection-panel" class="control station-panel" hidden>
+ <details class="station-drawer">
+  <summary class="station-drawer-title"><strong>剑架设置</strong><small>剑型外观与引导</small></summary>
+  <div class="station-panel-content">
+   <label class="sword-appearance-switch"><input id="show-legacy-swords" type="checkbox">显示旧剑外观<small>默认关闭 · 七把独立剑型，+3 起新增符文、龙齿、弧刃与雷霆</small></label>
+   <button id="tutorial-help" type="button" class="secondary">重新体验新手引导</button>
+  </div>
+ </details>
+</section>
 <section id="relic-panel" class="control station-panel" hidden>
  <details class="station-drawer">
   <summary class="station-drawer-title"><strong>遗物管理</strong><small id="relic-rack-count">0/8 · 纳贡补货</small></summary>
   <div class="station-panel-content">
   
-   <details class="cabinet-advanced" open><summary>墙上遗物与工坊设置</summary>   <div class="market-subtitle">已装备遗物 · 8 格</div><div id="relic-equipped" class="relic-list"></div><div class="market-subtitle">遗物背包 · 最多 8 件</div><div id="relic-bag" class="relic-list"></div><div id="relic-controls" class="market-controls"><button id="relic-paid-refresh" class="secondary" type="button">2 铁剑刷新（0/1）</button><button id="relic-ad-refresh" class="secondary" type="button" hidden>广告刷新（0/2）</button></div>
-   <small class="hint">首次免费选 1 件，不受纳贡日限制；之后用铁剑交易。已购遗物可以免费装备和卸下；装备架8件，背包8件，最多持有16件。</small><button id="tutorial-help" type="button" class="secondary">重新体验新手引导</button>   <label class="sword-appearance-switch"><input id="show-legacy-swords" type="checkbox">显示旧剑外观<small>默认关闭 · 七把独立剑型，+3 起新增符文、龙齿、弧刃与雷霆</small></label>
-   <div class="cabinet-upgrade-section"><b>收藏剑架</b><div id="workshop-upgrades" class="cabinet-upgrades"></div></div>
+   <details class="cabinet-advanced" open><summary>遗物装备与背包</summary>   <div class="market-subtitle">已装备遗物 · 8 格</div><div id="relic-equipped" class="relic-list"></div><div class="market-subtitle">遗物背包 · 最多 8 件</div><div id="relic-bag" class="relic-list"></div><div id="relic-controls" class="market-controls"><button id="relic-paid-refresh" class="secondary" type="button">2 铁剑刷新（0/1）</button><button id="relic-ad-refresh" class="secondary" type="button" hidden>广告刷新（0/2）</button></div>
+   <small class="hint">首次免费选 1 件，不受纳贡日限制；之后用铁剑交易。已购遗物可以免费装备和卸下；装备架8件，背包8件，最多持有16件。</small>
 </details>
   </div>
  </details>
@@ -79,7 +87,7 @@
  <div class="finished-actions"><button id="sell" class="primary">出售并继续锻造</button><button id="collect" class="secondary">收藏</button><button id="offer-cat" class="secondary">献给食铁兽</button><button id="deliver" class="primary" hidden>完成代工</button></div>
 </section>
 <section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-rewind" class="secondary" hidden>⏳ 使用回溯发条 · 恢复宝剑</button><button id="broken-ad-revive" class="secondary" type="button" hidden>观看广告 · 修复宝剑（每把一次）</button><button id="broken-next" class="primary">再锻一把</button></section>
-<footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div><div class="nav-actions"><button id="nav-collection">神兵剑谱</button></div></footer>
+<footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div></footer>
 <div id="tutorial-layer" class="tutorial-layer" aria-live="polite" hidden>
  <div id="tutorial-focus" class="tutorial-focus" aria-hidden="true"></div>
  <div id="tutorial-tip" class="tutorial-tip">
