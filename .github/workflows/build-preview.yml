@@ -51,7 +51,7 @@ jobs:
         working-directory: private-source
         run: npm ci --no-audit --no-fund
 
-      - name: Verify V4.1 rules before publishing
+      - name: Verify sword V2.2 and established game rules before publishing
         working-directory: private-source
         run: npm test
 
@@ -86,7 +86,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='V4.1'
+          info['previewRelease']='V2.2'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -102,7 +102,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: V4.1 compiled preview from private source"
+            git commit -m "deploy: V2.2 compiled preview from private source"
             git push origin HEAD:main
           fi
-# Preview-only V2.2 build trigger including forge-board UI fix (source 8c5280fbc2b7b4fdead209dc8c97fc34c323a43d).
+# Preview-only V2.2 build after revive peak-level correction (source e4401e21395f1c0d304f55925506bd229fd71f0e).
