@@ -105,4 +105,4 @@ jobs:
             git commit -m "deploy: V2.2 compiled preview from private source"
             git push origin HEAD:main
           fi
-# Preview-only V2.2 build after revive peak-level correction (source e4401e21395f1c0d304f55925506bd229fd71f0e).
+# Preview-only release: adaptive tribute supply and daily rewarded offering; source release 2026-10-18.
