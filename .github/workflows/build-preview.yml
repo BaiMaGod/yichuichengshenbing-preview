@@ -106,3 +106,4 @@ jobs:
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
+# Preview source refresh: remove standalone forging info and items drawer; preserve consumables.
