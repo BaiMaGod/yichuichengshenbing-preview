@@ -16,7 +16,7 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
   performance.now=time;window.requestAnimationFrame=f=>raf(()=>f(time()));
  });
  await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
- await page.goto(url);await page.waitForSelector('#scene3d[data-cat-asset="ready"]');await page.locator('#sound').click();
+ await page.goto(url);await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  const state=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
  const sword={id:'animation-gift',blade:'great',material:'iron',level:10,maxReachedLevel:10,route:{kind:'normal',vein:'dragonbone',final:'dragon_slayer'},value:10000,quality:1,mark:'none',disposal:'COLLECTED'};
  Object.assign(state,{session:null,tributeDays:1,workshopDay:2,catTributes:1,sound:false,swords:[sword],caseIds:[sword.id]});
