@@ -41,16 +41,16 @@ async function play(page){
  await hit(1);await hit(2);
  assert.equal(await step(),'hammer','two guaranteed strikes only reach 720 G; opening goal is 1800 G');
  assert.equal((await state()).session.currentValue,720);
- // Reproduce a legitimate, deterministic sequence in QA after the tutorial's
- // two guaranteed hits. pagehide's game save runs first; override the next seed
- // afterwards so that a restored game plays the normal probability table.
+ // Stage the deterministic follow-up before navigation and restore at document init.
+ // This avoids racing the game's pagehide/cloud-save handlers on slow mobile runners.
+ await page.addInitScript(k=>{
+  const staged=sessionStorage.getItem('__forge_tutorial_stage');
+  if(staged){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_tutorial_stage');}
+ },key);
  await page.evaluate(k=>{
-  window.addEventListener('pagehide',()=>{
-   const saved=JSON.parse(localStorage.getItem(k));
-   saved.session.seed=2;
-   localStorage.setItem(k,JSON.stringify(saved));
-   localStorage.removeItem(k+'.meta');
-  },{once:true});
+  const saved=JSON.parse(localStorage.getItem(k));
+  saved.session.seed=2;
+  sessionStorage.setItem('__forge_tutorial_stage',JSON.stringify(saved));
  },key);
  await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]',{timeout:60000});
  assert.equal(await step(),'hammer');
