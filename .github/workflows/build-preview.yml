@@ -105,4 +105,4 @@ jobs:
             git commit -m "deploy: V2.2 compiled preview from private source"
             git push origin HEAD:main
           fi
-# Preview-only release: adaptive tribute supply and daily rewarded offering; source release 2026-10-18.
+# Preview-only release: adaptive tribute supply and daily rewarded offering; source release 2026-10-18 retest 2.
