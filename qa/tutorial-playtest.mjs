@@ -15,6 +15,16 @@ async function play(page){
  const state=()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)),key);
  const step=()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)).step,tutorialKey);
  const click3d=async name=>{
+  // After reload the camera interpolates for several frames. A point from
+  // dataset.targets can be stale relative to the currently rendered anvil.
+  await page.waitForFunction(name=>{
+   const host=document.querySelector('#scene3d'),point=JSON.parse(host.dataset.targets||'{}')[name];
+   if(!point||!Number.isFinite(point.x)||!Number.isFinite(point.y))return false;
+   const now=performance.now(),key='__qaStable3d_'+name,last=window[key];
+   if(!last||Math.hypot(last.x-point.x,last.y-point.y)>0.8){window[key]={x:point.x,y:point.y,since:now};return false;}
+   return host.dataset.renderedCameraReady==='true'&&host.dataset.hammerStage==='idle'&&
+    document.querySelector('.game').dataset.moving!=='true'&&now-last.since>650;
+  },name,{polling:100,timeout:20000});
   const p=await root.evaluate((e,name)=>{const point=JSON.parse(e.dataset.targets||'{}')[name],rect=e.getBoundingClientRect();return {x:rect.x+point.x,y:rect.y+point.y}},name);
   assert.ok(Number.isFinite(p.x)&&Number.isFinite(p.y),name+' point');
   if(size[0]<800)await page.touchscreen.tap(p.x,p.y);
