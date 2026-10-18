@@ -1,0 +1,43 @@
+/* Preview-only compiled output patch; source lives in the private repository. */
+#sound{visibility:hidden!important;pointer-events:none!important}
+#tutorial-help{display:none!important}
+.game:not([data-debug="true"]) #collection-panel{display:none!important}
+.topbar .settings-trigger{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:17px;z-index:6;display:flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border-radius:10px;background:#ffffff0d;color:#e5d0b2;border:1px solid #ffffff1c}
+.settings-trigger svg{display:block}.settings-trigger:focus-visible{outline:2px solid #e9c991;outline-offset:2px}
+@media(min-width:800px){.topbar .settings-trigger{right:34px;top:calc(env(safe-area-inset-top) + 17px)}}
+@media(max-width:360px){.topbar .settings-trigger{right:12px}}
+/* Settings and readable onboarding use the same translucent game dialog style. */
+#settings-dialog.game-dialog,#guide-dialog.game-dialog{
+ box-sizing:border-box;position:fixed;display:flex;flex-direction:column;
+ width:min(calc(100% - 32px),420px);max-height:min(82dvh,700px);
+ min-height:0;overflow:hidden;margin:auto;padding:17px;
+ border:1px solid var(--forge-dialog-border);border-radius:11px;
+ background:var(--forge-dialog-surface);color:#f1e4d1;
+ -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 16px 45px #0009;
+}
+#settings-dialog.game-dialog h2,#guide-dialog.game-dialog h2{
+ flex:none;margin:0;font-size:16px;font-weight:600;line-height:1.5;text-align:center;color:#f2e4d2;
+}
+.settings-content{display:grid;gap:8px;min-height:0}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:68px;padding:12px 13px;border:1px solid #f6e1c51a;border-radius:9px;background:#f8eede08;color:#f1e4d1}
+.settings-row-text{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;min-width:0}
+.settings-row-text strong{font-size:14px;font-weight:650}
+.settings-row-text small{font-size:11px;line-height:1.45;color:#bcb2a7;font-weight:400}
+.settings-link{width:100%;text-align:left;cursor:pointer}
+.settings-link:hover,.settings-link:focus-visible{background:#f8eede14;outline-color:#d8b882}
+.settings-chevron{font-size:24px;line-height:1;color:#e3c28e}
+.sound-switch{display:flex;align-items:center;gap:8px;padding:6px 0 6px 6px;flex-shrink:0;background:transparent;color:#eed3a6;font-size:12px}
+.sound-switch-track{position:relative;display:block;width:42px;height:24px;border-radius:20px;background:#555a5f;transition:background .16s ease}
+.sound-switch-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#f0e9de;box-shadow:0 1px 4px #0008;transition:transform .16s ease}
+.sound-switch[aria-checked="true"] .sound-switch-track{background:#9d8056}
+.sound-switch[aria-checked="true"] .sound-switch-thumb{transform:translateX(18px)}
+.sound-switch:focus-visible{outline:2px solid #e9c991;outline-offset:3px;border-radius:6px}
+.guide-content{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px 5px 3px 2px;scrollbar-width:thin;scrollbar-color:#91826f #292b2a}
+.guide-progress{display:block;margin:3px 0 10px;color:#dab680;font-size:11px;letter-spacing:1px}
+#guide-title{font-size:17px;font-weight:650;color:#f3ddb9;margin:0 0 8px}
+#guide-description{font-size:12px;line-height:1.75;color:#dad0c0;margin:0 0 11px}
+#guide-points{margin:0;padding-left:20px;color:#c5bbac;font-size:12px;line-height:1.75}
+#guide-points li{margin-bottom:9px;padding-left:2px}
+#guide-dialog .game-dialog-actions{margin-top:9px}
+#guide-dialog .game-dialog-actions.single .dialog-button{min-height:35px}
+@media(max-height:560px){#settings-dialog.game-dialog,#guide-dialog.game-dialog{max-height:90dvh}#guide-points li{margin-bottom:5px}}
