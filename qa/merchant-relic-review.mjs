@@ -11,7 +11,7 @@ try{for(const [width,height] of sizes){
  await page.addInitScript(()=>{const animate=Element.prototype.animate;window.motionLog=[];Element.prototype.animate=function(frames,options){if(this.id==='merchant-call'||this.id==='merchant-panel')window.motionLog.push({id:this.id,frames,options});return animate.call(this,frames,options);};});
  await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(process.env.QA_URL||'http://127.0.0.1:4173');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
- await page.locator('#sound').click();
+ await page.locator('#settings-open').click();await page.locator('#settings-sound').click();await page.locator('#settings-close').click();
  const fixture=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
  Object.assign(fixture,{session:null,tributeDays:2,workshopDay:3,catTributes:2,ironBlanks:40,coins:10000,sound:false,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['lucky','emberLocket','steady'],merchantDepartedDay:0});
  await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),fixture);
