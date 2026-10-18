@@ -39,9 +39,30 @@ async function play(page){
  await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).step==='hammer',tutorialKey);
  assert.equal(await page.locator('#cashout').isDisabled(),true);
  await hit(1);await hit(2);
- assert.equal(await step(),'cashout');
+ assert.equal(await step(),'hammer','two guaranteed strikes only reach 720 G; opening goal is 1800 G');
  assert.equal((await state()).session.currentValue,720);
+ // Reproduce a legitimate, deterministic sequence in QA after the tutorial's
+ // two guaranteed hits. pagehide's game save runs first; override the next seed
+ // afterwards so that a restored game plays the normal probability table.
+ await page.evaluate(k=>{
+  window.addEventListener('pagehide',()=>{
+   const saved=JSON.parse(localStorage.getItem(k));
+   saved.session.seed=2;
+   localStorage.setItem(k,JSON.stringify(saved));
+   localStorage.removeItem(k+'.meta');
+  },{once:true});
+ },key);
+ await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]',{timeout:60000});
+ assert.equal(await step(),'hammer');
+ await hit(3);await hit(4);await hit(5);
+ assert.equal(await step(),'cashout');
+ assert.equal((await state()).session.currentValue,2430);
  await page.locator('#cashout').click();
+ await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).step==='collection',tutorialKey);
+ await page.locator('#collect').click();
+ await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).caseIds.length===1,key);
+ assert.equal(await step(),'collection','collection teaches the rack before tribute');
+ await page.locator('#station-collection').click();
  await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).step==='tribute',tutorialKey);
  await page.locator('#station-cat').click();
  await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.station==='cat');
@@ -53,13 +74,19 @@ async function play(page){
  await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.station==='relics');
  await page.locator('#relic-list button').first().click();
  await page.locator('#relic-exchange').click();
- await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).step==='done',tutorialKey);
+ await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).step==='settings',tutorialKey);
  await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).relicWelcomeUsed===true,key);
  const completed=await state();
  assert.equal(completed.relicWelcomeUsed,true);assert.equal(completed.relics.length,1);assert.ok(completed.ironBlanks>=3);
+ await page.locator('#settings-open').click();
+ await page.waitForFunction(k=>JSON.parse(localStorage.getItem(k)).step==='done',tutorialKey);
+ await page.locator('#settings-guide').click();
+ await page.waitForFunction(()=>document.querySelector('#guide-dialog').open);
+ await page.locator('#guide-close').click();
+ await page.locator('#settings-close').click();
  await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  assert.equal(await page.locator('#tutorial-layer').isHidden(),true);
- assert.deepEqual(errors,[]);results.push({viewport:size.join('x'),firstSwordValue:720,tributeDay:completed.workshopDay,relics:completed.relics.length,refreshRestored:true});
+ assert.deepEqual(errors,[]);results.push({viewport:size.join('x'),firstSwordValue:2430,tributeDay:completed.workshopDay,relics:completed.relics.length,refreshRestored:true});
 }
 try{
  const page=await browser.newPage({viewport:{width:size[0],height:size[1]},hasTouch:size[0]<800});page.setDefaultTimeout(30000);
@@ -73,5 +100,5 @@ try{
  results.push({skipSurvivesReload:true});
  await context.close();
  await writeFile(`${out}/${size.join('x')}-tutorial-report.json`,JSON.stringify(results,null,2));
- console.log('V1.23 guided tutorial passed',size.join('x'));
+ console.log('V4.8 eight-step tutorial passed',size.join('x'));
 }finally{await browser.close();}
