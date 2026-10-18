@@ -31,7 +31,7 @@ jobs:
           assert 'continuous-limbs-curled-fingers' in javascript, 'Missing revised panda limbs'
           assert 'cat-turnaround-v2.webp' not in javascript, 'Build still references removed cat atlas'
           # Prevent shipping an obsolete choice panel while core source has removed it.
-          assert '<summary>锻造信息与道具</summary>' in html, 'Current forging panel title is missing'
+          assert '<summary>锻造信息与道具</summary>' not in html and 'id="forge-options"' not in html, 'Retired forging panel was unexpectedly restored'
           assert '锻法与铭文' not in html, 'Obsolete forging styles panel is still rendered'
           for old_id in ['safe','precise','bold','mark','mark-row']:
               assert f'id="{old_id}"' not in html, 'Obsolete forging control: '+old_id
