@@ -118,3 +118,5 @@ jobs:
 # Preview V4.7: show sword codex only with ?debug=1 (browser), name locked relics, record skipped sword shape stages. Source commit 1f3eb3b5b6188f2f3b494eb4067f63e4e90ed8e9.
 
 # Preview V4.8: rough oxidized starter sword, balanced original forging odds, readable tribute guide, 8-step rack/settings onboarding; build strictly in public preview runner.
+
+# Retry V4.8 after updating regression fixtures to the new quota and Settings guide; private source is never built in its own workflow.
