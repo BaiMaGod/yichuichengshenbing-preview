@@ -9,7 +9,7 @@ try{for(const [width,height] of sizes){
  await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
  await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(process.env.QA_URL||'http://127.0.0.1:4173');await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
- await page.locator('#sound').click();
+ await page.locator('#settings-open').click();await page.locator('#settings-sound').click();await page.locator('#settings-close').click();
  const fixture=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
  fixture.session=null;fixture.workshopDay=3;fixture.tributeDays=2;fixture.catTributes=2;fixture.ironBlanks=20;fixture.coins=10000;fixture.sound=false;fixture.showCaseLevel=2;fixture.relics=['guard','rhythm','stellar'];fixture.relicWelcomeUsed=true;fixture.relicOffersDay=3;fixture.relicOffers=['lucky','emberLocket','steady'];fixture.caseIds=[];fixture.swords=[];
  for(let i=0;i<6;i++){const sword={id:'rack-'+i,blade:'great',material:'iron',level:3+i*3,maxReachedLevel:3+i*3,route:{kind:'normal',vein:'dragonbone',final:'dragon_slayer'},name:'收藏剑 '+(i+1),value:720*2**i,quality:1,mark:'none',disposal:'COLLECTED',superGod:false};fixture.swords.push(sword);fixture.caseIds.push(sword.id);}
