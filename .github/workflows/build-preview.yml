@@ -108,3 +108,4 @@ jobs:
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
 # Preview source refresh: remove standalone forging info and items drawer; preserve consumables.
 # Rebuild retry after regression test now expects the retired drawer to be absent.
+# Preview-only V4.3 rebuild: panda click guard, taller tribute drawer, standard buttons.
