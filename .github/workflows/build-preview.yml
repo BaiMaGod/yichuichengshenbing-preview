@@ -86,7 +86,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='V4.6'
+          info['previewRelease']='V4.8'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -102,7 +102,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: V4.6 unified sword rack rendering from private source"
+            git commit -m "deploy: V4.8 unified sword rack rendering from private source"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
@@ -113,6 +113,8 @@ jobs:
 # Preview-only V4.4 final build from 5de4d34f38eb4c794cc859bba16c132b6cd5c1a2; stronger entry pulse is not replaced by same-frame hit.
 # Preview-only V4.5 rebuild: stable relic vending labels + immediate camera reprojection; source 672b4c4306b048a6341bf10d2eec42c31fbe7433.
 
-# Preview-only V4.6 rebuild: unify forge/rack sword visuals, PBR reflections and retained gallery materials; build only in this preview repo.
+# Preview-only V4.8 rebuild: unify forge/rack sword visuals, PBR reflections and retained gallery materials; build only in this preview repo.
 
 # Preview V4.7: show sword codex only with ?debug=1 (browser), name locked relics, record skipped sword shape stages. Source commit 1f3eb3b5b6188f2f3b494eb4067f63e4e90ed8e9.
+
+# Preview V4.8: rough oxidized starter sword, balanced original forging odds, readable tribute guide, 8-step rack/settings onboarding; build strictly in public preview runner.
