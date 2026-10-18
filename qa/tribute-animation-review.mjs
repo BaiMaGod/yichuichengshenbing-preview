@@ -40,9 +40,9 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
  const first=early.find(p=>p.swordVisible&&p.swordUp[1]<-.99&&p.swordFace[2]>.99&&p.headPitch<-.60&&p.jawAngle>.15);
  assert.ok(first,'No correct early swallow frame was rendered: '+JSON.stringify({firstShotAt:firstShot.elapsed,earlyFrames:early.map(p=>({elapsed:p.elapsed,visible:p.swordVisible,up:p.swordUp,face:p.swordFace,pitch:p.headPitch,jaw:p.jawAngle}))}));
  console.log(width,'verified early GPU swallow pose at',first.elapsed,'first screenshot at',firstShot.elapsed);
- assert.ok(Math.abs(proof.turn+Math.PI)<.01);assert.equal(proof.stance,1);assert.ok(proof.backAnatomy.includes('white-rump-pointed-tail'));assert.equal(proof.rewardCount,5);
+ assert.ok(Math.abs(proof.turn+Math.PI)<.01);assert.equal(proof.stance,1);assert.ok(proof.backAnatomy.includes('white-rump-pointed-tail'));assert.ok(proof.rewardCount>=3&&proof.rewardCount<=8,'tribute reward must respect the current multiplier ladder');
  assert.ok(stages.some(p=>p.phase==='turning'&&p.elapsed>=1&&p.elapsed<2));assert.ok(stages.some(p=>p.phase==='ejecting'&&p.elapsed>=2&&p.elapsed<3));
- const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.equal(after.ironBlanks,5);assert.equal(after.catTributes,2);assert.deepEqual(after.caseIds,[]);assert.deepEqual(errors,[]);
+ const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.equal(after.ironBlanks,proof.rewardCount,'rendered sword count must equal real reward');assert.equal(after.catTributes,2);assert.deepEqual(after.caseIds,[]);assert.deepEqual(errors,[]);
  await page.locator('#cat-back').click();await page.locator('#station-cat').click();await page.waitForFunction(()=>Math.abs(JSON.parse(document.querySelector('#scene3d').dataset.catProof||'{}').turn)<.01);
  // A second run at normal speed checks the actual three-second completion.
  await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),state);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
