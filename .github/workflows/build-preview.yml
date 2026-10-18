@@ -114,3 +114,5 @@ jobs:
 # Preview-only V4.5 rebuild: stable relic vending labels + immediate camera reprojection; source 672b4c4306b048a6341bf10d2eec42c31fbe7433.
 
 # Preview-only V4.6 rebuild: unify forge/rack sword visuals, PBR reflections and retained gallery materials; build only in this preview repo.
+
+# Preview V4.7: show sword codex only with ?debug=1 (browser), name locked relics, record skipped sword shape stages. Source commit 1f3eb3b5b6188f2f3b494eb4067f63e4e90ed8e9.
