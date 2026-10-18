@@ -120,3 +120,5 @@ jobs:
 # Preview V4.8: rough oxidized starter sword, balanced original forging odds, readable tribute guide, 8-step rack/settings onboarding; build strictly in public preview runner.
 
 # Retry V4.8 after updating regression fixtures to the new quota and Settings guide; private source is never built in its own workflow.
+
+# Preview V4.8 QA rebuild 2026-10-18: on-boarding retry safety, first 1,800G tribute and post-charge frenzy tested from private source main; only compiled assets are published.
