@@ -86,7 +86,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='V4.2'
+          info['previewRelease']='V4.4'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -102,7 +102,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: V4.2 compiled preview from private source"
+            git commit -m "deploy: V4.4 compiled preview from private source"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
@@ -110,3 +110,4 @@ jobs:
 # Rebuild retry after regression test now expects the retired drawer to be absent.
 # Preview-only V4.3 rebuild: panda click guard, taller tribute drawer, standard buttons.
 # Preview-only V4.4 rebuild: frenzy/super-god original audio ambience, reversible camera shake and rainbow energy streaks; source c37219234b665bc892a8700bc88d0fec95cb403f.
+# Preview-only V4.4 final build from 5de4d34f38eb4c794cc859bba16c132b6cd5c1a2; stronger entry pulse is not replaced by same-frame hit.
