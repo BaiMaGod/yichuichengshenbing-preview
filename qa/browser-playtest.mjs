@@ -55,7 +55,7 @@ for(const [width,height] of sizes){
  await page.addInitScript(()=>localStorage.setItem('yichuichengshenbing.tutorial.v4',JSON.stringify({version:1,step:'done',skipped:true,replay:false,startTributes:0})));
  await page.goto(url);await ready();assert.equal(await page.locator('#menu-toggle').count(),0);assert.deepEqual(await page.locator('.station-nav button').allTextContents(),['剑架','锻剑','纳贡','遗物']);const navBounds=await page.locator('.station-nav').boundingBox();assert.ok(navBounds.y>height-90&&navBounds.y+navBounds.height<=height,'four destinations stay at bottom');assert.equal(await page.locator('#target-water').count(),0);assert.equal(await page.locator('#quench').count(),0);
  console.log(`${width}: loaded workshop`);await snap('workshop');await tap('furnace');await page.waitForSelector('#scene3d[data-sword-place="furnace"]');await page.waitForFunction(()=>Number(document.querySelector('#scene3d').dataset.heat)>=74);await tap('anvil');await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='forge');await page.waitForTimeout(800);
- console.log(`${width}: heating and placement complete`);const baseline=await state();baseline.session.tutorial=false;assert.equal(baseline.session.hits,0);assert.equal(baseline.session.goodHeat,true);assert.equal(await page.locator('#forge-options').getAttribute('open'),null);
+ console.log(`${width}: heating and placement complete`);const baseline=await state();baseline.session.tutorial=false;assert.equal(baseline.session.hits,0);assert.equal(baseline.session.goodHeat,true);assert.equal(await page.locator('#forge-options').count(),0);
  assert.equal(await page.locator('#target-anvil').isVisible(),false,'no label covers the sword during forging');assert.equal(await page.locator('#target-anvil').textContent(),'');
  await page.locator('#station-cat').click();assert.equal((await state()).session.hits,0);await page.locator('#station-forge').click();await page.waitForTimeout(900);
  await page.locator('#sound').click();await page.locator('#sound').click();assert.equal((await state()).session.hits,0);
@@ -90,7 +90,7 @@ for(const [width,height] of sizes){
  assert.ok(proof.benchBounds.left>=0&&proof.benchBounds.right<=width,'complete bench fits screen');assert.ok(proof.ledger.bottom<=proof.benchBounds.top-10,'sign stays above the bench');assert.ok(proof.ledger.bottom<proof.bounds.top,'sign stays above the blade');assert.ok(proof.benchBounds.bottom<proof.navTop,'bench clears action row');assert.ok(proof.ledger.left>=0&&proof.ledger.right<=width,'sign fits screen');assert.ok(proof.ledger.top<height*.3,'sign remains in upper screen');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight>innerHeight),false,'page fits viewport height');
  const upgradedBladeColors=await bladePixels(page,proof);assert.ok(baseBladeColors.some((rgb,i)=>rgb.reduce((n,c,j)=>n+Math.abs(c-upgradedBladeColors[i][j]),0)>60),'upgraded blade visibly changes color');
- await page.locator('#forge-options summary').click({position:{x:12,y:12}});const options=await page.locator('#forge-options').boundingBox();assert.ok(options.y+options.height<proof.bounds.top&&options.y+options.height<proof.benchBounds.top,'expanded choices stay above blade and bench');await page.locator('#forge-options summary').click({position:{x:12,y:12}});assert.equal((await state()).session.hits,7);
+ assert.equal(await page.locator('#forge-options').count(),0,'retired forging info drawer remains absent');assert.equal((await state()).session.hits,7);
  await page.reload();await ready();assert.equal((await state()).session.hits,7);assert.equal((await state()).session.currentValue,seven.session.currentValue);
  const charged=structuredClone(seven);charged.session.hits=9;charged.session.frenzyCharge=9;charged.session.seed=seedForRange(.95,.99);await fixture(charged);assert.ok(parseFloat(await page.locator('#fracture-risk').textContent())>0);charged.session.seed=seedForRange(.85,.86);await fixture(charged);await hit();const frenzy=await state();assert.equal(frenzy.session.hits,10);assert.equal(frenzy.session.frenzyCharge,0);assert.ok(frenzy.session.frenzyUntil>Date.now());assert.notEqual(frenzy.session.strikes.at(-1).result,'break');
  await page.waitForSelector('#scene3d[data-blade-rendered-finish="rainbow"]');
@@ -113,7 +113,19 @@ for(const [width,height] of sizes){
   const f=structuredClone(baseline);f.session.goodHeat=false;f.session.protection=false;f.session.level=result==='break'?5:0;f.session.seed=seedForRange(roll,roll+.005);await fixture(f);await hit();const after=await state();assert.equal(after.session.strikes.at(-1).result,result);outcomes.push(result);if(result==='great')assert.equal(after.session.currentValue,800);if(result==='unchanged'||result==='damage')assert.equal(after.session.currentValue,320);if(result==='break'){assert.equal(after.session.phase,'broken');assert.equal(after.session.currentValue,0);}await snap(result);
  }
  console.log(`${width}: five outcomes verified`);await fixture(seven);const shown=await page.locator('#value-now').textContent();await page.locator('#cashout').click();await page.waitForFunction(()=>document.querySelector('.game').dataset.phase==='finished');const complete=await state();assert.equal(complete.session.sword.value,seven.session.currentValue);assert.ok(shown.includes(Math.floor(complete.session.sword.value).toLocaleString('zh-CN')));assert.equal(complete.session.hits,7);await tap('anvil');assert.equal((await state()).session.hits,7);await snap('collected');
- await page.locator('#offer-cat').click();await page.waitForTimeout(1200);await tap('cat');await page.waitForSelector('#cat-back:not([hidden])',{timeout:30000});const paid=await state();assert.equal(paid.session,null);assert.ok(paid.ironBlanks>=3);assert.equal(paid.catTributes,1);await snap('cat-reward');
+ await page.locator('#offer-cat').click();await page.waitForTimeout(1200);
+  const beforePanda=await state();
+  await tap('cat');
+  const afterPanda=await state();
+  assert.equal(afterPanda.catTributes,beforePanda.catTributes,'panda tap must not submit a sword');
+  assert.equal(afterPanda.airTributeTotal,beforePanda.airTributeTotal,'panda tap must not trigger air punishment');
+  assert.equal(afterPanda.ironBlanks,beforePanda.ironBlanks,'panda tap must not change iron supplies');
+  assert.equal(afterPanda.session?.id,beforePanda.session?.id,'panda tap must not consume a sword');
+  const tributeCap=await page.locator('#cat-panel').evaluate(el=>parseFloat(getComputedStyle(el).maxHeight));
+  assert.ok(tributeCap>=height*.55,'tribute panel should use available vertical space');
+  assert.equal(await page.locator('#tribute').evaluate(el=>getComputedStyle(el).borderRadius),'8px','tribute button matches dialogs');
+  await page.locator('#tribute').click();
+  await page.waitForSelector('#cat-back:not([hidden])',{timeout:30000});const paid=await state();assert.equal(paid.session,null);assert.ok(paid.ironBlanks>=3);assert.equal(paid.catTributes,1);await snap('cat-reward');
  // The current merchant upgrade rules are covered by the core tests.
  // Verify the maximum-level one-second heat behavior through the real UI.
  const furnaceFixture=structuredClone(paid);furnaceFixture.coins=100000;furnaceFixture.ironBlanks=100;furnaceFixture.furnaceLevel=9;furnaceFixture.relicWelcomeUsed=true;
