@@ -122,3 +122,5 @@ jobs:
 # Retry V4.8 after updating regression fixtures to the new quota and Settings guide; private source is never built in its own workflow.
 
 # Preview V4.8 QA rebuild 2026-10-18: on-boarding retry safety, first 1,800G tribute and post-charge frenzy tested from private source main; only compiled assets are published.
+
+# QA rebuild (2026-10-18): verify first sword's free retry is admitted by both core Game.start and UI Game.canAfford, and rebuild only in preview with source commit e664d555.
