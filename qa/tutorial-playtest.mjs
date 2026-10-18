@@ -21,9 +21,20 @@ async function play(page){
   else await page.mouse.click(p.x,p.y);
  };
  const hit=async count=>{
+  const before=await page.evaluate(k=>{
+   const scene=document.querySelector('#scene3d'),r=scene.getBoundingClientRect(),p=JSON.parse(scene.dataset.targets||'{}').anvil;
+   const target=p?document.elementFromPoint(r.x+p.x,r.y+p.y):null,s=JSON.parse(localStorage.getItem(k));
+   return {step:JSON.parse(localStorage.getItem('yichuichengshenbing.tutorial.v4'))?.step,phase:s?.session?.phase,hits:s?.session?.hits,seed:s?.session?.seed,station:scene.dataset.station,anvil:p,hitElement:target?.id||target?.className,rect:{x:r.x,y:r.y,width:r.width,height:r.height},busy:scene.dataset.hammerStage,rootPhase:document.querySelector('.game').dataset.phase};
+  },key);
+  console.log('HIT_PRE',count,JSON.stringify(before));
   await click3d('anvil');
-  await page.waitForFunction(({key,count})=>JSON.parse(localStorage.getItem(key))?.session?.hits===count,{key,count},{timeout:25000});
-  await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.hammerStage==='idle',{timeout:25000});
+  try {
+   await page.waitForFunction(({key,count})=>JSON.parse(localStorage.getItem(key))?.session?.hits===count,{key,count},{timeout:25000});
+   await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.hammerStage==='idle',{timeout:25000});
+  } catch(err) {
+   const after=await page.evaluate(k=>({saved:JSON.parse(localStorage.getItem(k))?.session,host:{...document.querySelector('#scene3d').dataset},pointer:document.elementFromPoint(innerWidth/2,innerHeight/2)?.id}),key);
+   console.error('HIT_FAILURE',count,JSON.stringify(after));throw err;
+  }
  };
  const errors=[];page.on('pageerror',err=>errors.push(err.message));
  await page.goto(url);await page.waitForSelector('#scene3d[data-cat-asset="ready"]',{timeout:60000});
