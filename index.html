@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-<meta name="source-commit" content="e4401e21395f1c0d304f55925506bd229fd71f0e">
+<meta name="source-commit" content="a062bada09fb88a851f7a87136ccbe2bfb5f2201">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-BjIPiHkD.js"></script>
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-C4bcomZP.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-BVEBE1bG.css">
 </head>
 <body>
@@ -34,9 +34,10 @@
    <p class="muted" id="cat-offer-info">锻造宝剑，价值达到纳贡要求后收剑，再上交。</p>
    <label class="tribute-selector">纳贡选择<select id="tribute-choice" aria-label="选择纳贡宝剑"></select></label>
    <div id="wrath-status" class="wrath-status" hidden></div><button id="tribute" class="primary">上交宝剑</button>
+   <button id="ad-tribute" class="secondary" type="button" hidden>看广告上供 · 领取3把铁剑（每日1次）</button>
    <div id="tribute-reward" class="reward-text"></div>
    <button id="cat-back" class="secondary" hidden>返回锻剑</button>
-   <small class="hint">可上交当前宝剑或剑架宝剑。每次纳贡完成后，纳贡日增加 1。</small>
+   <small class="hint">成功纳贡得3把铁剑，价值达到要求的2/4/8/16倍逐档+1；上贡空气同样补给3把，但保留没收遗物、扣金币及怒火惩罚。广告纳贡每日自然日限1次，获得3把铁剑，不算正常纳贡、不刷新遗物。</small>
   </div>
  </details>
 </section>
@@ -84,10 +85,10 @@
  <div class="section-title"><span>神兵出炉</span><small>宝剑已成</small></div>
  <div class="reveal-summary"><div><strong id="finished-level">+2</strong><small>强化进度</small></div><div><strong id="finished-quality">Q1.00</strong><small>锻造品质</small></div><div><strong id="finished-value">150</strong><small>宝剑价值 · 金</small></div></div>
  <p class="finished-sale-note">出售可得 <b id="finished-sell">0</b> 金</p>
- <div class="finished-actions"><button id="sell" class="primary">出售并继续锻造</button><button id="collect" class="secondary">收藏</button><button id="offer-cat" class="secondary">献给食铁兽</button><button id="deliver" class="primary" hidden>完成代工</button></div>
+ <div class="finished-actions"><button id="sell" class="primary">出售并继续锻造</button><button id="collect" class="secondary">收藏</button><button id="offer-cat" class="secondary">献给食铁兽</button></div>
 </section>
 <section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-rewind" class="secondary" hidden>⏳ 使用回溯发条 · 恢复宝剑</button><button id="broken-ad-revive" class="secondary" type="button" hidden>观看广告 · 修复宝剑（每把一次）</button><button id="broken-next" class="primary">再锻一把</button></section>
-<footer class="bottom" hidden><div id="foot-hint" class="foot-hint">先接委托，再锻出神兵</div></footer>
+<footer class="bottom" hidden><div id="foot-hint" class="foot-hint">锻出神兵 · 收藏、出售或纳贡</div></footer>
 <div id="tutorial-layer" class="tutorial-layer" aria-live="polite" hidden>
  <div id="tutorial-focus" class="tutorial-focus" aria-hidden="true"></div>
  <div id="tutorial-tip" class="tutorial-tip">
