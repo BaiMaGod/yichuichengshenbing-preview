@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 938afd917cf2c0be0bc9fdfb74d4bd44e4e664ed
+          ref: 4d417f7ce6b91f515bd58de28beaf02e5926f8ec
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -153,3 +153,5 @@ jobs:
 # Preview V4.9: silver sword showroom probe faces bright softbox; build only in preview runner; Chromium visual regression added.
 
 # V5.0: pre-publish WebGL frenzy performance regression; pinned private source 938afd917cf2c0be0bc9fdfb74d4bd44e4e664ed.
+
+# Require real completed-frame samples instead of zero-filled short software-GPU windows; source 4d417f7ce6b91f515bd58de28beaf02e5926f8ec.
