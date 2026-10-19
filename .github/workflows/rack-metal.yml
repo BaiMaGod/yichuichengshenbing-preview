@@ -1,0 +1,38 @@
+name: Sword rack metal WebGL review
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'release.json'
+      - 'qa/rack-metal-review.mjs'
+      - '.github/workflows/rack-metal.yml'
+permissions:
+  contents: read
+jobs:
+  rack-visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install headless Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Render actual rack swords and sample pixels
+        run: |
+          mkdir -p /tmp/forge-rack-test/yichuichengshenbing-preview
+          cp -a . /tmp/forge-rack-test/yichuichengshenbing-preview/
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/forge-rack-test >/tmp/forge-rack-http.log 2>&1 &
+          node qa/rack-metal-review.mjs
+      - name: Save rack visual proofs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sword-rack-metal-screenshots
+          path: qa-evidence/rack-metal/
+          retention-days: 7
