@@ -36,3 +36,5 @@ jobs:
           name: sword-rack-metal-screenshots
           path: qa-evidence/rack-metal/
           retention-days: 7
+
+# QA run after V4.9 compiled publication from source 10931d47; preview-only.
