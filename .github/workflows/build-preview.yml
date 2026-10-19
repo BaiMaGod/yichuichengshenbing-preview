@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: main
+          ref: 938afd917cf2c0be0bc9fdfb74d4bd44e4e664ed
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -58,6 +58,29 @@ jobs:
       - name: Build browser version for preview only
         working-directory: private-source
         run: npm run build
+
+      - name: Install browser for pre-publish frenzy regression
+        working-directory: private-source
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+          npx playwright install --with-deps chromium
+
+      - name: Verify frenzy, super-god, countdown, repeated modes and archived sword
+        working-directory: private-source
+        env:
+          QA_BASELINE_URL: https://baimagod.github.io/yichuichengshenbing-preview/
+          QA_OUT: qa-evidence/frenzy
+        run: node --experimental-strip-types qa/frenzy-performance.mjs
+
+      - name: Upload frenzy screenshots and measured report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frenzy-performance-v5
+          path: private-source/qa-evidence/frenzy/
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Validate compiled release has no source
         run: |
@@ -86,7 +109,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='V4.9'
+          info['previewRelease']='V5.0'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -102,7 +125,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: V4.9 correct rack metal reflection and illuminate blade faces"
+            git commit -m "deploy: V5.0 prewarm frenzy rendering and reduce enchantment GPU overhead"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
@@ -128,3 +151,5 @@ jobs:
 # Preview V4.8 repair: restore settled metal finish for archived frenzy/super-god swords; source 74a825586667925b71ae70c382d27c004d4bb030.
 
 # Preview V4.9: silver sword showroom probe faces bright softbox; build only in preview runner; Chromium visual regression added.
+
+# V5.0: pre-publish WebGL frenzy performance regression; pinned private source 938afd917cf2c0be0bc9fdfb74d4bd44e4e664ed.
