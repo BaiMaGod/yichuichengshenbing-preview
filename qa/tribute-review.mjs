@@ -9,7 +9,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.CH
 const reports=[],key='yichuichengshenbing.v5';
 try{for(const [width,height] of (process.env.QA_SIZE?[process.env.QA_SIZE.split('x').map(Number)]:[[390,844],[360,800],[1280,900]])){
  const page=await browser.newPage({viewport:{width,height}});page.setDefaultTimeout(90000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
- const state=freshState();Object.assign(state,{tributeDays:2,workshopDay:3,catTributes:2,coins:10000,ironBlanks:20,sound:false,showCaseLevel:2,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['lucky','ember','master']});
+ const state=freshState();Object.assign(state,{tributeDays:2,workshopDay:3,catTributes:2,coins:10000,ironBlanks:20,sound:false,showCaseLevel:2,relics:['guard','rhythm','stellar'],relicWelcomeUsed:true,relicOffersDay:3,relicOffers:['lucky','emberLocket','master']});
  for(let i=0;i<6;i++){const sword={id:'rack-'+i,blade:'great',material:'iron',level:3+i*3,maxReachedLevel:3+i*3,route:{kind:'normal',vein:'dragonbone',final:'dragon_slayer'},name:'宝剑 '+(i+1),value:1500*2**i,quality:1,mark:'none',disposal:'COLLECTED'};state.swords.push(sword);state.caseIds.push(sword.id);}
  await page.addInitScript(k=>{const staged=sessionStorage.getItem('__forge_qa_staged_save');if(staged!==null){localStorage.setItem(k,staged);localStorage.removeItem(k+'.meta');sessionStorage.removeItem('__forge_qa_staged_save');}},key);
  await page.addInitScript(({key,state})=>{if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(state));},{key,state});
