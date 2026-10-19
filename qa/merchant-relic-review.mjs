@@ -35,13 +35,22 @@ try{for(const [width,height] of sizes){
  await page.locator('#station-relics').click();await settled();await page.waitForFunction(()=>Array.from(document.querySelector('#relic-list').children).every(e=>e.getBoundingClientRect().width>35&&!e.hidden));
  assert.equal(await ghost.isVisible(),false);assert.equal(await page.locator('#relic-panel #relic-list').count(),0);assert.equal(await page.locator('#nav-furnace,#nav-anvil,#nav-upgrades').count(),0);
  await shot('machine-inline');
+ // Check the fixture against the live game: stale/retired IDs must fail immediately, not time out on hidden buttons.
+ const liveOffers=await page.evaluate(()=>window.__workshop.state.relicOffers);
+ assert.deepEqual(liveOffers,['lucky','emberLocket','steady'],'QA relic offers were rejected or changed during save migration');
+ const firstSlot=page.locator('#relic-list .relic-row[data-slot="0"] button');
+ const secondSlot=page.locator('#relic-list .relic-row[data-slot="1"] button');
+ assert.equal(await firstSlot.isVisible(),true,'First relic offer must be purchasable');
+ assert.equal(await secondSlot.isVisible(),true,'Second relic offer must be purchasable');
  const labels=await page.locator('#relic-list .relic-row').evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,scroll:e.scrollHeight,client:e.clientHeight,text:e.textContent};}));
  for(const row of labels){assert.ok(row.x>=0&&row.x+row.width<=width);assert.ok(row.y>=80&&row.y+row.height<height-80);assert.ok(row.scroll<=row.client+1,'relic label content fits '+JSON.stringify(row));}
- await page.locator('#relic-list button').first().click();await page.locator('#relic-look-again').click();
- await page.locator('#relic-list button').first().click();await page.locator('#relic-exchange').click();
- let saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.ok(saved.relics.includes('lucky'));assert.equal(saved.hammerLevel,1);assert.equal(saved.ironBlanks,38);assert.equal(await page.locator('#relic-list .relic-empty').count(),1);
- await page.locator('#relic-list button').first().click();await page.locator('#relic-exchange').click();
- saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.ok(saved.relics.includes('emberLocket'));assert.equal(saved.furnaceLevel,1);
+ await firstSlot.click();await page.locator('#relic-look-again').click();
+ await firstSlot.click();await page.locator('#relic-exchange').click();
+ let saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.ok(saved.relics.includes('lucky'));assert.equal(saved.hammerLevel,1);assert.equal(saved.ironBlanks,38);assert.equal(saved.relicOffers[0],'');assert.equal(await page.locator('#relic-list .relic-empty').count(),1);
+ assert.equal(await firstSlot.isVisible(),false,'Bought-out first slot must be hidden');
+ assert.equal(await secondSlot.isVisible(),true,'Second offer must remain accessible after the first purchase');
+ await secondSlot.click();await page.locator('#relic-exchange').click();
+ saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.ok(saved.relics.includes('emberLocket'));assert.equal(saved.furnaceLevel,1);assert.equal(saved.ironBlanks,36);assert.equal(saved.relicOffers[1],'');assert.equal(await page.locator('#relic-list .relic-empty').count(),2);
  await page.locator('#station-forge').click();await settled();
  const world=JSON.parse(await page.locator('#scene3d').getAttribute('data-wall-relic-world'));assert.deepEqual(world.position,JSON.parse(wall).position);assert.deepEqual(world.quaternion,[0,0,0,1]);assert.deepEqual(world.scale,[1,1,1]);assert.equal(world.depthTest,true);
  await page.locator('#board-toggle').click();await settled();assert.equal(await page.locator('#scene3d').getAttribute('data-wall-relic-world'),JSON.stringify(world));
