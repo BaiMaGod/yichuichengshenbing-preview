@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 5a066fcaf315854520c0b9106df5e7b0f33d2056
+          ref: 7c33e99269746eccfb43dd0154b2ad6bd56db7ba
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -158,3 +158,5 @@ jobs:
 # Stable program-handle polling + rapid evolution/disposal regression; source 1a55c041e76a4d4a042674e503ff477d9c82ff47.
 
 # Header HUD preview: put wallet/settings on tribute-day row and replace iron blanks text with inline sword icon. Source 8f4075954ff7e4e5a10b3bc0cbeee75d4bbc26f1.
+
+# Preview QA fixture cleanup: valid current relic offers, persistent slot assertions, and source-side guard tests.
