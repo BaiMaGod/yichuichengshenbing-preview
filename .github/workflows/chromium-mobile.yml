@@ -51,3 +51,5 @@ jobs:
           retention-days: 7
 
 # Preview-only runtime QA requested for V2.2 compiled release from e4401e21395f1c0d304f55925506bd229fd71f0e.
+
+# Re-run browser WebGL QA against already-published source 74a825586667925b71ae70c382d27c004d4bb030 (settled sword finish).
