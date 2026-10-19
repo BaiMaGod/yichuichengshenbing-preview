@@ -124,3 +124,5 @@ jobs:
 # Preview V4.8 QA rebuild 2026-10-18: on-boarding retry safety, first 1,800G tribute and post-charge frenzy tested from private source main; only compiled assets are published.
 
 # QA rebuild (2026-10-18): verify first sword's free retry is admitted by both core Game.start and UI Game.canAfford, and rebuild only in preview with source commit e664d555.
+
+# Preview V4.8 repair: restore settled metal finish for archived frenzy/super-god swords; source 74a825586667925b71ae70c382d27c004d4bb030.
