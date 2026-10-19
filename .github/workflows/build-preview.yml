@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 19e7a11cf7f656cf40b39bd4081a974be438f591
+          ref: 86978600fe4142238267dfa2d0e1b6ebdce69d30
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false

@@ -35,7 +35,7 @@ try{for(const [width,height] of sizes){
  await page.locator('#station-relics').click();await settled();await page.waitForFunction(()=>Array.from(document.querySelector('#relic-list').children).every(e=>e.getBoundingClientRect().width>35&&!e.hidden));
  assert.equal(await ghost.isVisible(),false);assert.equal(await page.locator('#relic-panel #relic-list').count(),0);assert.equal(await page.locator('#nav-furnace,#nav-anvil,#nav-upgrades').count(),0);
  await shot('machine-inline');
- // Compare against the actual persisted save: the production bundle intentionally exposes no window.__workshop.
+ // Compare against the actual persisted save; production bundles do not expose internal engine state.
  const liveOffers=await page.evaluate(k=>JSON.parse(localStorage.getItem(k))?.relicOffers,key);
  assert.deepEqual(liveOffers,['lucky','emberLocket','steady'],'QA relic offers were rejected or changed during save migration');
  const firstSlot=page.locator('#relic-list .relic-row[data-slot="0"] button');
