@@ -86,7 +86,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='V4.8'
+          info['previewRelease']='V4.9'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -102,7 +102,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: V4.8 unified sword rack rendering from private source"
+            git commit -m "deploy: V4.9 correct rack metal reflection and illuminate blade faces"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
@@ -126,3 +126,5 @@ jobs:
 # QA rebuild (2026-10-18): verify first sword's free retry is admitted by both core Game.start and UI Game.canAfford, and rebuild only in preview with source commit e664d555.
 
 # Preview V4.8 repair: restore settled metal finish for archived frenzy/super-god swords; source 74a825586667925b71ae70c382d27c004d4bb030.
+
+# Preview V4.9: silver sword showroom probe faces bright softbox; build only in preview runner; Chromium visual regression added.
