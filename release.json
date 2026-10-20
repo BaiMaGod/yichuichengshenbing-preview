@@ -11,5 +11,10 @@
     "leaderboard": false
   },
   "sourceCommit": "741c3d9a126519fcf5b8dac0fcf38fe9cd58d709",
-  "previewRelease": "v0.3.1-workshop-interactions"
+  "previewRelease": "v0.3.1-workshop-interactions",
+  "verification": {
+    "rules": 175,
+    "interactionCases": 7,
+    "sourceCommit": "741c3d9a126519fcf5b8dac0fcf38fe9cd58d709"
+  }
 }
