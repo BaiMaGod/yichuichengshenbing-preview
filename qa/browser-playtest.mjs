@@ -126,7 +126,7 @@ for(const [width,height] of sizes){
   assert.ok(tributeCap>=height*.55,'tribute panel should use available vertical space');
   assert.equal(await page.locator('#tribute').evaluate(el=>getComputedStyle(el).borderRadius),'8px','tribute button matches dialogs');
   await page.locator('#tribute').click();
-  await page.waitForSelector('#cat-back:not([hidden])',{timeout:30000});const paid=await state();assert.equal(paid.session,null);assert.ok(paid.ironBlanks>=3);assert.equal(paid.catTributes,1);await snap('cat-reward');
+  await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.tribute==='complete',null,{timeout:30000});assert.equal(await page.locator('#cat-panel > .station-drawer').getAttribute('open'),null);const paid=await state();assert.equal(paid.session,null);assert.ok(paid.ironBlanks>=3);assert.equal(paid.catTributes,1);await snap('cat-reward');
  // The current merchant upgrade rules are covered by the core tests.
  // Verify the maximum-level one-second heat behavior through the real UI.
  const furnaceFixture=structuredClone(paid);furnaceFixture.coins=100000;furnaceFixture.ironBlanks=100;furnaceFixture.furnaceLevel=9;furnaceFixture.relicWelcomeUsed=true;

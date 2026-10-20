@@ -31,7 +31,7 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
   const proof=await page.locator('#scene3d').evaluate(e=>JSON.parse(e.dataset.catProof));snapshots.push({name,...proof});
   await page.screenshot({path:`${out}/${width}-${name}.png`});console.log(width,name,proof.elapsed);
  }
- await page.waitForSelector('#cat-back:not([hidden])');await page.evaluate(()=>window.setAnimationSpeed(1));await page.waitForTimeout(350);
+ await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.tribute==='complete',null,{timeout:90000});assert.equal(await page.locator('#cat-panel > .station-drawer').getAttribute('open'),null);await page.evaluate(()=>window.setAnimationSpeed(1));await page.waitForTimeout(350);
  const proof=await page.locator('#scene3d').evaluate(e=>JSON.parse(e.dataset.catProof));await page.screenshot({path:`${out}/${width}-complete.png`});
  const stages=await page.evaluate(()=>window.stages),firstShot=snapshots[0];
  // Screenshots can be much slower than the WebGL animation on shared CI GPUs:
@@ -43,12 +43,12 @@ try{for(const [width,height] of process.env.QA_SIZE?[process.env.QA_SIZE.split('
  assert.ok(Math.abs(proof.turn+Math.PI)<.01);assert.equal(proof.stance,1);assert.ok(proof.backAnatomy.includes('white-rump-pointed-tail'));assert.ok(proof.rewardCount>=3&&proof.rewardCount<=8,'tribute reward must respect the current multiplier ladder');
  assert.ok(stages.some(p=>p.phase==='turning'&&p.elapsed>=1&&p.elapsed<2));assert.ok(stages.some(p=>p.phase==='ejecting'&&p.elapsed>=2&&p.elapsed<3));
  const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.equal(after.ironBlanks,proof.rewardCount,'rendered sword count must equal real reward');assert.equal(after.catTributes,2);assert.deepEqual(after.caseIds,[]);assert.deepEqual(errors,[]);
- await page.locator('#cat-back').click();await page.locator('#station-cat').click();await page.waitForFunction(()=>Math.abs(JSON.parse(document.querySelector('#scene3d').dataset.catProof||'{}').turn)<.01);
+ await page.locator('#cat-panel > .station-drawer > summary').click();await page.locator('#cat-back').click();await page.locator('#station-cat').click();await page.waitForFunction(()=>Math.abs(JSON.parse(document.querySelector('#scene3d').dataset.catProof||'{}').turn)<.01);
  // A second run at normal speed checks the actual three-second completion.
  await page.evaluate(s=>sessionStorage.setItem('__forge_qa_staged_save',JSON.stringify(s)),state);await page.reload();await page.waitForSelector('#scene3d[data-cat-asset="ready"]');
  await page.locator('#station-cat').click();await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.renderedCameraReady==='true'&&document.querySelector('#scene3d').dataset.renderedStation==='cat');
  await page.evaluate(()=>{window.phaseTimes=[];const h=document.querySelector('#scene3d');new MutationObserver(ms=>{for(const m of ms)if(m.attributeName==='data-tribute')window.phaseTimes.push({phase:h.dataset.tribute,ms:performance.now()});}).observe(h,{attributes:true,attributeFilter:['data-tribute']});});
- await page.locator('#tribute').click();await page.waitForSelector('#cat-back:not([hidden])');const times=await page.evaluate(()=>window.phaseTimes);
+ await page.locator('#tribute').click();await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.tribute==='complete',null,{timeout:90000});assert.equal(await page.locator('#cat-panel > .station-drawer').getAttribute('open'),null);const times=await page.evaluate(()=>window.phaseTimes);
  const start=times.find(p=>p.phase==='offering').ms,end=times.find(p=>p.phase==='complete').ms;
  assert.ok(end-start>=2950&&end-start<3700,JSON.stringify(times));
  reports.push({width,height,proof,snapshots,times,duration:end-start,errors});console.log(width,'normal speed',end-start);await page.close();

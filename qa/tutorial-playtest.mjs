@@ -88,7 +88,7 @@ async function play(page){
  await page.locator('#station-cat').click();
  await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.station==='cat');
  await page.locator('#tribute').click();
- await page.waitForSelector('#cat-back:not([hidden])',{timeout:30000});
+ await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.tribute==='complete',null,{timeout:30000});assert.equal(await page.locator('#cat-panel > .station-drawer').getAttribute('open'),null);
  assert.equal((await state()).catTributes,1);
  assert.equal(await step(),'relic');
  await page.locator('#station-relics').click();
