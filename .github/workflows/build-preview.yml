@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 23fd464fc66c6f606eb155784f03dcb8a7125e23
+          ref: 6cca31b354b83ec501579a2763cf9ca25a074c62
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -78,6 +78,12 @@ jobs:
           QA_OUT: qa-evidence/sword-suite-game
         run: npm run test:sword-game
 
+      - name: Verify three high-tier silhouettes and front metal exposure
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/high-tier
+        run: npm run test:sword-study
+
       - name: Upload sword suite screenshots and verification reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -86,6 +92,7 @@ jobs:
           path: |
             private-source/qa-evidence/sword-suite/
             private-source/qa-evidence/sword-suite-game/
+            private-source/qa-evidence/high-tier/
           if-no-files-found: warn
           retention-days: 7
 
@@ -132,7 +139,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='V5.1-sword-suite'
+          info['previewRelease']='V5.2-high-tier-swords'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -148,7 +155,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: V5.1 rebuild 111 sword forms and publish verified gallery"
+            git commit -m "deploy: V5.2 apply three high-tier sword models"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
@@ -185,4 +192,4 @@ jobs:
 
 # Preview QA fixture cleanup: valid current relic offers, persistent slot assertions, and source-side guard tests.
 
-# V5.1 sword-suite: all 111 forms, family-owned palettes, actual workshop/enchantment/rack/tribute gates. Source 23fd464fc66c6f606eb155784f03dcb8a7125e23.
+# V5.1 sword-suite: all 111 forms, family-owned palettes, actual workshop/enchantment/rack/tribute gates. Source 6cca31b354b83ec501579a2763cf9ca25a074c62.
