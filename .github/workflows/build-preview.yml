@@ -82,7 +82,9 @@ jobs:
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/high-tier
-        run: npm run test:sword-study
+        run: |
+          node scripts/build-sword-study.mjs qa-evidence/high-tier/study.html
+          node qa/sword-high-tier-review.mjs qa-evidence/high-tier/study.html
 
       - name: Upload sword suite screenshots and verification reports
         if: always()
