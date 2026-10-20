@@ -1,6 +1,6 @@
 {
   "name": "yichuichengshenbing",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "channel": "browser",
   "orientation": "portrait",
   "features": {
@@ -10,6 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "4bbf6880c845a43866620dd08be2073f231349b2",
-  "previewRelease": "V5.6-royal-sword-models"
+  "sourceCommit": "741c3d9a126519fcf5b8dac0fcf38fe9cd58d709",
+  "previewRelease": "v0.3.1-workshop-interactions"
 }
