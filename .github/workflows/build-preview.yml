@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 72ec7a288c0d2fbfd4c23f08bf30b11230930f13
+          ref: 0e3698242ad8a1e43279ffdc022123458f57f12d
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -115,6 +115,26 @@ jobs:
           QA_FORMS: normal:dragon_slayer:10,normal:dragon_fang:10,special:abyss:10
         run: node --experimental-strip-types qa/sword-shine-game-review.mjs
 
+      - name: Verify royal sword reference shapes, metal and exterior glow
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/royal
+        run: |
+          npm run build:sword-royal-study
+          node qa/sword-royal-review.mjs
+
+      - name: Verify royal mobile inspection preview and offline operation
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/royal-mobile
+        run: node qa/sword-royal-mobile.mjs
+
+      - name: Verify approved royal sword forms in actual desktop and phone gameplay
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/royal-game
+        run: node --experimental-strip-types qa/sword-royal-game-review.mjs
+
       - name: Upload sword suite screenshots and verification reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -128,6 +148,9 @@ jobs:
             private-source/qa-evidence/faithful/
             private-source/qa-evidence/faithful-shine/
             private-source/qa-evidence/faithful-native-game/
+            private-source/qa-evidence/royal/
+            private-source/qa-evidence/royal-mobile/
+            private-source/qa-evidence/royal-game/
           if-no-files-found: warn
           retention-days: 7
 
@@ -152,6 +175,7 @@ jobs:
           test -f private-source/dist/sword-gallery.html
           test -f private-source/dist/sword-mythic-study.html
           test -f private-source/dist/sword-faithful-study.html
+          test -f private-source/dist/sword-royal-study.html
           test -d private-source/dist/assets
           test -f private-source/dist/release.json
           if find private-source/dist -type f \( -name '*.ts' -o -name '*.map' \) | grep -q .; then
@@ -176,7 +200,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='V5.5-iron-sword-required'
+          info['previewRelease']='V5.6-royal-sword-models'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -188,11 +212,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html sword-gallery.html sword-mythic-study.html sword-faithful-study.html release.json assets art audio 2>/dev/null || true
+          git add index.html sword-gallery.html sword-mythic-study.html sword-faithful-study.html sword-royal-study.html release.json assets art audio 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: V5.5 require iron inventory for normal sword forging"
+            git commit -m "deploy: V5.6 apply approved citadel, Excalibur and sovereign sword models"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
