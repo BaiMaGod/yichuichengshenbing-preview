@@ -10,7 +10,7 @@ permissions:
 
 concurrency:
   group: forge-preview-release
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-and-publish:
@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 0e3698242ad8a1e43279ffdc022123458f57f12d
+          ref: 5ddd1f1415236386017ba051f9a8ebd3421fc0f1
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
