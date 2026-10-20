@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 6cca31b354b83ec501579a2763cf9ca25a074c62
+          ref: 5829e5274e426f46d2e3892043d7d7c0d9bf6f3c
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -86,6 +86,14 @@ jobs:
           node scripts/build-sword-study.mjs qa-evidence/high-tier/study.html
           node qa/sword-high-tier-review.mjs qa-evidence/high-tier/study.html
 
+      - name: Verify new mythic sword metal, front-side-back and live effects
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/mythic
+        run: |
+          npm run build:sword-mythic-study
+          node qa/sword-mythic-review.mjs
+
       - name: Upload sword suite screenshots and verification reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -95,6 +103,7 @@ jobs:
             private-source/qa-evidence/sword-suite/
             private-source/qa-evidence/sword-suite-game/
             private-source/qa-evidence/high-tier/
+            private-source/qa-evidence/mythic/
           if-no-files-found: warn
           retention-days: 7
 
@@ -117,6 +126,7 @@ jobs:
         run: |
           test -f private-source/dist/index.html
           test -f private-source/dist/sword-gallery.html
+          test -f private-source/dist/sword-mythic-study.html
           test -d private-source/dist/assets
           test -f private-source/dist/release.json
           if find private-source/dist -type f \( -name '*.ts' -o -name '*.map' \) | grep -q .; then
@@ -141,7 +151,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='V5.2-high-tier-swords'
+          info['previewRelease']='V5.3-mythic-swords'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -153,11 +163,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html sword-gallery.html release.json assets art audio 2>/dev/null || true
+          git add index.html sword-gallery.html sword-mythic-study.html release.json assets art audio 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: V5.2 apply three high-tier sword models"
+            git commit -m "deploy: V5.3 apply meteor, thunder and underworld sword models"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
