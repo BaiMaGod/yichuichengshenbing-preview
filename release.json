@@ -10,11 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "741c3d9a126519fcf5b8dac0fcf38fe9cd58d709",
-  "previewRelease": "v0.3.1-workshop-interactions",
-  "verification": {
-    "rules": 175,
-    "interactionCases": 7,
-    "sourceCommit": "741c3d9a126519fcf5b8dac0fcf38fe9cd58d709"
-  }
+  "sourceCommit": "eeff9bee821de2f7f8979d8ca7100e021ade2dbe",
+  "previewRelease": "v0.3.1-frenzy-feedback"
 }
