@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 70
     steps:
       - name: Check private source access
         env:
