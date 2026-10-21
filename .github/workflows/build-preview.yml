@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 56bc08412faede25e230f9f2d3a7aa6182fe5934
+          ref: d7dc0a6faff11755e54695166db05f72151e91ba
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -339,3 +339,4 @@ jobs:
 
 # Preview-only V5.5 build: iron sword shortage must not auto-spend gold; source pinned 72ec7a288c0d2fbfd4c23f08bf30b11230930f13.
 # Settings fresh-start rebuild: source 56bc08412faede25e230f9f2d3a7aa6182fe5934; build/test only in preview repo.
+# Fix CSS block closure for settings reset; source d7dc0a6faff11755e54695166db05f72151e91ba.
