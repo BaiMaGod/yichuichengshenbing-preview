@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: eeff9bee821de2f7f8979d8ca7100e021ade2dbe
+          ref: ed888856ed99bf0cb24a905c9c37514d4d8c7b75
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -58,6 +58,10 @@ jobs:
       - name: Build browser version for preview only
         working-directory: private-source
         run: npm run build
+
+      - name: Build complete high-tier sword inspection preview
+        working-directory: private-source
+        run: npm run build:sword-high-study
 
       - name: Install browser for pre-publish frenzy regression
         working-directory: private-source
@@ -169,6 +173,17 @@ jobs:
           QA_OUT: qa-evidence/royal-game
         run: node --experimental-strip-types qa/sword-royal-game-review.mjs
 
+      - name: Verify complete high-tier mobile controls and native effects
+        working-directory: private-source
+        run: node qa/sword-high-fx-review.mjs
+
+      - name: Verify remaining high-tier families in desktop and phone gameplay
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/high-complete-game
+          QA_FORMS: normal:dragon_fang:9,normal:meteor:9,normal:genesis:8,normal:runic:9,normal:thunder:9,special:abyss:9,special:worldtree:9,special:underworld:9,special:light_hero:10,special:milk_frog:10,special:hakimi:10
+        run: node --experimental-strip-types qa/sword-high-game-review.mjs
+
       - name: Upload sword suite screenshots and verification reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -185,6 +200,8 @@ jobs:
             private-source/qa-evidence/royal/
             private-source/qa-evidence/royal-mobile/
             private-source/qa-evidence/royal-game/
+            private-source/qa-evidence/high-fx/
+            private-source/qa-evidence/high-complete-game/
           if-no-files-found: warn
           retention-days: 7
 
@@ -225,6 +242,7 @@ jobs:
           test -f private-source/dist/sword-mythic-study.html
           test -f private-source/dist/sword-faithful-study.html
           test -f private-source/dist/sword-royal-study.html
+          test -f private-source/dist/sword-high-study.html
           test -d private-source/dist/assets
           test -f private-source/dist/release.json
           if find private-source/dist -type f \( -name '*.ts' -o -name '*.map' \) | grep -q .; then
@@ -249,7 +267,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.1-frenzy-feedback'
+          info['previewRelease']='v0.3.2-high-swords-v6'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -261,11 +279,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html sword-gallery.html sword-mythic-study.html sword-faithful-study.html sword-royal-study.html release.json assets art audio 2>/dev/null || true
+          git add index.html sword-gallery.html sword-mythic-study.html sword-faithful-study.html sword-royal-study.html sword-high-study.html release.json assets art audio 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: audible frenzy music and visible screen-space camera shake"
+            git commit -m "deploy: complete high-tier sword overhaul v0.3.2"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
