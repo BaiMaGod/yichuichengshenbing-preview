@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 659b6709e8217956e2d64c32a85b08c778393043
+          ref: 56bc08412faede25e230f9f2d3a7aa6182fe5934
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -282,7 +282,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.2-super-god-screen-fx'
+          info['previewRelease']='v0.3.2-settings-fresh-start'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -298,7 +298,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: stronger frenzy shake and full-screen super-god energy field"
+            git commit -m "deploy: settings restart with cloud-safe fresh save"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
@@ -338,3 +338,4 @@ jobs:
 # V5.1 sword-suite: all 111 forms, family-owned palettes, actual workshop/enchantment/rack/tribute gates. Source 6cca31b354b83ec501579a2763cf9ca25a074c62.
 
 # Preview-only V5.5 build: iron sword shortage must not auto-spend gold; source pinned 72ec7a288c0d2fbfd4c23f08bf30b11230930f13.
+# Settings fresh-start rebuild: source 56bc08412faede25e230f9f2d3a7aa6182fe5934; build/test only in preview repo.
