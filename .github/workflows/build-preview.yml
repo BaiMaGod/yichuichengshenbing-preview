@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 741c3d9a126519fcf5b8dac0fcf38fe9cd58d709
+          ref: 374aeb4b0de5a21b94d4e4dece1c422ef94bb5af
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -65,6 +65,21 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y fonts-noto-cjk
           npx playwright install --with-deps chromium
+
+      - name: Verify audible frenzy music, screen-space shake and feedback lifecycle
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/forge-feedback
+        run: node --experimental-strip-types -e "import('./qa/forge-feedback-review.mjs').then(m=>m.runFeedbackReview()).then(r=>console.log(JSON.stringify(r,null,2)))"
+
+      - name: Upload measured frenzy audio and camera feedback
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-feedback-audio-camera
+          path: private-source/qa-evidence/forge-feedback/
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Build TapTap channel for interaction regression only
         working-directory: private-source
@@ -234,7 +249,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.1-workshop-interactions'
+          info['previewRelease']='v0.3.1-frenzy-feedback'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -250,7 +265,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: v0.3.1 tribute, relic management and merchant interaction fixes"
+            git commit -m "deploy: audible frenzy music and visible screen-space camera shake"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
