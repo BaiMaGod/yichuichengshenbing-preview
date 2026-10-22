@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 5e1b98eb66f5a4d469fd3b0e2a6e3b9221e76536
+          ref: 18f7f692501762dc598ba01d204f9bd261c22003
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -82,6 +82,21 @@ jobs:
         with:
           name: rack-tribute-sale-v033
           path: private-source/qa-evidence/rack-tribute/
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Verify world-space anvil impact rings on phone and desktop
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/impact-rings
+        run: node --experimental-strip-types qa/forge-impact-rings-review.mjs
+
+      - name: Upload world-space impact ring screenshots and measured report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-world-impact-rings
+          path: private-source/qa-evidence/impact-rings/
           if-no-files-found: warn
           retention-days: 7
 
@@ -297,7 +312,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.3-rack-tribute-sale'
+          info['previewRelease']='v0.3.4-world-impact-rings'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -313,7 +328,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: full rack lighting, clear tribute receipts and visible sale prices"
+            git commit -m "deploy: stronger divine shake and world-space anvil impact rings"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
