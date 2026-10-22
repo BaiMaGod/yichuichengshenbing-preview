@@ -2,11 +2,6 @@ name: Build and publish preview (source remains private)
 on:
   workflow_dispatch:
     inputs:
-      full_qa:
-        description: 'Run extended 3D visual and performance QA (slow)'
-        required: false
-        type: boolean
-        default: false
   push:
     paths:
       - '.github/workflows/build-preview.yml'
@@ -111,14 +106,14 @@ jobs:
           retention-days: 7
 
       - name: Verify world-space anvil impact rings on phone and desktop
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/impact-rings
         run: node --experimental-strip-types qa/forge-impact-rings-review.mjs
 
       - name: Upload world-space impact ring screenshots and measured report
-        if: ${{ always() && inputs.full_qa }}
+        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: forge-world-impact-rings
@@ -127,21 +122,21 @@ jobs:
           retention-days: 7
 
       - name: Verify audible frenzy music, screen-space shake and feedback lifecycle
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/forge-feedback
         run: node --experimental-strip-types -e "import('./qa/forge-feedback-review.mjs').then(m=>m.runFeedbackReview()).then(r=>console.log(JSON.stringify(r,null,2)))"
 
       - name: Verify full-screen frenzy and super-god effects, lifecycle and input
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/screen-fx
         run: node --experimental-strip-types -e "import('./qa/forge-screen-fx-review.mjs').then(m=>m.runScreenFxReview()).then(r=>console.log(JSON.stringify(r,null,2)))"
 
       - name: Upload full-screen effect screenshots and measured report
-        if: ${{ always() && inputs.full_qa }}
+        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: full-screen-forge-fx
@@ -150,7 +145,7 @@ jobs:
           retention-days: 7
 
       - name: Upload measured frenzy audio and camera feedback
-        if: ${{ always() && inputs.full_qa }}
+        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: forge-feedback-audio-camera
@@ -178,21 +173,21 @@ jobs:
           retention-days: 7
 
       - name: Verify all 111 sword forms and complete front-side-back geometry
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/sword-suite
         run: npm run test:sword-gallery
 
       - name: Verify sword families in desktop and phone workshop, enchantment, rack and tribute
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/sword-suite-game
         run: npm run test:sword-game
 
       - name: Verify three high-tier silhouettes and front metal exposure
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/high-tier
@@ -201,7 +196,7 @@ jobs:
           node qa/sword-high-tier-review.mjs qa-evidence/high-tier/study.html
 
       - name: Verify new mythic sword metal, front-side-back and live effects
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/mythic
@@ -210,7 +205,7 @@ jobs:
           node qa/sword-mythic-review.mjs
 
       - name: Verify original-reference sword silhouettes and animated materials
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/faithful
@@ -219,14 +214,14 @@ jobs:
           node qa/sword-faithful-review.mjs
 
       - name: Verify visible sword glow outside the metal silhouette
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/faithful-shine
         run: node qa/sword-shine-review.mjs
 
       - name: Verify native sword effects in desktop and phone gameplay
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/faithful-native-game
@@ -234,7 +229,7 @@ jobs:
         run: node --experimental-strip-types qa/sword-shine-game-review.mjs
 
       - name: Verify royal sword reference shapes, metal and exterior glow
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/royal
@@ -243,26 +238,26 @@ jobs:
           node qa/sword-royal-review.mjs
 
       - name: Verify royal mobile inspection preview and offline operation
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/royal-mobile
         run: node qa/sword-royal-mobile.mjs
 
       - name: Verify approved royal sword forms in actual desktop and phone gameplay
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/royal-game
         run: node --experimental-strip-types qa/sword-royal-game-review.mjs
 
       - name: Verify complete high-tier mobile controls and native effects
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         run: node qa/sword-high-fx-review.mjs
 
       - name: Verify remaining high-tier families in desktop and phone gameplay
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/high-complete-game
@@ -270,7 +265,7 @@ jobs:
         run: node --experimental-strip-types qa/sword-high-game-review.mjs
 
       - name: Upload sword suite screenshots and verification reports
-        if: ${{ always() && inputs.full_qa }}
+        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: sword-suite-v1
@@ -291,14 +286,14 @@ jobs:
           retention-days: 7
 
       - name: Verify frenzy, super-god, countdown, repeated modes and archived sword
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/frenzy
         run: node --experimental-strip-types qa/frenzy-performance.mjs
 
       - name: Upload frenzy screenshots and measured report
-        if: ${{ always() && inputs.full_qa }}
+        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: frenzy-performance-v5
@@ -307,14 +302,14 @@ jobs:
           retention-days: 7
 
       - name: Verify panda whip animation on phone and desktop
-        if: ${{ inputs.full_qa }}
+        if: github.event_name == 'workflow_dispatch'
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/whip
         run: node qa/whip-review.mjs
 
       - name: Upload panda whip animation verification
-        if: ${{ always() && inputs.full_qa }}
+        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: panda-whip-animation
