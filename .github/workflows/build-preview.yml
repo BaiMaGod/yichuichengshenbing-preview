@@ -141,7 +141,6 @@ jobs:
         run: node --experimental-strip-types -e "import('./qa/forge-screen-fx-review.mjs').then(m=>m.runScreenFxReview()).then(r=>console.log(JSON.stringify(r,null,2)))"
 
       - name: Upload full-screen effect screenshots and measured report
-        if: ${{ inputs.full_qa }}
         if: ${{ always() && inputs.full_qa }}
         uses: actions/upload-artifact@v4
         with:
@@ -151,7 +150,6 @@ jobs:
           retention-days: 7
 
       - name: Upload measured frenzy audio and camera feedback
-        if: ${{ inputs.full_qa }}
         if: ${{ always() && inputs.full_qa }}
         uses: actions/upload-artifact@v4
         with:
@@ -272,7 +270,6 @@ jobs:
         run: node --experimental-strip-types qa/sword-high-game-review.mjs
 
       - name: Upload sword suite screenshots and verification reports
-        if: ${{ inputs.full_qa }}
         if: ${{ always() && inputs.full_qa }}
         uses: actions/upload-artifact@v4
         with:
@@ -301,7 +298,6 @@ jobs:
         run: node --experimental-strip-types qa/frenzy-performance.mjs
 
       - name: Upload frenzy screenshots and measured report
-        if: ${{ inputs.full_qa }}
         if: ${{ always() && inputs.full_qa }}
         uses: actions/upload-artifact@v4
         with:
@@ -318,7 +314,6 @@ jobs:
         run: node qa/whip-review.mjs
 
       - name: Upload panda whip animation verification
-        if: ${{ inputs.full_qa }}
         if: ${{ always() && inputs.full_qa }}
         uses: actions/upload-artifact@v4
         with:
