@@ -1,6 +1,6 @@
 {
   "name": "yichuichengshenbing",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "channel": "browser",
   "orientation": "portrait",
   "features": {
@@ -10,6 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "18f7f692501762dc598ba01d204f9bd261c22003",
-  "previewRelease": "v0.3.4-world-impact-rings"
+  "sourceCommit": "e25c66bb91296c6b95afc72c20bc6599424f6f41",
+  "previewRelease": "v0.3.5-revive-share"
 }

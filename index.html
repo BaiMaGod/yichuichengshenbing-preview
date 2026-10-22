@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-<meta name="source-commit" content="18f7f692501762dc598ba01d204f9bd261c22003">
+<meta name="source-commit" content="e25c66bb91296c6b95afc72c20bc6599424f6f41">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-BCjn7Yve.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Chn1zNBJ.css">
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-DzGEa0uM.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BtbKEu3M.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
@@ -36,7 +36,6 @@
    <p class="muted" id="cat-offer-info">锻造宝剑，价值达到纳贡要求后收剑，再上交。</p>
    <label class="tribute-selector">纳贡选择<select id="tribute-choice" aria-label="选择纳贡宝剑"></select></label>
    <div id="wrath-status" class="wrath-status" hidden></div><button id="tribute" class="primary">上交宝剑</button>
-   <button id="ad-tribute" class="secondary" type="button" hidden>看广告上供 · 领取3把铁剑（每日1次）</button>
    <div id="tribute-reward" class="reward-text" hidden></div>
    <button id="cat-back" class="secondary" hidden>返回锻剑</button>
    <div class="tribute-help" aria-label="纳贡玩法说明">
@@ -70,7 +69,7 @@
  </details>
 </section>
 <section id="merchant-panel" class="control station-panel" hidden>
- <details class="station-drawer" open><summary class="station-drawer-title"><strong>幽灵商人</strong><small>金币交易 · 点击收起</small></summary><div class="station-panel-content"><p id="merchant-note" class="muted"></p><p id="merchant-trade-status" class="hint" role="status" hidden></p><div id="merchant-list" class="relic-list"></div><div id="merchant-controls" class="market-controls"><button id="merchant-paid-refresh" class="secondary" type="button">500 金币刷新（0/1）</button><button id="merchant-ad-refresh" class="secondary" type="button" hidden>广告刷新（0/2）</button></div><small id="merchant-inventory" class="hint"></small><button id="merchant-back" class="secondary">收起</button></div></details>
+ <details class="station-drawer" open><summary class="station-drawer-title"><strong>幽灵商人</strong><small>金币交易 · 点击收起</small></summary><div class="station-panel-content"><p id="merchant-note" class="muted"></p><p id="merchant-trade-status" class="hint" role="status" hidden></p><div id="merchant-list" class="relic-list"></div><div id="merchant-controls" class="market-controls"><button id="merchant-paid-refresh" class="secondary" type="button">500 金币刷新（0/1）</button><button id="merchant-ad-refresh" class="secondary" type="button" hidden>广告刷新（0/2）</button></div><div class="market-subtitle">宝剑回收</div><p class="hint">收剑后的宝剑与剑架藏品，可在商人来访时出售。</p><div id="merchant-sword-list" class="relic-list"></div><small id="merchant-inventory" class="hint"></small><button id="merchant-back" class="secondary">收起</button></div></details>
 </section>
 <section class="control" id="heat" hidden>
  <div class="section-title"><span>炉中加热</span><small id="heating-order">当前订单</small></div>
@@ -87,10 +86,9 @@
 <section class="control" id="finished" hidden>
  <div class="section-title"><span>神兵出炉</span><small>宝剑已成</small></div>
  <div class="reveal-summary"><div><strong id="finished-level">+2</strong><small>强化进度</small></div><div><strong id="finished-quality">Q1.00</strong><small>锻造品质</small></div><div><strong id="finished-value">150</strong><small>宝剑价值 · 金</small></div></div>
- <p class="finished-sale-note">出售可得 <b id="finished-sell">0</b> 金</p><p id="finished-sale-rule" class="sale-rule"></p>
- <div class="finished-actions"><button id="sell" class="primary">出售并继续锻造</button><button id="collect" class="secondary">收藏</button><button id="offer-cat" class="secondary">献给食铁兽</button></div>
+ <div class="finished-actions"><button id="collect" class="secondary">收藏</button><button id="continue-forging" class="primary">继续锻造</button></div>
 </section>
-<section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-rewind" class="secondary" hidden>⏳ 使用回溯发条 · 恢复宝剑</button><button id="broken-ad-revive" class="secondary" type="button" hidden>观看广告 · 修复宝剑（每把一次）</button><button id="broken-next" class="primary">再锻一把</button></section>
+<section class="control failed" id="broken" hidden><h2>💥 神兵未成</h2><p>锻造途中剑胚断裂，保留你的成长与已解锁记录。</p><p id="broken-scrap">回收残料</p><button id="broken-rewind" class="secondary" hidden>⏳ 使用回溯发条 · 恢复宝剑</button><button id="broken-revive" class="secondary" type="button" hidden>✨ 复活宝剑（每把仅一次）</button><button id="broken-next" class="primary">再锻一把</button></section>
 <footer class="bottom" hidden><div id="foot-hint" class="foot-hint">锻出神兵 · 收藏、出售或纳贡</div></footer>
 <div id="tutorial-layer" class="tutorial-layer" aria-live="polite" hidden>
  <div id="tutorial-focus" class="tutorial-focus" aria-hidden="true"></div>
@@ -111,6 +109,7 @@
  </div>
  <div class="game-dialog-actions single"><button id="owned-relic-close" class="dialog-button primary">关闭</button></div>
 </dialog>
+<dialog id="revive-dialog" class="game-dialog revive-dialog" aria-labelledby="revive-title" aria-describedby="revive-description"><h2 id="revive-title">复活这把宝剑？</h2><div class="game-dialog-rule"></div><p id="revive-description" class="game-dialog-description">选择一种方式恢复到断裂前一锤。每把剑只能复活一次，再次断裂将无法继续复活。</p><div class="game-dialog-actions revive-actions"><button id="revive-watch" class="dialog-button primary" type="button">看广告复活</button><button id="revive-share" class="dialog-button primary" type="button">分享复活</button><button id="revive-cancel" class="dialog-button secondary" type="button">再想想</button></div></dialog>
 <dialog id="game-confirm" class="game-dialog" aria-labelledby="game-confirm-title" aria-describedby="game-confirm-description"><h2 id="game-confirm-title"></h2><div class="game-dialog-rule"></div><p id="game-confirm-description" class="game-dialog-description"></p><div class="game-dialog-actions"><button id="game-confirm-cancel" class="dialog-button secondary">再看看</button><button id="game-confirm-accept" class="dialog-button primary">确认</button></div></dialog>
 
 <dialog id="settings-dialog" class="game-dialog settings-dialog" aria-labelledby="settings-title">
@@ -135,3 +134,4 @@
  <div class="game-dialog-actions single"><button id="guide-close" class="dialog-button secondary" type="button">返回设置</button></div>
 </dialog>
 </body></html>
+
