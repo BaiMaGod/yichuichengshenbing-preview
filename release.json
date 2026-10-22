@@ -1,6 +1,6 @@
 {
   "name": "yichuichengshenbing",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "channel": "browser",
   "orientation": "portrait",
   "features": {
@@ -10,6 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "d7dc0a6faff11755e54695166db05f72151e91ba",
-  "previewRelease": "v0.3.2-settings-fresh-start"
+  "sourceCommit": "5e1b98eb66f5a4d469fd3b0e2a6e3b9221e76536",
+  "previewRelease": "v0.3.3-rack-tribute-sale"
 }
