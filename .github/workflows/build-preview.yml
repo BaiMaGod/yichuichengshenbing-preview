@@ -21,7 +21,7 @@ concurrency:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ inputs.full_qa && 180 || 35 }}
+    timeout-minutes: 180
     steps:
       - name: Check private source access
         env:
