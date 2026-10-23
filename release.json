@@ -1,6 +1,6 @@
 {
   "name": "yichuichengshenbing",
-  "version": "0.3.5",
+  "version": "0.3.7",
   "channel": "browser",
   "orientation": "portrait",
   "features": {
@@ -10,6 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "04378e0b6a3c509fed41d68805c9102ca1577f3e",
-  "previewRelease": "v0.3.6-two-four-sword-racks"
+  "sourceCommit": "87557016c61f48958af94afe20a5c4b1165a82b5",
+  "previewRelease": "v0.3.7-preserve-visual-strike-performance"
 }
