@@ -20,7 +20,7 @@ try{for(const [width,height] of (process.env.QA_SIZE?[process.env.QA_SIZE.split(
  await page.locator('#station-collection').click();await snap('rack');assert.ok(await page.locator('#merchant-call').isHidden());
  const rack=JSON.parse(await scene.getAttribute('data-side-display-proof'));assert.ok(rack.left>=0&&rack.right<=width);assert.ok(rack.top>85&&rack.bottom<height-80);assert.equal(await page.getByText('收藏剑架',{exact:true}).isVisible(),false);
  await page.locator('#station-relics').click();await snap('relics');assert.equal(await scene.getAttribute('data-relic-shelf-count'),'3');assert.ok(await page.locator('#merchant-call').isHidden());const relic=JSON.parse(await scene.getAttribute('data-side-display-proof'));
- await page.locator('#station-cat').click();await snap('tribute-choice');assert.ok(await page.locator('#merchant-call').isHidden());assert.equal(await page.locator('#tribute-choice option').count(),6);
+ await page.locator('#station-cat').click();await snap('tribute-choice');assert.ok(await page.locator('#merchant-call').isHidden());assert.equal(await page.locator('#tribute-choice option').count(),7,'Six stored swords plus one daily rewarded-ad tribute option');
  if(width===390){
   await page.locator('#tribute-choice').selectOption('rack-3');await page.locator('#tribute').click();await page.waitForFunction(()=>document.querySelector('#scene3d').dataset.tribute==='complete');await snap('tribute-complete');
   const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);assert.equal(after.workshopDay,4);assert.ok(!after.caseIds.includes('rack-3'));assert.equal(after.caseIds.length,5);assert.equal(after.ironBlanks,24);
