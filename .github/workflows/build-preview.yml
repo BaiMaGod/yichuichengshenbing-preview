@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 04378e0b6a3c509fed41d68805c9102ca1577f3e
+          ref: 2cc994f228355acb58bb0954b0b6be16b70b718f
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -79,6 +79,21 @@ jobs:
       - name: Install Chromium for targeted pre-publish browser regression
         working-directory: private-source
         run: npx playwright install chromium
+
+      - name: Verify continuous normal, frenzy and super-god strikes without visual downgrade
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/forge-strikes
+        run: npm run test:forge-strikes
+
+      - name: Upload continuous strike performance and pixel comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-strike-performance-v037
+          path: private-source/qa-evidence/forge-strikes/
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Verify all 84 high sword bodies across phone and desktop sizes
         if: github.event_name == 'workflow_dispatch'
@@ -403,7 +418,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.6-two-four-sword-racks'
+          info['previewRelease']='v0.3.7-preserve-visual-strike-performance'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -419,7 +434,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: two four-sword racks and aligned runic satellites"
+            git commit -m "deploy: preserve visuals and smooth continuous sword strikes"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
@@ -463,3 +478,5 @@ jobs:
 # Fix CSS block closure for settings reset; source d7dc0a6faff11755e54695166db05f72151e91ba.
 
 # Two four-sword racks: eight collected swords, fixed rack camera, broad high swords retain height, blade-centred instanced runic orbits.
+
+# V0.3.7: reachable model/material/GPU prewarm, local strike UI updates, identical-material particle batches; real shadows and effects preserved.
