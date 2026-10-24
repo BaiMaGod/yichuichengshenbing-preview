@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: 3a1629e0c36a4a8d806377961381cadffac12575
+          ref: c3ad86b3516332c4fc21021912ddf1b6841e5ba7
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -94,22 +94,6 @@ jobs:
         working-directory: private-source
         run: npx playwright install chromium
 
-      - name: Verify upgraded hammer silhouettes, impacts and resource stability
-        working-directory: private-source
-        env:
-          QA_OUT: qa-evidence/hammer-upgrades
-        run: node --experimental-strip-types qa/hammer-model-review.mjs
-
-      - name: Upload upgraded hammer phone and desktop inspection
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: hammer-upgrade-inspection
-          path: private-source/qa-evidence/hammer-upgrades/
-          if-no-files-found: warn
-          retention-days: 7
-
-
       - name: Verify visible furnace progress, heat cues, reload and anvil transfer
         working-directory: private-source
         env:
@@ -139,6 +123,22 @@ jobs:
           path: private-source/qa-evidence/forge-strikes/
           if-no-files-found: warn
           retention-days: 7
+
+      - name: Verify upgraded hammer silhouettes, impacts and resource stability
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/hammer-upgrades
+        run: node --experimental-strip-types qa/hammer-model-review.mjs
+
+      - name: Upload upgraded hammer phone and desktop inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hammer-upgrade-inspection
+          path: private-source/qa-evidence/hammer-upgrades/
+          if-no-files-found: warn
+          retention-days: 7
+
 
       - name: Verify all 84 high sword bodies across phone and desktop sizes
         if: github.event_name == 'workflow_dispatch'
