@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: f49d919f53ba7ec32ba53eb20c24b378a5943da0
+          ref: b98ff90092e8ee36dfd3ce59416eebbfa5627751
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -289,10 +289,25 @@ jobs:
       - name: Upload validated TapTap H5 package
         uses: actions/upload-artifact@v4
         with:
-          name: forge-taptap-h5-v0310
-          path: private-source/releases/forge-taptap-h5-v0.3.10.zip
+          name: forge-taptap-h5-v0311
+          path: private-source/releases/forge-taptap-h5-v0.3.11.zip
           if-no-files-found: error
           retention-days: 14
+
+      - name: Verify default TapTap sharing, cancel and duplicate revival callbacks
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/share-revive
+        run: node --experimental-strip-types qa/share-revive-review.mjs
+
+      - name: Upload default-share revival evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: default-share-revival-v0311
+          path: private-source/qa-evidence/share-revive/
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Verify wallet resource dialogs and rewarded currency on Web and TapTap
         working-directory: private-source
@@ -501,7 +516,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.10-resource-dialog'
+          info['previewRelease']='v0.3.11-default-share'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
