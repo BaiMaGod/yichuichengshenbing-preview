@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: c3ad86b3516332c4fc21021912ddf1b6841e5ba7
+          ref: db4c6bd772c0232381b4fb3cdb751b1e4266c77d
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -269,7 +269,30 @@ jobs:
 
       - name: Build TapTap channel for interaction regression only
         working-directory: private-source
-        run: npm run build:taptap
+        run: npm run package:taptap
+
+      - name: Verify Web and TapTap dialog styles, native selector replacement, ad callbacks and relic refresh
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/h5-interaction
+        run: node --experimental-strip-types qa/h5-interaction-review.mjs
+
+      - name: Upload H5 dialog and reward regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: h5-interaction-v039
+          path: private-source/qa-evidence/h5-interaction/
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload validated TapTap H5 package
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-taptap-h5-v039
+          path: private-source/releases/forge-taptap-h5-v0.3.9.zip
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Verify tribute panels, relic management, dispenser refresh and merchant trading
         working-directory: private-source
@@ -463,7 +486,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.8-furnace-progress'
+          info['previewRelease']='v0.3.9-h5-ui-ad-refresh'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -479,7 +502,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: restore visible furnace heating progress"
+            git commit -m "deploy: fix H5 dialogs, rewarded ads and relic refresh"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
