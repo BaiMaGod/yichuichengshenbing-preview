@@ -1,6 +1,6 @@
 {
   "name": "yichuichengshenbing",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "channel": "browser",
   "orientation": "portrait",
   "features": {
@@ -10,6 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "48c6551f24a58d8ef4598f9f00c8477e7d2b8611",
-  "previewRelease": "v0.3.7-thunder-star-hammers"
+  "sourceCommit": "c3ad86b3516332c4fc21021912ddf1b6841e5ba7",
+  "previewRelease": "v0.3.8-furnace-progress"
 }
