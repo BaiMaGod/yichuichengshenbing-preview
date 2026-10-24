@@ -1,6 +1,6 @@
 {
   "name": "yichuichengshenbing",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "channel": "browser",
   "orientation": "portrait",
   "features": {
@@ -10,6 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "c3ad86b3516332c4fc21021912ddf1b6841e5ba7",
-  "previewRelease": "v0.3.8-furnace-progress"
+  "sourceCommit": "f00153cc68a0fa7968f33a00b917da3101e5a4ad",
+  "previewRelease": "v0.3.9-h5-ui-ad-refresh"
 }

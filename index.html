@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-<meta name="source-commit" content="c3ad86b3516332c4fc21021912ddf1b6841e5ba7">
+<meta name="source-commit" content="f00153cc68a0fa7968f33a00b917da3101e5a4ad">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-C3QKzbzq.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Bq7ldKTM.css">
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-D-fRKFrB.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DhGW4YGo.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
@@ -17,7 +17,7 @@
 <section class="workbench" aria-label="立体锻造工坊">
  <div id="scene3d" tabindex="0" aria-label="立体锻造工坊"></div>
  <div id="relic-list" class="relic-world-labels" aria-label="遗物机在售遗物" hidden></div>
- <div id="relic-controls" class="market-controls relic-machine-controls" aria-label="遗物机刷新" hidden><button id="relic-paid-refresh" class="secondary" type="button">2 铁剑刷新（0/1）</button><button id="relic-ad-refresh" class="secondary" type="button" hidden>广告刷新（0/2）</button></div>
+ <div id="relic-controls" class="market-controls relic-machine-controls" aria-label="遗物机刷新" hidden><button id="relic-paid-refresh" class="secondary" type="button">2 铁剑刷新（0/1）</button><button id="relic-ad-refresh" class="secondary" type="button" hidden>广告刷新（0/2）</button><small id="relic-refresh-status" role="status"></small></div>
  <div id="collection-list" class="collection-world-labels" aria-label="剑架宝剑信息" hidden></div>
  <div id="collection-pager" class="collection-pager" aria-label="切换剑架" hidden>
   <button id="rack-prev" class="rack-arrow rack-prev" type="button" aria-label="上一座剑架" hidden>‹</button>
@@ -39,7 +39,7 @@
   <div class="station-panel-content">
    <p id="cat-speech" class="cat-speech">「别磨蹭，快把宝剑端上来！」</p>
    <p class="muted" id="cat-offer-info">锻造宝剑，价值达到纳贡要求后收剑，再上交。</p>
-   <label class="tribute-selector">纳贡选择<select id="tribute-choice" aria-label="选择纳贡宝剑"></select></label>
+   <div class="tribute-selector"><span id="tribute-choice-label">纳贡选择</span><button id="tribute-choice-open" class="secondary" type="button" aria-labelledby="tribute-choice-label tribute-choice-text" aria-haspopup="dialog" aria-controls="tribute-choice-dialog"><span id="tribute-choice-text">选择纳贡宝剑</span><span aria-hidden="true">⌄</span></button><select id="tribute-choice" aria-label="选择纳贡宝剑" hidden tabindex="-1" aria-hidden="true"></select></div>
    <div id="wrath-status" class="wrath-status" hidden></div><button id="tribute" class="primary">上交宝剑</button>
    <div id="tribute-reward" class="reward-text" hidden></div>
    <button id="cat-back" class="secondary" hidden>返回锻剑</button>
@@ -116,7 +116,8 @@
  </div>
  <div class="game-dialog-actions single"><button id="owned-relic-close" class="dialog-button primary">关闭</button></div>
 </dialog>
-<dialog id="revive-dialog" class="game-dialog revive-dialog" aria-labelledby="revive-title" aria-describedby="revive-description"><h2 id="revive-title">复活这把宝剑？</h2><div class="game-dialog-rule"></div><p id="revive-description" class="game-dialog-description">选择一种方式恢复到断裂前一锤。每把剑只能复活一次，再次断裂将无法继续复活。</p><div class="game-dialog-actions revive-actions"><button id="revive-watch" class="dialog-button primary" type="button">看广告复活</button><button id="revive-share" class="dialog-button primary" type="button">分享复活</button><button id="revive-cancel" class="dialog-button secondary" type="button">再想想</button></div></dialog>
+<dialog id="tribute-choice-dialog" class="game-dialog" aria-labelledby="tribute-choice-title"><h2 id="tribute-choice-title">选择纳贡方式</h2><div class="game-dialog-rule"></div><p class="game-dialog-description">选择宝剑后，再点击确认纳贡。</p><div id="tribute-choice-options" class="game-dialog-scroll" role="group" aria-label="纳贡方式"></div><div class="game-dialog-actions single"><button id="tribute-choice-cancel" class="dialog-button secondary" type="button">再看看</button></div></dialog>
+<dialog id="revive-dialog" class="game-dialog revive-dialog" aria-labelledby="revive-title" aria-describedby="revive-description"><h2 id="revive-title">复活这把宝剑？</h2><div class="game-dialog-rule"></div><p id="revive-description" class="game-dialog-description">选择一种方式恢复到断裂前一锤。每把剑只能复活一次，再次断裂将无法继续复活。</p><p id="revive-availability" class="game-dialog-description" role="status"></p><div class="game-dialog-actions revive-actions"><button id="revive-watch" class="dialog-button primary" type="button">看广告复活</button><button id="revive-share" class="dialog-button primary" type="button">分享复活</button><button id="revive-cancel" class="dialog-button secondary" type="button">再想想</button></div></dialog>
 <dialog id="game-confirm" class="game-dialog" aria-labelledby="game-confirm-title" aria-describedby="game-confirm-description"><h2 id="game-confirm-title"></h2><div class="game-dialog-rule"></div><p id="game-confirm-description" class="game-dialog-description"></p><div class="game-dialog-actions"><button id="game-confirm-cancel" class="dialog-button secondary">再看看</button><button id="game-confirm-accept" class="dialog-button primary">确认</button></div></dialog>
 
 <dialog id="settings-dialog" class="game-dialog settings-dialog" aria-labelledby="settings-title">
@@ -141,4 +142,5 @@
  <div class="game-dialog-actions single"><button id="guide-close" class="dialog-button secondary" type="button">返回设置</button></div>
 </dialog>
 </body></html>
+
 
