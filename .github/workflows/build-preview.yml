@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: b98ff90092e8ee36dfd3ce59416eebbfa5627751
+          ref: 5bdc9368e515a880a666a362fbbf375058007b04
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -289,8 +289,8 @@ jobs:
       - name: Upload validated TapTap H5 package
         uses: actions/upload-artifact@v4
         with:
-          name: forge-taptap-h5-v0311
-          path: private-source/releases/forge-taptap-h5-v0.3.11.zip
+          name: forge-taptap-h5-v0312
+          path: private-source/releases/forge-taptap-h5-v0.3.12.zip
           if-no-files-found: error
           retention-days: 14
 
@@ -304,7 +304,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: default-share-revival-v0311
+          name: share-native-error-v0312
           path: private-source/qa-evidence/share-revive/
           if-no-files-found: warn
           retention-days: 7
@@ -516,7 +516,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.11-default-share'
+          info['previewRelease']='v0.3.12-share-errors'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
