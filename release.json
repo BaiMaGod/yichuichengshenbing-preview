@@ -1,6 +1,6 @@
 {
   "name": "yichuichengshenbing",
-  "version": "0.3.14",
+  "version": "0.3.16",
   "channel": "browser",
   "orientation": "portrait",
   "features": {
@@ -10,6 +10,6 @@
     "share": false,
     "leaderboard": false
   },
-  "sourceCommit": "23759e816d4bea513b8538044f2c688a4b89977d",
-  "previewRelease": "v0.3.14-supergod-gain-hotfix-20261025"
+  "sourceCommit": "2953a8e5f77dd3b40f4a201d64139bff20091c7f",
+  "previewRelease": "v0.3.16-sword-sale-soft-knee-20261025"
 }

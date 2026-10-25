@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="zh-CN"><head>
-<meta name="source-commit" content="23759e816d4bea513b8538044f2c688a4b89977d">
+<meta name="source-commit" content="2953a8e5f77dd3b40f4a201d64139bff20091c7f">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>  <script type="module" crossorigin src="./assets/index-DuAVJk7I-sg2510.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-TpE_SO0c.css">
+<meta name="theme-color" content="#161c2a"><title>锻剑纳贡：食铁兽要吃剑</title>
+  <script type="module" crossorigin src="./assets/index-CkWzgQKc.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-COi479Hs.css">
 </head>
 <body>
 <main class="game" data-phase="choose">
@@ -17,7 +18,7 @@
 <section class="workbench" aria-label="立体锻造工坊">
  <div id="scene3d" tabindex="0" aria-label="立体锻造工坊"></div>
  <div id="relic-list" class="relic-world-labels" aria-label="遗物机在售遗物" hidden></div>
- <div id="relic-controls" class="market-controls relic-machine-controls" aria-label="遗物机刷新" hidden><button id="relic-paid-refresh" class="secondary" type="button">2 铁剑刷新（0/1）</button><button id="relic-ad-refresh" class="secondary" type="button" hidden>广告刷新（0/2）</button><small id="relic-refresh-status" role="status"></small></div>
+ <div id="relic-controls" class="market-controls relic-machine-controls" aria-label="遗物机刷新" hidden><button id="relic-paid-refresh" class="secondary" type="button" aria-haspopup="dialog">2 铁剑刷新（0/1）</button><small id="relic-refresh-status" role="status"></small></div>
  <div id="collection-list" class="collection-world-labels" aria-label="剑架宝剑信息" hidden></div>
  <div id="collection-pager" class="collection-pager" aria-label="切换剑架" hidden>
   <button id="rack-prev" class="rack-arrow rack-prev" type="button" aria-label="上一座剑架" hidden>‹</button>
@@ -44,13 +45,15 @@
    <div id="tribute-reward" class="reward-text" hidden></div>
    <button id="cat-back" class="secondary" hidden>返回锻剑</button>
    <div class="tribute-help" aria-label="纳贡玩法说明">
-    <details class="tribute-more"><summary>正常纳贡与超额奖励说明</summary>
-     <p><strong>正常纳贡：</strong>选一把价值达标的宝剑，上交后获得至少 3 把铁剑，进入下一纳贡日。</p>
-     <p><strong>超额奖励：</strong>宝剑价值达到要求的 2 倍多 1 把、4 倍再多 1 把、8 倍再多 1 把，以此类推。</p>
-    </details>
-    <details class="tribute-more"><summary>上供空气、广告和惩罚说明</summary>
-     <p>没有达标宝剑时可以上供空气，获得 3 把基础铁剑，但会被食铁兽挥鞭抽打 3 下，并可能被没收遗物；遗物不足时可能扣金币。累计上供空气 3 次后触发怒火，普通锤击成功概率减半、受损概率增加；连续正常纳贡 5 次平息怒火。</p>
-     <p>广告纳贡每自然日最多 1 次，领取 3 把铁剑。不算正常纳贡，会刷新遗物机，但不会平息怒火。</p>
+    <details class="tribute-more"><summary>纳贡说明</summary>
+     <ul class="tribute-rules">
+      <li><strong>正常纳贡：</strong>选择价值达标的宝剑上交，获得至少 3 把铁剑和金币奖励，正常纳贡次数 +1。</li>
+      <li><strong>超额奖励：</strong>宝剑价值达到要求的 2、4、8、16 倍时，分别额外获得 1、2、3、4 把铁剑，以此类推。</li>
+      <li><strong>上供空气：</strong>没有达标宝剑时可选，获得 3 把铁剑，但不计正常纳贡；食铁兽会挥鞭抽打 3 下、没收遗物，累计第 2 次起还可能扣金币。</li>
+      <li><strong>广告纳贡：</strong>每自然日最多 1 次，完整观看广告后获得 3 把铁剑，也算正常纳贡，可增加平息怒火进度；不消耗宝剑。</li>
+      <li><strong>食铁兽怒火：</strong>累计上供空气 3 次后触发，普通锤击成功概率减半、受损概率增加；连续正常纳贡 5 次可平息，广告纳贡也计入，再次上供空气会中断连续进度。</li>
+      <li><strong>纳贡后刷新：</strong>以上三种纳贡均进入下一纳贡日，刷新遗物机并重置铁剑及广告刷新次数。</li>
+     </ul>
     </details>
    </div>
   </div>
@@ -125,6 +128,9 @@
  <h2 id="settings-title">设置</h2><div class="game-dialog-rule"></div>
  <div class="settings-content">
   <div class="settings-row"><div class="settings-row-text"><strong>游戏声音</strong><small>锻打、纳贡及场景音效</small></div><button id="settings-sound" class="sound-switch" type="button" role="switch" aria-label="游戏声音" aria-checked="true"><span id="settings-sound-state">开启</span><span class="sound-switch-track" aria-hidden="true"><span class="sound-switch-thumb"></span></span></button></div>
+  <button id="leaderboard-best" type="button" class="settings-row settings-link" hidden><span class="settings-row-text"><strong>最高价值宝剑榜</strong><small>看看谁锻造出了最贵的神兵</small></span><span aria-hidden="true">›</span></button>
+  <button id="leaderboard-monthly" type="button" class="settings-row settings-link" hidden><span class="settings-row-text"><strong>当月宝剑榜</strong><small>比拼本月收剑的最高价值</small></span><span aria-hidden="true">›</span></button>
+  <button id="leaderboard-tribute" type="button" class="settings-row settings-link" hidden><span class="settings-row-text"><strong>纳贡次数榜</strong><small>累计达标宝剑纳贡次数，不计空气纳贡</small></span><span aria-hidden="true">›</span></button>
   <button id="settings-guide" type="button" class="settings-row settings-link"><span class="settings-row-text"><strong>新手教程</strong><small>完整了解锻造、纳贡与遗物玩法</small></span><span class="settings-chevron" aria-hidden="true">›</span></button>
   <div class="settings-row settings-version"><span class="settings-row-text"><strong>游戏版本</strong><small id="settings-version"></small></span></div>
   <button id="settings-reset" type="button" class="settings-row settings-link settings-reset"><span class="settings-row-text"><strong>↺ 从头开始</strong><small>清空游戏进度，重新开始冒险</small></span><span class="settings-chevron" aria-hidden="true">›</span></button>
@@ -142,6 +148,7 @@
  <div class="game-dialog-actions single"><button id="guide-replay" class="dialog-button secondary" type="button">重新体验操作引导</button></div>
  <div class="game-dialog-actions single"><button id="guide-close" class="dialog-button secondary" type="button">返回设置</button></div>
 </dialog>
+
 </body></html>
 
 
