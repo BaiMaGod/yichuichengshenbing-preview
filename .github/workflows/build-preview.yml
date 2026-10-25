@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: BaiMaGod/yichuichengshenbing
-          ref: aa2e51269e79938200878975c825d54cad9f9d7c
+          ref: 23759e816d4bea513b8538044f2c688a4b89977d
           token: ${{ secrets.FORGE_SOURCE_TOKEN }}
           path: private-source
           persist-credentials: false
@@ -302,22 +302,22 @@ jobs:
       - name: Upload validated TapTap H5 package
         uses: actions/upload-artifact@v4
         with:
-          name: forge-taptap-h5-v0313
-          path: private-source/releases/forge-taptap-h5-v0.3.13.zip
+          name: forge-taptap-h5-v0314
+          path: private-source/releases/forge-taptap-h5-v0.3.14.zip
           if-no-files-found: error
           retention-days: 14
 
-      - name: Verify default TapTap sharing, cancel and duplicate revival callbacks
+      - name: Verify reviewed TapTap share template, cancel and duplicate revival callbacks
         working-directory: private-source
         env:
           QA_OUT: qa-evidence/share-revive
         run: node --experimental-strip-types qa/share-revive-review.mjs
 
-      - name: Upload default-share revival evidence
+      - name: Upload reviewed-template revival evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: share-native-error-v0312
+          name: reviewed-share-template-v0314
           path: private-source/qa-evidence/share-revive/
           if-no-files-found: warn
           retention-days: 7
@@ -529,7 +529,7 @@ jobs:
           release=root/'release.json'
           info=json.loads(release.read_text())
           info['sourceCommit']=sha
-          info['previewRelease']='v0.3.13-relic-restock'
+          info['previewRelease']='v0.3.14-reviewed-share-template'
           release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
           for forbidden in ['src','tests','node_modules','docs']:
             assert not (root/forbidden).exists(),'Public preview must not include private source: '+forbidden
@@ -545,7 +545,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Preview already matches the source build"
           else
-            git commit -m "deploy: wallet resource dialog and rewarded supplies"
+            git commit -m "deploy: approved sword revival share template"
             git push origin HEAD:main
           fi
 # Preview-only V4.2 release: tribute supply, no apprentice contracts, daily rewarded offerings.
