@@ -1,0 +1,113 @@
+name: Deploy approved sword sale pricing preview
+on:
+  push:
+    paths:
+      - '.github/workflows/deploy-sword-sale.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: forge-preview-release
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish-pricing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Require private source access
+        env:
+          SOURCE_TOKEN: ${{ secrets.FORGE_SOURCE_TOKEN }}
+        run: |
+          test -n "$SOURCE_TOKEN" || { echo "::error::Missing private source token"; exit 1; }
+      - name: Checkout public preview (compiled files only)
+        uses: actions/checkout@v4
+        with:
+          path: preview
+          persist-credentials: true
+      - name: Checkout approved private source commit
+        uses: actions/checkout@v4
+        with:
+          repository: BaiMaGod/yichuichengshenbing
+          ref: 2953a8e5f77dd3b40f4a201d64139bff20091c7f
+          token: ${{ secrets.FORGE_SOURCE_TOKEN }}
+          path: private-source
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: private-source/package-lock.json
+      - name: Install private dependencies
+        working-directory: private-source
+        run: npm ci --no-audit --no-fund
+      - name: Run complete game rule test suite
+        working-directory: private-source
+        run: npm test
+      - name: Build preview browser bundle
+        working-directory: private-source
+        run: npm run build
+      - name: Build supplemental preview galleries
+        working-directory: private-source
+        run: |
+          npm run build:sword-high-study
+          npm run build:sword-mythic-study
+          npm run build:sword-faithful-study
+          npm run build:sword-royal-study
+      - name: Install Chromium for sword sale browser regression
+        working-directory: private-source
+        run: npx playwright install chromium
+      - name: Verify merchant soft-knee prices, sword racks and tribute receipts
+        working-directory: private-source
+        env:
+          QA_OUT: qa-evidence/rack-tribute
+        run: node --experimental-strip-types qa/rack-tribute-review.mjs
+      - name: Validate public assets contain no source
+        run: |
+          test -f private-source/dist/index.html
+          test -f private-source/dist/release.json
+          test -f private-source/dist/sword-gallery.html
+          test -f private-source/dist/sword-high-study.html
+          test -f private-source/dist/sword-mythic-study.html
+          test -f private-source/dist/sword-faithful-study.html
+          test -f private-source/dist/sword-royal-study.html
+          test -d private-source/dist/assets
+          if find private-source/dist -type f \( -name '*.ts' -o -name '*.map' \) | grep -q .; then
+            echo "::error::Compiled bundle contains private source"
+            exit 1
+          fi
+      - name: Stage approved browser artifacts with exact source SHA
+        run: |
+          rsync -a private-source/dist/ preview/
+          python3 - <<'PY'
+          import pathlib, subprocess, json, re
+          root=pathlib.Path('preview')
+          sha=subprocess.check_output(['git','-C','private-source','rev-parse','HEAD'],text=True).strip()
+          assert sha=='2953a8e5f77dd3b40f4a201d64139bff20091c7f', 'Unexpected source revision'
+          html=(root/'index.html').read_text()
+          html=re.sub(r'<meta name="source-commit" content="[a-f0-9]{40}">','',html)
+          html=html.replace('<head>','<head>\n<meta name="source-commit" content="'+sha+'">',1)
+          (root/'index.html').write_text(html)
+          release=root/'release.json'
+          info=json.loads(release.read_text())
+          info['sourceCommit']=sha
+          info['previewRelease']='v0.3.16-sword-sale-soft-knee-20261025'
+          release.write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
+          for forbidden in ['src','tests','node_modules','docs']:
+              assert not (root/forbidden).exists(), 'Private content in preview: '+forbidden
+          print('Verified staged pricing release from',sha)
+          PY
+      - name: Commit and publish only compiled preview files
+        working-directory: preview
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sword-gallery.html sword-mythic-study.html sword-faithful-study.html sword-royal-study.html sword-high-study.html release.json assets art audio 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Compiled preview already matches source"
+          else
+            git commit -m "deploy: sword sale fourfold soft knee pricing"
+            git push origin HEAD:main
+          fi
