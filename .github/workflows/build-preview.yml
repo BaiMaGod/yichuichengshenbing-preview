@@ -302,8 +302,8 @@ jobs:
       - name: Upload validated TapTap H5 package
         uses: actions/upload-artifact@v4
         with:
-          name: forge-taptap-h5-v0314
-          path: private-source/releases/forge-taptap-h5-v0.3.14.zip
+          name: forge-taptap-h5-current
+          path: private-source/releases/forge-taptap-h5-*.zip
           if-no-files-found: error
           retention-days: 14
 
