@@ -13,3 +13,11 @@ License: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
 Edits: high-pass at 120 Hz, tail fade, MP3 encoding.
 
 These are independently licensed sounds. No audio was extracted from ForgeTax.
+
+Frenzy charging recordings
+
+frenzy-entry.mp3 and frenzy-extended.mp3: user-edited versions of charging power by JavierZumer.
+Source: https://freesound.org/people/JavierZumer/sounds/257229/
+License: CC BY 4.0 https://creativecommons.org/licenses/by/4.0/
+Edits: user-supplied entry and extension cuts. Uploaded MP3 bytes preserved unchanged, played at original speed and pitch.
+
