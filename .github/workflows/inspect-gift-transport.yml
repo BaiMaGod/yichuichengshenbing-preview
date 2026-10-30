@@ -1,0 +1,28 @@
+name: Inspect gift endpoint preflight only
+on:
+  push:
+    branches: [inspect-gift-transport-20261030]
+    paths: ['.github/workflows/inspect-gift-transport.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Read CORS preflight headers without redeeming any code
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, json
+          url='https://poster-api.xd.cn/api/v1.0/cdk/game/submit-simple'
+          for origin in ['https://www.taptap.cn','https://baiMaGod.github.io']:
+              request=urllib.request.Request(url,method='OPTIONS',headers={'Origin':origin,'Access-Control-Request-Method':'POST','Access-Control-Request-Headers':'content-type'})
+              try:
+                  with urllib.request.urlopen(request,timeout=20) as response:
+                      print(json.dumps({'origin':origin,'status':response.status,'headers':dict(response.headers)},ensure_ascii=False))
+              except urllib.error.HTTPError as error:
+                  print(json.dumps({'origin':origin,'status':error.code,'headers':dict(error.headers)},ensure_ascii=False))
+              except Exception as error:
+                  print(type(error).__name__,str(error))
+          PY
