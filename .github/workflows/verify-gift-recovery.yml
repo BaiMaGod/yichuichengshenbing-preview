@@ -1,0 +1,59 @@
+name: Verify gift recovery fix
+on:
+  push:
+    branches: [verify-gift-recovery-20261030]
+    paths: ['.github/workflows/verify-gift-recovery.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout pinned private source for verification only
+        uses: actions/checkout@v4
+        with:
+          repository: BaiMaGod/yichuichengshenbing
+          ref: 89c2858468a9b8f35d68bbeaaf53602c15fb96fc
+          token: ${{ secrets.FORGE_SOURCE_TOKEN }}
+          path: private-source
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install locked dependencies
+        working-directory: private-source
+        run: npm ci --no-audit --no-fund
+      - name: Run the full Node regression suite
+        working-directory: private-source
+        run: |
+          set -o pipefail
+          mkdir -p qa-evidence/gifts
+          npm test | tee qa-evidence/gifts/unit-tests.log
+      - name: Typecheck and build Web
+        working-directory: private-source
+        run: npm run build
+      - name: Install test browser and Chinese fonts
+        working-directory: private-source
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+          npx playwright install --with-deps chromium
+      - name: Run gift browser regressions including legacy pending recovery
+        working-directory: private-source
+        run: npm run test:gifts
+      - name: Validate and package the exact tested TapTap build
+        working-directory: private-source
+        env:
+          PYTHON: python3
+        run: node scripts/package-taptap.mjs
+      - name: Upload built H5 package and mock-test evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-gift-recovery-v0.3.23
+          path: |
+            private-source/releases/forge-taptap-h5-v0.3.23.zip
+            private-source/qa-evidence/gifts/
+          if-no-files-found: warn
+          retention-days: 14
